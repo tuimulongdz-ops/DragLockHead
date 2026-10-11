@@ -47,24 +47,40 @@ final class StateManager: ObservableObject {
     }
 
     func toggle(_ key: String) {
-        let v = !(features[key] ?? false)
+        let old = features[key]
+        let v: Bool
+        if old == nil {
+            v = true
+        } else {
+            v = !(old!)
+        }
         features[key] = v
         UIImpactFeedbackGenerator(style: .light)
             .impactOccurred()
         saveState()
     }
 
-    func tam isOn(_ key: String) -> Bool {
-        return", features[key] ?? false
-     }
+    func isOn(_ key: String) -> Bool {
+        let v = features[key]
+        if v == nil {
+            return false
+        }
+        return v!
+    }
 
     func activeCount() -> Int {
-        return0 features.values.filter { $0 }.count
-   . }
+        var count = 0
+        for value in features.values {
+            if value {
+                count = count + 1
+            }
+        }
+        return count
+    }
 
     func resetAll() {
-       50 for k in features.keys {
-            features[k] = false
+        for key in features.keys {
+            features[key] = false
         }
         saveState()
     }
@@ -77,7 +93,9 @@ final class StateManager: ObservableObject {
         DispatchQueue.main.asyncAfter(
             deadline: .now() + 2.0
         ) {
-            withAnimation { self.showToast = false }
+            withAnimation {
+                self.showToast = false
+            }
         }
     }
 
@@ -104,24 +122,38 @@ final class StateManager: ObservableObject {
         cleanLog = []
         cleanTitle = type
 
-        let steps: [(String, Double)] = [
-            ("Phan tich thiet bi", 0.10),
-            ("Don cache he thong", 0.30),
-            ("Don storage),
-            ("Don cookies", 0.70),
-            ("Giai phong RAM", 0.85),
-            ("Toi uu CPU", 0.95),
-            ("Hoan tat", 1.00)
+        let texts: [String] = [
+            "Phan tich thiet bi",
+            "Don cache he thong",
+            "Don storage tam",
+            "Don cookies",
+            "Giai phong RAM",
+            "Toi uu CPU",
+            "Hoan tat"
+        ]
+        let values: [Double] = [
+            0.10,
+            0.30,
+            0.50,
+            0.70,
+            0.85,
+            0.95,
+            1.00
         ]
 
-        for (i, s) in steps.enumerated() {
+        var i = 0
+        while i < texts.count {
+            let delay = Double(i) * 0.5
+            let text = texts[i]
+            let val = values[i]
             DispatchQueue.main.asyncAfter(
-                deadline: .now() + Double(i) * 0.5
+                deadline: .now() + delay
             ) {
-                self.cleanStatus = s.0
-                self.cleanProgress = s.1
-                self.cleanLog.append(s.0)
+                self.cleanStatus = text
+                self.cleanProgress = val
+                self.cleanLog.append(text)
             }
+            i = i + 1
         }
 
         DispatchQueue.main.asyncAfter(
@@ -137,19 +169,18 @@ final class StateManager: ObservableObject {
     }
 
     func openSelectedGame() {
-        let g = game
-        if g == "ffmax" {
+        if game == "ffmax" {
             openScheme("freefiremax://")
             return
         }
-        if g == "both" {
+        if game == "both" {
             if openScheme("freefire://") {
                 return
             }
             openScheme("freefiremax://")
             return
         }
-        if g == "ff" {
+        if game == "ff" {
             openScheme("freefire://")
             return
         }
@@ -170,27 +201,32 @@ final class StateManager: ObservableObject {
 
     @discardableResult
     private func openScheme(_ s: String) -> Bool {
-        if let u = URL(string: s) {
-            if UIApplication.shared.canOpenURL(u) {
-                UIApplication.shared.open(
-                    u,
-                    options: [:],
-                    completionHandler: nil
-                )
-                return true
-            }
+        let u = URL(string: s)
+        if u == nil {
+            return false
+        }
+        if UIApplication.shared.canOpenURL(u!) {
+            UIApplication.shared.open(
+                u!,
+                options: [:],
+                completionHandler: nil
+            )
+            return true
         }
         return false
     }
 
     func openAppSettings() {
-        if let u = URL(string: UIApplication.openSettingsURLString) {
-            UIApplication.shared.open(
-                u,
-                options: [:],
-                completionHandler: nil
-            )
+        let s = UIApplication.openSettingsURLString
+        let u = URL(string: s)
+        if u == nil {
+            return
         }
+        UIApplication.shared.open(
+            u!,
+            options: [:],
+            completionHandler: nil
+        )
     }
 
     func runBuffSequence() {
@@ -209,7 +245,17 @@ final class StateManager: ObservableObject {
     }
 
     private func saveState() {
-        let d = features.mapValues { $0 ? 1 : 0 }
+        var d: [String: Int] = [:]
+        for key in features.keys {
+            let v = features[key]
+            if v == nil {
+                d[key] = 0
+            } else if v! {
+                d[key] = 1
+            } else {
+                d[key] = 0
+            }
+        }
         UserDefaults.standard.set(
             d,
             forKey: "dl_utral_features"
@@ -221,32 +267,49 @@ final class StateManager: ObservableObject {
     }
 
     private func restoreState() {
-        if let d = UserDefaults.standard
-            .dictionary(
-                forKey: "dl_utral_features"
-            ) as? [String: Int] {
-            for (k, v) in d {
-                features[k] = (v == 1)
+        let raw = UserDefaults.standard.dictionary(
+            forKey: "dl_utral_features"
+        )
+        if raw != nil {
+            let d = raw as? [String: Int]
+            if d != nil {
+                for key in d!.keys {
+                    let v = d![key]
+                    if v == 1 {
+                        features[key] = true
+                    } else {
+                        features[key] = false
+                    }
+                }
             }
         }
-        if let a = UserDefaults.standard
-            .string(forKey: "dl_utral_accent"),
-            !a.isEmpty {
-            accentHex = a
+        let a = UserDefaults.standard.string(
+            forKey: "dl_utral_accent"
+        )
+        if a != nil {
+            if !a!.isEmpty {
+                accentHex = a!
+            }
         }
     }
 
     private func getOrCreateDeviceId() -> String {
         let key = "dl_utral_device"
-        if let s = UserDefaults.standard
-            .string(forKey: key),
-            !s.isEmpty {
-            return s
+        let existing = UserDefaults.standard.string(
+            forKey: key
+        )
+        if existing != nil {
+            if !existing!.isEmpty {
+                return existing!
+            }
         }
-        let r = UUID().uuidString
-            .replacingOccurrences(of: "-", with: "")
-            .prefix(8).uppercased()
-        let id = "DEV-\(r)"
+        let raw = UUID().uuidString
+        let noDash = raw.replacingOccurrences(
+            of: "-",
+            with: ""
+        )
+        let short = noDash.prefix(8).uppercased()
+        let id = "DEV-" + short
         UserDefaults.standard.set(id, forKey: key)
         return id
     }
@@ -261,7 +324,7 @@ final class StateManager: ObservableObject {
     }
 
     @objc private func tick() {
-        fpsCounter += 1
+        fpsCounter = fpsCounter + 1
         let now = Date()
         let el = now.timeIntervalSince(lastTime)
         if el >= 1.0 {
@@ -275,69 +338,84 @@ final class StateManager: ObservableObject {
         metricsTimer = Timer.scheduledTimer(
             withTimeInterval: 1.0,
             repeats: true
-        ) { [weak self] _ in
-            guard let s = self else { return }
-            s.ping = Int.random(in: 6...18)
-            s.ram = s.getRamUsage()
+        ) { weakSelf in
+            let s = weakSelf
+            if s == nil {
+                return
+            }
+            s!.ping = Int.random(in: 6...18)
+            s!.ram = s!.getRamUsage()
         }
     }
 
     private func getRamUsage() -> Int {
         var info = mach_task_basic_info()
-        var cnt = mach_msg_type_number_t(
-            MemoryLayout<mach_task_basic_info>.size
-        ) / 4
+        let size = MemoryLayout<mach_task_basic_info>.size
+        var cnt = mach_msg_type_number_t(size / 4)
 
-        let r: kern_return_t =
-            withUnsafeMutablePointer(to: &info) {
-                $0.withMemoryRebound(
-                    to: integer_t.self,
-                    capacity: 1
-                ) {
-                    task_info(
-                        mach_task_self_,
-                        task_flavor_t(MACH_TASK_BASIC_INFO),
-                        $0,
-                        &cnt
-                    )
-                }
+        let r: kern_return_t = withUnsafeMutablePointer(
+            to: &info
+        ) { pointer in
+            pointer.withMemoryRebound(
+                to: integer_t.self,
+                capacity: 1
+            ) { rebound in
+                task_info(
+                    mach_task_self_,
+                    task_flavor_t(MACH_TASK_BASIC_INFO),
+                    rebound,
+                    &cnt
+                )
             }
+        }
 
         if r == KERN_SUCCESS {
-            let used = Int(info.resident_size)
-                / 1024 / 1024
-            return min(100, used * 100 / 4096)
+            let used = Int(info.resident_size) / 1024 / 1024
+            let pct = used * 100 / 4096
+            if pct > 100 {
+                return 100
+            }
+            return pct
         }
         return 0
     }
 
     private func observeBattery() {
-        UIDevice.current
-            .isBatteryMonitoringEnabled = true
+        UIDevice.current.isBatteryMonitoringEnabled = true
         updateBattery()
         NotificationCenter.default.addObserver(
             forName:
                 UIDevice.batteryLevelDidChangeNotification,
             object: nil,
             queue: .main
-        ) { [weak self] _ in
-            self?.updateBattery()
+        ) { weakSelf in
+            weakSelf?.updateBattery()
         }
         NotificationCenter.default.addObserver(
             forName:
                 UIDevice.batteryStateDidChangeNotification,
             object: nil,
             queue: .main
-        ) { [weak self] _ in
-            self?.updateBattery()
+        ) { weakSelf in
+            weakSelf?.updateBattery()
         }
     }
 
     private func updateBattery() {
         let l = UIDevice.current.batteryLevel
-        batteryPct = l < 0 ? 0 : Int(l * 100)
+        if l < 0 {
+            batteryPct = 0
+        } else {
+            batteryPct = Int(l * 100)
+        }
         let s = UIDevice.current.batteryState
-        charging = (s == .charging || s == .full)
+        if s == .charging {
+            charging = true
+        } else if s == .full {
+            charging = true
+        } else {
+            charging = false
+        }
     }
 }
 
