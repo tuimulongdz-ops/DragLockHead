@@ -10,97 +10,34 @@ struct CodeSnippet: Identifiable {
 }
 
 struct CodeLibrary {
-
     static let snippets: [CodeSnippet] = [
-
         CodeSnippet(
-            name: "AIMLOCK C++",
-            icon: "1",
-            desc: "Khoa muc tieu tu dong",
-            language: "C++",
-            code: """
-// AIMLOCK - Native Plugin
-#include <cmath>
-
-struct Vector3 { float x, y, z; };
-
-class AimLock {
-public:
-  float range = 600.0f;
-  float strength = 1.2f;
-  float fov = 25.0f;
-
-  Vector3 FindClosest(
-    Vector3 cam,
-    Vector3 fwd,
-    Vector3* enemies,
-    int count
-  ) {
-    float best = 999999.0f;
-    Vector3 res = {0, 0, 0};
-    for (int i = 0; i < count; i++) {
-      Vector3 d = Norm(Sub(enemies[i], cam));
-      float a = Angle(fwd, d);
-      if (a > fov) continue;
-      float dist = Dist(cam, enemies[i]);
-      float s = dist + a * 2.0f;
-      if (s < best) {
-        best = s;
-        res = enemies[i];
-      }
-    }
-    return res;
-  }
-
-private:
-  Vector3 Sub(Vector3 a, Vector3 b) {
-    return {a.x-b.x, a.y-b.y, a.z-b.z};
-  }
-  Vector3 Norm(Vector3 v) {
-    float l = sqrt(v.x*v.x+v.y*v.y+v.z*v.z);
-    if (l == 0) return v;
-    return {v.x/l, v.y/l, v.z/l};
-  }
-  float Dist(Vector3 a, Vector3 b) {
-    Vector3 d = Sub(a, b);
-    return sqrt(d.x*d.x+d.y*d.y+d.z*d.z);
-  }
-  float Angle(Vector3 a, Vector3 b) {
-    float dot = a.x*b.x+a.y*b.y+a.z*b.z;
-    return acos(dot) * 57.2958f;
-  }
-};
-"""
-        ),
-
-        CodeSnippet(
-            name: "MICRO PULL JS",
-            icon: "2",
-            desc: "Nhe tam cam ung muot",
+            name: "NHẸ TÂM",
+            icon: "👆",
+            desc: "Micro pull chuẩn xác",
             language: "JavaScript",
             code: """
 // MICRO PULL - Touch Smooth
 (function() {
-  let lastX = 0;
-  let lastY = 0;
-  const SMOOTH = 0.85;
-  const THROTTLE = 8;
-  let lastTime = 0;
+  var lastX = 0, lastY = 0;
+  var SMOOTH = 0.85;
+  var THROTTLE = 8;
+  var lastTime = 0;
 
   document.addEventListener(
     'touchmove',
     function(e) {
-      const now = performance.now();
+      var now = performance.now();
       if (now - lastTime < THROTTLE) return;
       lastTime = now;
 
-      const t = e.touches[0];
+      var t = e.touches[0];
       if (!t) return;
 
-      lastX = lastX + (t.clientX - lastX) * SMOOTH;
-      lastY = lastY + (t.clientY - lastY) * SMOOTH;
+      lastX += (t.clientX - lastX) * SMOOTH;
+      lastY += (t.clientY - lastY) * SMOOTH;
 
-      const el = e.target;
+      var el = e.target;
       if (el && el.style) {
         el.style.transform =
           'translate(' + lastX + 'px,' +
@@ -112,41 +49,35 @@ private:
 })();
 """
         ),
-
         CodeSnippet(
-            name: "HEAD TRACK C#",
-            icon: "3",
-            desc: "Bam dau du doan",
+            name: "BÁM ĐẦU",
+            icon: "💀",
+            desc: "Head tracking dự đoán",
             language: "C#",
             code: """
 // HEAD TRACK - Unity C#
 using UnityEngine;
 
-public class HeadTrackAdvanced
-  : MonoBehaviour {
-
+public class HeadTrack : MonoBehaviour {
   public float range = 500f;
   public float speed = 12f;
   public float predictTime = 0.15f;
   public LayerMask enemyLayer;
 
-  private Transform head;
-  private Vector3 lastPos;
-  private Vector3 velocity;
-  private Camera cam;
+  Transform head;
+  Vector3 lastPos;
+  Vector3 velocity;
+  Camera cam;
 
-  void Start() {
-    cam = Camera.main;
-  }
+  void Start() { cam = Camera.main; }
 
   void Update() {
-    if (head == null) FindHead();
+    if (head == null) Find();
     if (head == null) return;
 
     Vector3 p = Predict(head.position);
-    Vector3 d = (
-      p - cam.transform.position
-    ).normalized;
+    Vector3 d = (p - cam.transform.position)
+      .normalized;
 
     cam.transform.rotation = Quaternion.Lerp(
       cam.transform.rotation,
@@ -155,116 +86,109 @@ public class HeadTrackAdvanced
     );
   }
 
-  void FindHead() {
+  void Find() {
     var hits = Physics.OverlapSphere(
       cam.transform.position,
       range,
       enemyLayer
     );
     float best = float.MaxValue;
-    Transform bestHead = null;
+    Transform bt = null;
 
     foreach (var h in hits) {
-      Transform t = FindBone(
-        h.transform,
-        "head"
-      );
+      var t = FindBone(h.transform, "head");
       if (t == null) continue;
       float d = Vector3.Distance(
         cam.transform.position,
         t.position
       );
-      if (d < best) {
-        best = d;
-        bestHead = t;
-      }
+      if (d < best) { best = d; bt = t; }
     }
-    head = bestHead;
+    head = bt;
   }
 
   Vector3 Predict(Vector3 cur) {
     float dt = Time.deltaTime;
-    if (dt > 0) {
+    if (dt > 0)
       velocity = (cur - lastPos) / dt;
-    }
     lastPos = cur;
     return cur + velocity * predictTime;
   }
 
-  Transform FindBone(
-    Transform root,
-    string name
-  ) {
+  Transform FindBone(Transform root, string n) {
     var list = root
       .GetComponentsInChildren<Transform>();
     foreach (Transform t in list) {
-      if (
-        t.name.ToLower().Contains(name)
-      ) return t;
+      if (t.name.ToLower().Contains(n))
+        return t;
     }
     return null;
   }
 }
 """
         ),
-
         CodeSnippet(
-            name: "TOUCH DELAY FIX",
-            icon: "4",
-            desc: "Khu tre cam ung iOS",
-            language: "Swift",
+            name: "DRAG AIM",
+            icon: "🎯",
+            desc: "Kéo aim theo ngón tay",
+            language: "C++",
             code: """
-// TOUCH DELAY FIX - Swift
-import UIKit
+// DRAG AIM - Native C++
+#include <cmath>
 
-class TouchOptimizer {
+struct Vec3 { float x, y, z; };
 
-  static func applyTo(_ view: UIView) {
-    view.isMultipleTouchEnabled = true
-    view.isExclusiveTouch = false
+class DragAim {
+public:
+  float pullRange = 200.0f;
+  float pullForce = 0.6f;
 
-    for sub in view.subviews {
-      sub.isUserInteractionEnabled = true
-      if let s = sub as? UIScrollView {
-        s.delaysContentTouches = false
-        s.canCancelContentTouches = true
-      }
-    }
+  Vec3 Update(
+    Vec3 aimDir,
+    Vec3 touchDir,
+    float dist
+  ) {
+    if (dist > pullRange) return aimDir;
+
+    float strength =
+      (1.0f - dist / pullRange)
+      * pullForce;
+
+    Vec3 result;
+    result.x = aimDir.x +
+      (touchDir.x - aimDir.x) * strength;
+    result.y = aimDir.y +
+      (touchDir.y - aimDir.y) * strength;
+    result.z = aimDir.z +
+      (touchDir.z - aimDir.z) * strength;
+
+    return Normalize(result);
   }
 
-  static func enable120Hz() {
-    if #available(iOS 15.0, *) {
-      let scenes =
-        UIApplication.shared.connectedScenes
-      for case let sc as UIWindowScene
-        in scenes {
-        sc.preferredFrameRateRange =
-          CAFrameRateRange(
-            minimum: 60,
-            maximum: 120,
-            preferred: 120
-          )
-      }
-    }
+private:
+  Vec3 Normalize(Vec3 v) {
+    float l = sqrt(
+      v.x*v.x + v.y*v.y + v.z*v.z
+    );
+    if (l == 0) return v;
+    return {v.x/l, v.y/l, v.z/l};
   }
-}
+};
 """
         ),
-
         CodeSnippet(
-            name: "AIM ASSIST C++",
-            icon: "5",
-            desc: "Keo muot + du doan",
+            name: "AIM ASSIST",
+            icon: "🌀",
+            desc: "Kéo mượt + dự đoán",
             language: "C++",
             code: """
 // AIM ASSIST - Native Engine
 #include <cmath>
-#include <algorithm>
 
 class AimAssist {
 private:
   float range = 600.0f;
-  float smooth = 0.08f;
+  float smoothness = 0.08f;
   float strength = 1.2f;
   float leadTime = 0.12f;
 
@@ -277,12 +201,11 @@ public:
   Target Calc(
     Target* enemies,
     int count,
-    float cx,
-    float cy,
-    float cz
+    float cx, float cy, float cz
   ) {
     Target best = {0,0,0,0,0,0};
     float bd = 999999.0f;
+
     for (int i = 0; i < count; i++) {
       float dx = enemies[i].x - cx;
       float dy = enemies[i].y - cy;
@@ -296,6 +219,7 @@ public:
         best = enemies[i];
       }
     }
+
     best.x += best.vx * leadTime;
     best.y += best.vy * leadTime;
     best.z += best.vz * leadTime;
@@ -303,65 +227,170 @@ public:
   }
 
   float Smooth(float c, float t) {
-    return c + (t - c) * smooth * strength;
+    return c + (t - c) * smoothness
+      * strength;
   }
 };
 """
         ),
-
         CodeSnippet(
-            name: "RECOIL FIX",
-            icon: "6",
-            desc: "Giam giat sung",
+            name: "PREDICTION",
+            icon: "🔮",
+            desc: "Dự đoán di chuyển địch",
             language: "C#",
             code: """
-// RECOIL FIX - Unity
+// PREDICTION - Unity
 using UnityEngine;
 
-public class RecoilFix
-  : MonoBehaviour {
+public class Prediction {
+  public float leadTime = 0.25f;
+  public float smooth = 6f;
+  public float maxPred = 8f;
 
-  public float comp = 0.8f;
-  public float recovery = 4f;
+  Vector3 smoothed;
+  Vector3 lastVel;
 
-  private Vector3 acc;
-  private Camera cam;
+  public Vector3 Get(
+    Transform target,
+    Rigidbody rb
+  ) {
+    if (rb == null)
+      return target.position;
 
-  void Start() {
-    cam = Camera.main;
-  }
+    Vector3 p = target.position
+      + rb.velocity * leadTime;
+    Vector3 d = p - target.position;
 
-  void LateUpdate() {
-    if (acc.magnitude > 0.001f) {
-      cam.transform.localRotation *=
-        Quaternion.Euler(-acc);
-      acc = Vector3.Lerp(
-        acc,
-        Vector3.zero,
-        Time.deltaTime * recovery
-      );
+    if (d.magnitude > maxPred) {
+      p = target.position
+        + d.normalized * maxPred;
     }
-  }
 
-  public void OnShoot() {
-    Vector3 r = new Vector3(
-      Random.Range(-0.5f, 0.5f),
-      Random.Range(0.5f, 1.5f),
-      0
-    ) * comp;
-    acc += r;
+    smoothed = Vector3.Lerp(
+      smoothed, p,
+      Time.deltaTime * smooth
+    );
+
+    lastVel = rb.velocity;
+    return smoothed;
   }
 }
 """
         ),
+        CodeSnippet(
+            name: "SMOOTH TARGET",
+            icon: "🌊",
+            desc: "Chuyển mục tiêu mượt",
+            language: "Swift",
+            code: """
+// SMOOTH TARGET - Swift
+import Foundation
+import simd
 
+class SmoothTarget {
+  var switchSpeed: Float = 8.0
+  var maxDelta: Float = 0.15
+  var holdTime: Float = 0.5
+
+  private var target: simd_float3?
+  private var smoothDir = simd_float3()
+  private var lastSwitch: Float = 0
+
+  func update(
+    targetPos: simd_float3,
+    currentPos: simd_float3,
+    dt: Float
+  ) -> simd_float3 {
+    let td = simd_normalize(
+      targetPos - currentPos
+    )
+    smoothDir = simd_slerp(
+      smoothDir, td,
+      dt * switchSpeed
+    )
+
+    let maxRad = maxDelta * 360.0 * dt
+    return simd_clamp(
+      smoothDir,
+      -maxRad, maxRad
+    )
+  }
+}
+"""
+        ),
+        CodeSnippet(
+            name: "AIM LOCK",
+            icon: "🔒",
+            desc: "Khóa mục tiêu tự động",
+            language: "C++",
+            code: """
+// AIM LOCK - Native
+#include <cmath>
+
+struct V3 { float x, y, z; };
+
+class AimLock {
+public:
+  float range = 600.0f;
+  float strength = 1.2f;
+  float fov = 25.0f;
+
+  V3 Find(
+    V3 cam,
+    V3 fwd,
+    V3* enemies,
+    int count
+  ) {
+    float best = 999999.0f;
+    V3 res = {0, 0, 0};
+
+    for (int i = 0; i < count; i++) {
+      V3 d = Norm(Sub(enemies[i], cam));
+      float a = Angle(fwd, d);
+      if (a > fov) continue;
+      float dist = Dist(cam, enemies[i]);
+      float s = dist + a * 2.0f;
+      if (s < best) {
+        best = s;
+        res = enemies[i];
+      }
+    }
+    return res;
+  }
+
+private:
+  V3 Sub(V3 a, V3 b) {
+    return {a.x-b.x, a.y-b.y, a.z-b.z};
+  }
+  V3 Norm(V3 v) {
+    float l = sqrt(
+      v.x*v.x + v.y*v.y + v.z*v.z
+    );
+    if (l == 0) return v;
+    return {v.x/l, v.y/l, v.z/l};
+  }
+  float Dist(V3 a, V3 b) {
+    V3 d = Sub(a, b);
+    return sqrt(
+      d.x*d.x + d.y*d.y + d.z*d.z
+    );
+  }
+  float Angle(V3 a, V3 b) {
+    float dot = a.x*b.x + a.y*b.y
+      + a.z*b.z;
+    return acos(dot) * 57.2958f;
+  }
+};
+"""
+        ),
         CodeSnippet(
             name: "TRIGGER BOT",
-            icon: "7",
-            desc: "Tu ban khi co target",
+            icon: "⚡",
+            desc: "Tự bắn khi có mục tiêu",
             language: "C++",
             code: """
 // TRIGGER BOT - Native
+#include <cmath>
 #include <chrono>
 
 class TriggerBot {
@@ -372,13 +401,9 @@ private:
     lastCheck;
 
 public:
-  bool ShouldFire(
-    float cx,
-    float cy,
-    float cz,
-    float fx,
-    float fy,
-    float fz,
+  bool Fire(
+    float cx, float cy, float cz,
+    float fx, float fy, float fz,
     float* enemies,
     int count
   ) {
@@ -414,102 +439,282 @@ public:
 };
 """
         ),
-
         CodeSnippet(
-            name: "PREDICTION",
-            icon: "8",
-            desc: "Du doan di chuyen",
+            name: "RECOIL FIX",
+            icon: "🎚️",
+            desc: "Giảm giật súng",
             language: "C#",
             code: """
-// PREDICTION - Unity
+// RECOIL FIX - Unity
 using UnityEngine;
 
-public class Prediction {
+public class RecoilFix
+  : MonoBehaviour {
+  public float comp = 0.8f;
+  public float recovery = 4f;
 
-  public float leadTime = 0.25f;
-  public float smooth = 6f;
-  public float maxPred = 8f;
+  Vector3 acc;
+  Camera cam;
 
-  private Vector3 smoothed;
-  private Vector3 lastVel;
+  void Start() { cam = Camera.main; }
 
-  public Vector3 Get(
-    Transform target,
-    Rigidbody rb
-  ) {
-    if (rb == null) {
-      return target.position;
+  void LateUpdate() {
+    if (acc.magnitude > 0.001f) {
+      cam.transform.localRotation *=
+        Quaternion.Euler(-acc);
+      acc = Vector3.Lerp(
+        acc, Vector3.zero,
+        Time.deltaTime * recovery
+      );
     }
+  }
 
-    Vector3 p =
-      target.position
-      + rb.velocity * leadTime;
-
-    Vector3 d = p - target.position;
-
-    if (d.magnitude > maxPred) {
-      p = target.position
-        + d.normalized * maxPred;
-    }
-
-    smoothed = Vector3.Lerp(
-      smoothed,
-      p,
-      Time.deltaTime * smooth
-    );
-
-    lastVel = rb.velocity;
-    return smoothed;
+  public void OnShoot() {
+    Vector3 r = new Vector3(
+      Random.Range(-0.5f, 0.5f),
+      Random.Range(0.5f, 1.5f),
+      0
+    ) * comp;
+    acc += r;
   }
 }
 """
         ),
-
         CodeSnippet(
-            name: "FPS BOOST",
-            icon: "9",
-            desc: "Toi uu hieu nang",
+            name: "NO SPREAD",
+            icon: "🎯",
+            desc: "Không tản mác đạn",
             language: "Swift",
             code: """
-// FPS BOOST - Swift
-import UIKit
-import QuartzCore
+// NO SPREAD - Swift
+import Foundation
+import simd
 
-class PerformanceBooster {
+class NoSpread {
+  var enabled = true
+  var multiplier: Float = 0.0
 
-  static func applyAll() {
-    enable120()
-    UIApplication.shared
-      .isIdleTimerDisabled = true
-    optimize()
-    URLCache.shared
-      .removeAllCachedResponses()
+  func apply(
+    spread: simd_float3
+  ) -> simd_float3 {
+    if !enabled { return spread }
+    return spread * multiplier
   }
 
-  private static func enable120() {
-    if #available(iOS 15.0, *) {
-      let scenes =
-        UIApplication.shared.connectedScenes
-      for case let sc as UIWindowScene
-        in scenes {
-        sc.preferredFrameRateRange =
-          CAFrameRateRange(
-            minimum: 60,
-            maximum: 120,
-            preferred: 120
-          )
+  func onShoot(
+    weaponRot: simd_quatf
+  ) -> simd_quatf {
+    // Reset weapon rotation về
+    // trạng thái chính xác
+    var r = weaponRot
+    r = simd_quatf(ix: 0, iy: 0,
+      iz: 0, r: 1)
+    return r
+  }
+}
+"""
+        ),
+        CodeSnippet(
+            name: "SILENT AIM",
+            icon: "🤫",
+            desc: "Ngắm không lộ",
+            language: "C++",
+            code: """
+// SILENT AIM - Native
+#include <cmath>
+
+class SilentAim {
+private:
+  float range = 600.0f;
+
+public:
+  struct Target {
+    float x, y, z;
+  };
+
+  // Trả về hướng aim thật
+  // nhưng không hiển thị trên
+  // màn hình user
+  Target GetSilentDir(
+    Target cam,
+    Target* enemies,
+    int count
+  ) {
+    Target best = {0, 0, 0};
+    float bd = 999999.0f;
+
+    for (int i = 0; i < count; i++) {
+      float dx = enemies[i].x - cam.x;
+      float dy = enemies[i].y - cam.y;
+      float dz = enemies[i].z - cam.z;
+      float d = sqrt(
+        dx*dx + dy*dy + dz*dz
+      );
+      if (d < bd) {
+        bd = d;
+        best = enemies[i];
       }
+    }
+    return best;
+  }
+};
+"""
+        ),
+        CodeSnippet(
+            name: "FLICK AIM",
+            icon: "💫",
+            desc: "Bật tâm tức thời",
+            language: "C++",
+            code: """
+// FLICK AIM - Native
+#include <cmath>
+#include <chrono>
+
+class FlickAim {
+private:
+  float speed = 25.0f;
+  float flickTime = 0.15f;
+  float startX = 0, startY = 0;
+  float targetX = 0, targetY = 0;
+  bool active = false;
+  std::chrono::steady_clock::time_point
+    start;
+
+public:
+  void Flick(float tx, float ty) {
+    targetX = tx;
+    targetY = ty;
+    start = std::chrono::steady_clock::now();
+    active = true;
+  }
+
+  bool Update(float& outX, float& outY) {
+    if (!active) return false;
+
+    auto now = std::chrono::steady_clock
+      ::now();
+    float dt = std::chrono::duration<float>(
+      now - start
+    ).count();
+    float t = dt / flickTime;
+    if (t >= 1.0f) {
+      active = false;
+      outX = targetX;
+      outY = targetY;
+      return false;
+    }
+
+    float ease = 1.0f - pow(1.0f - t, 3);
+    outX = startX +
+      (targetX - startX) * ease;
+    outY = startY +
+      (targetY - startY) * ease;
+    return true;
+  }
+};
+"""
+        ),
+        CodeSnippet(
+            name: "QUICK SCOPE",
+            icon: "🔭",
+            desc: "Ngắm nhanh scope",
+            language: "C#",
+            code: """
+// QUICK SCOPE - Unity
+using UnityEngine;
+
+public class QuickScope
+  : MonoBehaviour {
+
+  public float scopeTime = 0.15f;
+  float scopeStart;
+
+  public void OnScopePress() {
+    scopeStart = Time.time;
+  }
+
+  public bool IsScoped() {
+    return Time.time - scopeStart
+      < scopeTime;
+  }
+
+  public float ScopeProgress() {
+    return Mathf.Clamp01(
+      (Time.time - scopeStart)
+        / scopeTime
+    );
+  }
+}
+"""
+        ),
+        CodeSnippet(
+            name: "BURST LOCK",
+            icon: "🔥",
+            desc: "Khóa loạt đạn",
+            language: "C#",
+            code: """
+// BURST LOCK - Unity
+using UnityEngine;
+
+public class BurstLock
+  : MonoBehaviour {
+
+  public int burstCount = 3;
+  public float burstDelay = 0.08f;
+
+  int current;
+  float lastShot;
+
+  public bool OnShoot() {
+    if (Time.time - lastShot
+      < burstDelay) return false;
+
+    lastShot = Time.time;
+    current++;
+    if (current >= burstCount) {
+      current = 0;
+    }
+    return current > 0;
+  }
+
+  public bool IsLocked() {
+    return current > 0;
+  }
+}
+"""
+        ),
+        CodeSnippet(
+            name: "FAST SWAP",
+            icon: "⚡",
+            desc: "Đổi súng nhanh",
+            language: "C#",
+            code: """
+// FAST SWAP - Unity
+using UnityEngine;
+
+public class FastSwap
+  : MonoBehaviour {
+
+  public float swapDelay = 0.05f;
+  int currentSlot;
+  float lastSwap;
+
+  public void Swap(int slot) {
+    if (Time.time - lastSwap
+      < swapDelay) return;
+
+    lastSwap = Time.time;
+    currentSlot = slot;
+
+    var anim = GetComponent<Animator>();
+    if (anim != null) {
+      anim.speed = 100f;
+      anim.Play("SwitchWeapon", 0, 1f);
     }
   }
 
-  private static func optimize() {
-    guard let w = UIApplication
-      .shared.windows.first
-    else { return }
-    w.layer.shouldRasterize = true
-    w.layer.rasterizationScale =
-      UIScreen.main.scale
-    w.layer.drawsAsynchronously = true
+  public int CurrentSlot() {
+    return currentSlot;
   }
 }
 """
@@ -517,7 +722,6 @@ class PerformanceBooster {
     ]
 }
 
-// MARK: - LIBRARY VIEW
 struct CodeLibraryView: View {
 
     @State private var selected: CodeSnippet?
@@ -559,13 +763,14 @@ struct CodeLibraryView: View {
 
     private var searchBar: some View {
         HStack(spacing: 8) {
-            Image(systemName: "magnifyingglass")
-                .foregroundColor(
-                    Color(hex: "9ca3af")
-                )
-            TextField("Tim code...", text: $query)
-                .foregroundColor(.white)
-                .disableAutocorrection(true)
+            Text("🔍")
+                .font(.system(size: 14))
+            TextField(
+                "Tim code...",
+                text: $query
+            )
+            .foregroundColor(.white)
+            .disableAutocorrection(true)
         }
         .padding(.horizontal, 12)
         .padding(.vertical, 10)
@@ -585,7 +790,8 @@ struct CodeLibraryView: View {
     private var statsRow: some View {
         HStack(spacing: 8) {
             StatBox(
-                value: "\(CodeLibrary.snippets.count)",
+                value:
+                    "\(CodeLibrary.snippets.count)",
                 label: "SNIPPETS"
             )
             StatBox(value: "5", label: "NGON NGU")
@@ -669,9 +875,8 @@ struct CodeCard: View {
     private var iconView: some View {
         Text(snippet.icon)
             .font(
-                .system(size: 18, weight: .black)
+                .system(size: 20)
             )
-            .foregroundColor(.white)
             .frame(width: 42, height: 42)
             .background(
                 LinearGradient(
@@ -697,7 +902,10 @@ struct CodeCard: View {
     }
 
     private var textView: some View {
-        VStack(alignment: .leading, spacing: 2) {
+        VStack(
+            alignment: .leading,
+            spacing: 2
+        ) {
             Text(snippet.name)
                 .font(
                     .system(
@@ -733,11 +941,6 @@ struct CodeCard: View {
                         .opacity(0.2)
                 )
                 .cornerRadius(6)
-            Text("\(snippet.code.count)")
-                .font(.system(size: 8))
-                .foregroundColor(
-                    Color(hex: "9ca3af")
-                )
         }
     }
 }
@@ -754,31 +957,25 @@ struct CodeDetailView: View {
                 .ignoresSafeArea()
             VStack(spacing: 0) {
                 headerBar
-                Divider()
-                    .background(
-                        Color.white.opacity(0.1)
-                    )
+                divider
                 codeArea
-                Divider()
-                    .background(
-                        Color.white.opacity(0.1)
-                    )
+                divider
                 copyButton
             }
         }
     }
 
+    private var divider: some View {
+        Rectangle()
+            .fill(Color.white.opacity(0.1))
+            .frame(height: 1)
+    }
+
     private var headerBar: some View {
         HStack(spacing: 12) {
             Text(snippet.icon)
-                .font(
-                    .system(
-                        size: 20,
-                        weight: .black
-                    )
-                )
-                .foregroundColor(.white)
-                .frame(width: 40, height: 40)
+                .font(.system(size: 24))
+                .frame(width: 44, height: 44)
                 .background(
                     LinearGradient(
                         colors: [
@@ -818,10 +1015,10 @@ struct CodeDetailView: View {
             Spacer()
 
             Button(action: dismiss) {
-                Image(systemName: "xmark")
+                Text("✕")
                     .font(
                         .system(
-                            size: 14,
+                            size: 16,
                             weight: .bold
                         )
                     )
@@ -858,22 +1055,17 @@ struct CodeDetailView: View {
             maxWidth: .infinity,
             maxHeight: .infinity
         )
-        .background(
-            Color.black.opacity(0.6)
-        )
+        .background(Color.black.opacity(0.6))
     }
 
     private var copyButton: some View {
         Button(action: doCopy) {
             HStack(spacing: 8) {
-                Image(
-                    systemName: copied
-                        ? "checkmark.circle.fill"
-                        : "doc.on.doc.fill"
-                )
+                Text(copied ? "✓" : "📋")
+                    .font(.system(size: 14))
                 Text(
                     copied
-                        ? "DA COPY"
+                        ? "ĐÃ COPY"
                         : "COPY CODE"
                 )
                 .font(
