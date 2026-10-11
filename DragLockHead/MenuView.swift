@@ -2009,6 +2009,12 @@ struct InjectOverlay: View {
     @State private var dotCount: Int = 0
     @State private var pulse: Bool = false
 
+    private let dotTimer = Timer.publish(
+        every: 0.3,
+        on: .main,
+        in: .common
+    ).autoconnect()
+
     var body: some View {
         ZStack {
             Color.black.opacity(0.95)
@@ -2057,6 +2063,9 @@ struct InjectOverlay: View {
             .padding(20)
         }
         .onAppear(perform: start)
+        .onReceive(dotTimer) { _ in
+            dotCount = dotCount + 1
+        }
     }
 
     private var dots: String {
@@ -2239,15 +2248,6 @@ struct InjectOverlay: View {
         }
         withAnimation(.linear(duration: 2.8)) {
             progress = 1.0
-        }
-        Timer.scheduledTimer(
-            withTimeInterval: 0.3,
-            repeats: true
-        ) { [weak self] _ in
-            if self == nil {
-                return
-            }
-            self!.dotCount = self!.dotCount + 1
         }
     }
 }
