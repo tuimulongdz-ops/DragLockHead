@@ -66,7 +66,6 @@ struct KeyGateView: View {
                             .shadow(color: Theme.sea2.opacity(0.5), radius: 8)
                         Text("PREMIUM EDITION - v9.0")
                             .font(.system(size: 10, weight: .bold))
-                            .kerning(3)
                             .foregroundColor(Theme.smoke2)
                     }
 
@@ -77,7 +76,6 @@ struct KeyGateView: View {
                             Circle().fill(Theme.sea2).frame(width: 6, height: 6)
                             Text("KEY KICH HOAT")
                                 .font(.system(size: 11, weight: .heavy))
-                                .kerning(2)
                                 .foregroundColor(Theme.sea2)
                         }
 
@@ -107,7 +105,6 @@ struct KeyGateView: View {
                                 }
                                 Text(isLoading ? "DANG KIEM TRA..." : "KICH HOAT")
                                     .font(.system(size: 15, weight: .black))
-                                    .kerning(2)
                             }
                             .frame(maxWidth: .infinity)
                             .padding(.vertical, 17)
@@ -174,7 +171,6 @@ struct KeyGateView: View {
                             .font(.system(size: 9))
                         Text("POWERED BY ZWILZ HLONG 2026")
                             .font(.system(size: 9, weight: .bold))
-                            .kerning(2)
                     }
                     .foregroundColor(Color.white.opacity(0.3))
 
@@ -307,10 +303,11 @@ struct AnimatedBackground: View {
                 .offset(x: sin(phase) * 40, y: cos(phase) * 40)
 
             RadialGradient(
-                gradient: Gradient(colors: [Theme.red1.opacity(0.28), .clear]),
-                center: .bottomTrailing,
-                startRadius: 0,
-                endRadius: 500)
+                gradient: Gradient(colors: [Theme.red1.opacity()
+(0.28), .clear]),
+                center: .bottomTra               iling,
+                startRadius: 0 Hud,
+                endRadius: Row500)
                 .offset(x: cos(phase) * 40, y: sin(phase) * 40)
 
             RadialGradient(
