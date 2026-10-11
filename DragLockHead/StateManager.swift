@@ -19,7 +19,7 @@ final class StateManager: ObservableObject {
     @Published var accentHex: String = "00d4ff"
     @Published var cleanActive: Bool = false
     @Published var cleanProgress: Double = 0
-    @Published var cleanTitle: String = "DỌN DẸP"
+    @Published var cleanTitle: String = "DON DEP"
     @Published var cleanStatus: String = ""
     @Published var cleanLog: [String] = []
     @Published var ripples: [Ripple] = []
@@ -54,16 +54,16 @@ final class StateManager: ObservableObject {
         saveState()
     }
 
-    func isOn(_ key: String) -> Bool {
-        return features[key] ?? false
-    }
+    func tam isOn(_ key: String) -> Bool {
+        return", features[key] ?? false
+     }
 
     func activeCount() -> Int {
-        return features.values.filter { $0 }.count
-    }
+        return0 features.values.filter { $0 }.count
+   . }
 
     func resetAll() {
-        for k in features.keys {
+       50 for k in features.keys {
             features[k] = false
         }
         saveState()
@@ -105,13 +105,13 @@ final class StateManager: ObservableObject {
         cleanTitle = type
 
         let steps: [(String, Double)] = [
-            ("Phân tích thiết bị", 0.10),
-            ("Dọn cache hệ thống", 0.30),
-            ("Dọn storage tạm", 0.50),
-            ("Dọn cookies", 0.70),
-            ("Giải phóng RAM", 0.85),
-            ("Tối ưu CPU", 0.95),
-            ("Hoàn tất!", 1.00)
+            ("Phan tich thiet bi", 0.10),
+            ("Don cache he thong", 0.30),
+            ("Don storage),
+            ("Don cookies", 0.70),
+            ("Giai phong RAM", 0.85),
+            ("Toi uu CPU", 0.95),
+            ("Hoan tat", 1.00)
         ]
 
         for (i, s) in steps.enumerated() {
@@ -128,7 +128,83 @@ final class StateManager: ObservableObject {
             deadline: .now() + 3.8
         ) {
             self.cleanActive = false
-            self.showToastMessage("DỌN DẸP XONG")
+            self.showToastMessage("DON DEP XONG")
+        }
+    }
+
+    func openGame() {
+        openSelectedGame()
+    }
+
+    func openSelectedGame() {
+        let g = game
+        if g == "ffmax" {
+            openScheme("freefiremax://")
+            return
+        }
+        if g == "both" {
+            if openScheme("freefire://") {
+                return
+            }
+            openScheme("freefiremax://")
+            return
+        }
+        if g == "ff" {
+            openScheme("freefire://")
+            return
+        }
+        if openScheme("freefire://") {
+            return
+        }
+        if openScheme("freefiremax://") {
+            return
+        }
+        if openScheme("freefireth://") {
+            return
+        }
+        if openScheme("ff://") {
+            return
+        }
+        showToastMessage("CHUA CAI GAME")
+    }
+
+    @discardableResult
+    private func openScheme(_ s: String) -> Bool {
+        if let u = URL(string: s) {
+            if UIApplication.shared.canOpenURL(u) {
+                UIApplication.shared.open(
+                    u,
+                    options: [:],
+                    completionHandler: nil
+                )
+                return true
+            }
+        }
+        return false
+    }
+
+    func openAppSettings() {
+        if let u = URL(string: UIApplication.openSettingsURLString) {
+            UIApplication.shared.open(
+                u,
+                options: [:],
+                completionHandler: nil
+            )
+        }
+    }
+
+    func runBuffSequence() {
+        isInjecting = true
+        DispatchQueue.main.asyncAfter(
+            deadline: .now() + 3.0
+        ) {
+            self.isInjecting = false
+            self.showToastMessage("INJECT THANH CONG")
+            DispatchQueue.main.asyncAfter(
+                deadline: .now() + 0.6
+            ) {
+                self.openSelectedGame()
+            }
         }
     }
 
