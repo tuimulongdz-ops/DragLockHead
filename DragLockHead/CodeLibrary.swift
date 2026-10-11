@@ -444,7 +444,6 @@ struct StatBox: View {
                 .foregroundColor(Theme.sea2)
             Text(label)
                 .font(.system(size: 8, weight: .heavy))
-                .kerning(1.2)
                 .foregroundColor(Theme.smoke2)
         }
         .frame(maxWidth: .infinity)
@@ -489,7 +488,6 @@ struct CodeCard: View {
                 VStack(spacing: 2) {
                     Text(snippet.language)
                         .font(.system(size: 9, weight: .heavy))
-                        .kerning(1)
                         .foregroundColor(Theme.sea2)
                         .padding(.horizontal, 8)
                         .padding(.vertical, 4)
@@ -539,7 +537,6 @@ struct CodeDetailView: View {
                             .foregroundColor(.white)
                         Text(snippet.language)
                             .font(.system(size: 10, weight: .heavy))
-                            .kerning(1.5)
                             .foregroundColor(Theme.sea2)
                     }
 
@@ -581,7 +578,6 @@ struct CodeDetailView: View {
                         Text(copied ? "DA COPY" : "COPY CODE")
                     }
                     .font(.system(size: 13, weight: .black))
-                    .kerning(1)
                     .foregroundColor(.white)
                     .frame(maxWidth: .infinity)
                     .padding(.vertical, 15)
