@@ -1,8 +1,8 @@
-// Nhúng HTML vào WKWebView toàn màn hình
 import UIKit
 import WebKit
 
 final class ViewController: UIViewController, WKNavigationDelegate, WKUIDelegate {
+
     private var webView: WKWebView!
 
     override func viewDidLoad() {
@@ -11,18 +11,19 @@ final class ViewController: UIViewController, WKNavigationDelegate, WKUIDelegate
         setupWebView()
         loadHTML()
     }
+
     override var prefersStatusBarHidden: Bool { return true }
     override var supportedInterfaceOrientations: UIInterfaceOrientationMask { return .portrait }
 
     private func setupWebView() {
-        let c = WKWebViewConfiguration()
-        c.allowsInlineMediaPlayback = true
-        c.mediaTypesRequiringUserActionForPlayback = []
-        c.preferences.javaScriptEnabled = true
-        c.preferences.setValue(true, forKey: "allowFileAccessFromFileURLs")
-        c.preferences.setValue(true, forKey: "allowUniversalAccessFromFileURLs")
+        let config = WKWebViewConfiguration()
+        config.allowsInlineMediaPlayback = true
+        config.mediaTypesRequiringUserActionForPlayback = []
+        config.preferences.javaScriptEnabled = true
+        config.preferences.setValue(true, forKey: "allowFileAccessFromFileURLs")
+        config.preferences.setValue(true, forKey: "allowUniversalAccessFromFileURLs")
 
-        webView = WKWebView(frame: .zero, configuration: c)
+        webView = WKWebView(frame: .zero, configuration: config)
         webView.navigationDelegate = self
         webView.uiDelegate = self
         webView.scrollView.bounces = false
@@ -30,6 +31,7 @@ final class ViewController: UIViewController, WKNavigationDelegate, WKUIDelegate
         webView.scrollView.contentInsetAdjustmentBehavior = .never
         webView.translatesAutoresizingMaskIntoConstraints = false
         view.addSubview(webView)
+
         NSLayoutConstraint.activate([
             webView.topAnchor.constraint(equalTo: view.topAnchor),
             webView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
@@ -39,8 +41,13 @@ final class ViewController: UIViewController, WKNavigationDelegate, WKUIDelegate
     }
 
     private func loadHTML() {
-        guard let u = Bundle.main.url(forResource: "index", withExtension: "html", subdirectory: "web") else { return }
-        webView.loadFileURL(u, allowingReadAccessTo: u.deletingLastPathComponent())
+        guard let url = Bundle.main.url(forResource: "index",
+                                        withExtension: "html",
+                                        subdirectory: "web") else {
+            print("[ERR] index.html không tìm thấy")
+            return
+        }
+        webView.loadFileURL(url, allowingReadAccessTo: url.deletingLastPathComponent())
     }
 
     func webView(_ webView: WKWebView,
