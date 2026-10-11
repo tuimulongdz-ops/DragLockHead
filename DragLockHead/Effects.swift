@@ -1,6 +1,5 @@
 import SwiftUI
 
-// MARK: - 1. FLOATING PARTICLES
 struct FloatingParticles: View {
     @State private var items: [FP] = []
     @State private var tick: Double = 0
@@ -12,37 +11,30 @@ struct FloatingParticles: View {
         let y: Double
         let r: Double
         let delay: Double
-        let opacity: Double
+        let op: Double
     }
 
     var body: some View {
-        GeometryReader { geo in
+        GeometryReader { g in
             ZStack {
                 ForEach(items) { p in
                     Circle()
                         .fill(color)
-                        .frame(
-                            width: p.r,
-                            height: p.r
-                        )
+                        .frame(width: p.r, height: p.r)
                         .position(
-                            x: p.x * geo.size.width
-                                + sin(tick + p.delay)
-                                * 30,
-                            y: p.y * geo.size.height
-                                + cos(tick + p.delay)
-                                * 30
+                            x: p.x * g.size.width
+                                + sin(tick + p.delay) * 30,
+                            y: p.y * g.size.height
+                                + cos(tick + p.delay) * 30
                         )
-                        .opacity(p.opacity)
+                        .opacity(p.op)
                 }
             }
             .onAppear {
                 build()
                 withAnimation(
                     .linear(duration: 10)
-                        .repeatForever(
-                            autoreverses: true
-                        )
+                        .repeatForever(autoreverses: true)
                 ) {
                     tick = .pi * 2
                 }
@@ -52,23 +44,20 @@ struct FloatingParticles: View {
     }
 
     private func build() {
-        var arr: [FP] = []
+        var a: [FP] = []
         for _ in 0..<50 {
-            arr.append(FP(
+            a.append(FP(
                 x: Double.random(in: 0...1),
                 y: Double.random(in: 0...1),
                 r: Double.random(in: 2...6),
                 delay: Double.random(in: 0...6),
-                opacity: Double.random(
-                    in: 0.3...0.7
-                )
+                op: Double.random(in: 0.3...0.7)
             ))
         }
-        items = arr
+        items = a
     }
 }
 
-// MARK: - 2. GRID PULSE
 struct GridPulse: View {
     @State private var op: Double = 0.10
     let color: Color
@@ -94,9 +83,7 @@ struct GridPulse: View {
         .onAppear {
             withAnimation(
                 .easeInOut(duration: 3)
-                    .repeatForever(
-                        autoreverses: true
-                    )
+                    .repeatForever(autoreverses: true)
             ) {
                 op = 0.22
             }
@@ -104,7 +91,6 @@ struct GridPulse: View {
     }
 }
 
-// MARK: - 3. AURORA ROTATE
 struct AuroraRotate: View {
     @State private var angle: Double = 0
     let color1: Color
@@ -114,15 +100,13 @@ struct AuroraRotate: View {
         Rectangle()
             .fill(
                 AngularGradient(
-                    gradient: Gradient(
-                        colors: [
-                            color1.opacity(0.15),
-                            color2.opacity(0.10),
-                            color1.opacity(0.05),
-                            color2.opacity(0.15),
-                            color1.opacity(0.15)
-                        ]
-                    ),
+                    gradient: Gradient(colors: [
+                        color1.opacity(0.15),
+                        color2.opacity(0.10),
+                        color1.opacity(0.05),
+                        color2.opacity(0.15),
+                        color1.opacity(0.15)
+                    ]),
                     center: .center
                 )
             )
@@ -131,9 +115,7 @@ struct AuroraRotate: View {
             .onAppear {
                 withAnimation(
                     .linear(duration: 30)
-                        .repeatForever(
-                            autoreverses: false
-                        )
+                        .repeatForever(autoreverses: false)
                 ) {
                     angle = 360
                 }
@@ -141,7 +123,6 @@ struct AuroraRotate: View {
     }
 }
 
-// MARK: - 4. NEBULA CLOUDS
 struct NebulaClouds: View {
     @State private var ph: Double = 0
     let color1: Color
@@ -156,9 +137,7 @@ struct NebulaClouds: View {
         .onAppear {
             withAnimation(
                 .easeInOut(duration: 18)
-                    .repeatForever(
-                        autoreverses: true
-                    )
+                    .repeatForever(autoreverses: true)
             ) {
                 ph = .pi * 2
             }
@@ -173,12 +152,10 @@ struct NebulaClouds: View {
         Circle()
             .fill(
                 RadialGradient(
-                    gradient: Gradient(
-                        colors: [
-                            c.opacity(0.25),
-                            .clear
-                        ]
-                    ),
+                    gradient: Gradient(colors: [
+                        c.opacity(0.25),
+                        .clear
+                    ]),
                     center: .center,
                     startRadius: 0,
                     endRadius: 250
@@ -192,7 +169,6 @@ struct NebulaClouds: View {
     }
 }
 
-// MARK: - 5. SHOOTING STARS
 struct ShootingStars: View {
     @State private var fly: Bool = false
     let color: Color
@@ -200,22 +176,20 @@ struct ShootingStars: View {
     var body: some View {
         ZStack {
             ForEach(0..<3, id: \.self) { i in
-                star(i: i)
+                star(i)
             }
         }
         .onAppear {
             withAnimation(
                 .linear(duration: 3)
-                    .repeatForever(
-                        autoreverses: false
-                    )
+                    .repeatForever(autoreverses: false)
             ) {
                 fly = true
             }
         }
     }
 
-    private func star(i: Int) -> some View {
+    private func star(_ i: Int) -> some View {
         let sx = Double(i) * 150 - 150
         let sy = Double(i) * 200 - 200
         return Capsule()
@@ -239,20 +213,15 @@ struct ShootingStars: View {
     }
 }
 
-// MARK: - 6. PULSE RINGS
 struct PulseRings: View {
     let color: Color
 
     var body: some View {
         ZStack {
-            ring(0.0)
-            ring(0.8)
-            ring(1.6)
+            PulseRing(color: color, delay: 0.0)
+            PulseRing(color: color, delay: 0.8)
+            PulseRing(color: color, delay: 1.6)
         }
-    }
-
-    private func ring(_ delay: Double) -> some View {
-        PulseRing(color: color, delay: delay)
     }
 }
 
@@ -282,9 +251,7 @@ struct PulseRing: View {
             .onAppear {
                 withAnimation(
                     .easeOut(duration: 3)
-                        .repeatForever(
-                            autoreverses: false
-                        )
+                        .repeatForever(autoreverses: false)
                         .delay(delay)
                 ) {
                     expand = true
@@ -293,7 +260,6 @@ struct PulseRing: View {
     }
 }
 
-// MARK: - 7. ORBIT DOTS
 struct OrbitDots: View {
     @State private var angle: Double = 0
     let color1: Color
@@ -308,9 +274,7 @@ struct OrbitDots: View {
         .onAppear {
             withAnimation(
                 .linear(duration: 12)
-                    .repeatForever(
-                        autoreverses: false
-                    )
+                    .repeatForever(autoreverses: false)
             ) {
                 angle = 360
             }
@@ -336,7 +300,6 @@ struct OrbitDots: View {
     }
 }
 
-// MARK: - 8. TAP RIPPLE LAYER
 struct TapRippleLayer: View {
     let ripples: [Ripple]
 
@@ -356,7 +319,7 @@ struct TapRippleLayer: View {
 struct RippleCircle: View {
     let color: Color
     @State private var scale: CGFloat = 0.2
-    @State private var opacity: Double = 0.9
+    @State private var op: Double = 0.9
 
     var body: some View {
         ZStack {
@@ -364,26 +327,24 @@ struct RippleCircle: View {
                 .stroke(color, lineWidth: 3)
                 .frame(width: 60, height: 60)
                 .scaleEffect(scale)
-                .opacity(opacity)
-
+                .opacity(op)
             Circle()
                 .stroke(color, lineWidth: 1.5)
                 .frame(width: 60, height: 60)
                 .scaleEffect(scale * 0.6)
-                .opacity(opacity * 0.6)
+                .opacity(op * 0.6)
         }
         .onAppear {
             withAnimation(
                 .easeOut(duration: 0.7)
             ) {
                 scale = 6
-                opacity = 0
+                op = 0
             }
         }
     }
 }
 
-// MARK: - 9. CLEAN OVERLAY
 struct CleanOverlay: View {
     @ObservedObject var state: StateManager
 
@@ -391,11 +352,19 @@ struct CleanOverlay: View {
         ZStack {
             Color.black.opacity(0.92)
                 .ignoresSafeArea()
-
             VStack(spacing: 22) {
                 ringView
-                titleText
-                statusText
+                Text(state.cleanTitle)
+                    .font(.system(
+                        size: 14,
+                        weight: .black))
+                    .foregroundColor(.white)
+                Text(state.cleanStatus)
+                    .font(.system(
+                        size: 12,
+                        weight: .heavy))
+                    .foregroundColor(
+                        Color(hex: "9ca3af"))
                 progressBar
                 logView
             }
@@ -408,15 +377,12 @@ struct CleanOverlay: View {
             Circle()
                 .stroke(
                     state.accentColor.opacity(0.2),
-                    lineWidth: 6
-                )
+                    lineWidth: 6)
                 .frame(width: 120, height: 120)
-
             Circle()
                 .trim(
                     from: 0,
-                    to: state.cleanProgress
-                )
+                    to: state.cleanProgress)
                 .stroke(
                     LinearGradient(
                         colors: [
@@ -424,65 +390,30 @@ struct CleanOverlay: View {
                             Color(hex: "ff0033")
                         ],
                         startPoint: .topLeading,
-                        endPoint: .bottomTrailing
-                    ),
+                        endPoint: .bottomTrailing),
                     style: StrokeStyle(
                         lineWidth: 6,
-                        lineCap: .round
-                    )
+                        lineCap: .round)
                 )
                 .frame(width: 120, height: 120)
                 .rotationEffect(.degrees(-90))
-
-            Text(
-                "\(Int(state.cleanProgress * 100))%"
-            )
-            .font(
-                .system(
+            Text("\(Int(state.cleanProgress * 100))%")
+                .font(.system(
                     size: 22,
                     weight: .black,
-                    design: .monospaced
-                )
-            )
-            .foregroundColor(state.accentColor)
+                    design: .monospaced))
+                .foregroundColor(state.accentColor)
         }
         .shadow(
             color: state.accentColor.opacity(0.6),
-            radius: 20
-        )
-    }
-
-    private var titleText: some View {
-        Text(state.cleanTitle)
-            .font(
-                .system(
-                    size: 14,
-                    weight: .black
-                )
-            )
-            .foregroundColor(.white)
-    }
-
-    private var statusText: some View {
-        Text(state.cleanStatus)
-            .font(
-                .system(
-                    size: 12,
-                    weight: .heavy
-                )
-            )
-            .foregroundColor(
-                Color(hex: "9ca3af")
-            )
+            radius: 20)
     }
 
     private var progressBar: some View {
-        GeometryReader { geo in
+        GeometryReader { g in
             ZStack(alignment: .leading) {
                 Capsule()
-                    .fill(
-                        Color.white.opacity(0.1)
-                    )
+                    .fill(Color.white.opacity(0.1))
                 Capsule()
                     .fill(
                         LinearGradient(
@@ -491,14 +422,11 @@ struct CleanOverlay: View {
                                 Color(hex: "ff0033")
                             ],
                             startPoint: .leading,
-                            endPoint: .trailing
-                        )
+                            endPoint: .trailing)
                     )
                     .frame(
-                        width: geo.size.width
-                            * CGFloat(
-                                state.cleanProgress
-                            )
+                        width: g.size.width
+                            * CGFloat(state.cleanProgress)
                     )
             }
         }
@@ -507,39 +435,32 @@ struct CleanOverlay: View {
     }
 
     private var logView: some View {
-        VStack(alignment: .leading, spacing: 4) {
+        VStack(
+            alignment: .leading,
+            spacing: 4
+        ) {
             ForEach(
-                Array(
-                    state.cleanLog.suffix(5)
-                ),
+                Array(state.cleanLog.suffix(5)),
                 id: \.self
             ) { line in
                 HStack(spacing: 6) {
                     Text(">")
                         .foregroundColor(
-                            state.accentColor
-                        )
+                            state.accentColor)
                     Text(line)
                         .foregroundColor(
-                            Color(hex: "9ca3af")
-                        )
+                            Color(hex: "9ca3af"))
                 }
-                .font(
-                    .system(
-                        size: 10,
-                        design: .monospaced
-                    )
-                )
+                .font(.system(
+                    size: 10,
+                    design: .monospaced))
             }
         }
         .frame(
             maxWidth: .infinity,
-            alignment: .leading
-        )
+            alignment: .leading)
         .padding(14)
-        .background(
-            Color.black.opacity(0.6)
-        )
+        .background(Color.black.opacity(0.6))
         .cornerRadius(12)
     }
 }
