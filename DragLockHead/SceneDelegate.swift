@@ -1,4 +1,5 @@
 import UIKit
+import SwiftUI
 
 class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     var window: UIWindow?
@@ -7,10 +8,10 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
                willConnectTo session: UISceneSession,
                options connectionOptions: UIScene.ConnectionOptions) {
         guard let windowScene = (scene as? UIWindowScene) else { return }
-        let w = UIWindow(windowScene: windowScene)
-        w.rootViewController = ViewController()
-        w.backgroundColor = .black
-        self.window = w
-        w.makeKeyAndVisible()
+        let window = UIWindow(windowScene: windowScene)
+        window.rootViewController = UIHostingController(rootView: MenuView())
+        window.backgroundColor = .black
+        self.window = window
+        window.makeKeyAndVisible()
     }
 }
