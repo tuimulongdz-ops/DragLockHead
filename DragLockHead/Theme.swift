@@ -13,6 +13,8 @@ struct Theme {
     static let yellow = Color(hex: "fbbf24")
     static let purple = Color(hex: "a855f7")
     static let cyan = Color(hex: "00ffff")
+    static let pink = Color(hex: "ff00aa")
+    static let orange = Color(hex: "ff6b00")
 
     static let accents: [(String, String)] = [
         ("CYBER", "00d4ff"),
@@ -26,7 +28,15 @@ struct Theme {
         ("VOID", "a855f7"),
         ("RETRO", "ff00aa"),
         ("OCEAN", "1e90ff"),
-        ("FOREST", "22c55e")
+        ("FOREST", "22c55e"),
+        ("EMBER", "ff4500"),
+        ("LAVA", "ff2200"),
+        ("SKY", "87ceeb"),
+        ("MINT", "3eb489"),
+        ("PLASMA", "ff10f0"),
+        ("COSMIC", "7b2ff7"),
+        ("ROSE", "ff6699"),
+        ("SHADOW", "4a5568")
     ]
 }
 
