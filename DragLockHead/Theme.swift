@@ -13,36 +13,62 @@ struct Theme {
     static let yellow = Color(hex: "fbbf24")
     static let purple = Color(hex: "a855f7")
     static let cyan = Color(hex: "00ffff")
+
+    static let accentOptions: [(String, String)] = [
+        ("CYBER", "00d4ff"),
+        ("MATRIX", "00ff41"),
+        ("BLOOD", "ff0033"),
+        ("GOLD", "ffcc00"),
+        ("ICE", "00ffff"),
+        ("NEON", "ff00ff"),
+        ("SUNSET", "ff6b00"),
+        ("TOXIC", "aaff00"),
+        ("VOID", "a855f7"),
+        ("RETRO", "ff00aa"),
+        ("OCEAN", "1e90ff"),
+        ("FOREST", "22c55e")
+    ]
 }
 
 extension Color {
     init(hex: String) {
-        let clean = hex.trimmingCharacters(in: CharacterSet.alphanumerics.inverted)
-        var int: UInt64 = 0
-        Scanner(string: clean).scanHexInt64(&int)
+        let c = hex.trimmingCharacters(
+            in: CharacterSet.alphanumerics.inverted
+        )
+        var i: UInt64 = 0
+        Scanner(string: c).scanHexInt64(&i)
         let a, r, g, b: UInt64
-        switch clean.count {
+        switch c.count {
         case 3:
-            (a, r, g, b) = (255, (int >> 8) * 17, (int >> 4 & 0xF) * 17, (int & 0xF) * 17)
+            (a, r, g, b) = (
+                255,
+                (i >> 8) * 17,
+                (i >> 4 & 0xF) * 17,
+                (i & 0xF) * 17
+            )
         case 6:
-            (a, r, g, b) = (255, int >> 16, int >> 8 & 0xFF, int & 0xFF)
+            (a, r, g, b) = (
+                255,
+                i >> 16,
+                i >> 8 & 0xFF,
+                i & 0xFF
+            )
         case 8:
-            (a, r, g, b) = (int >> 24, int >> 16 & 0xFF, int >> 8 & 0xFF, int & 0xFF)
+            (a, r, g, b) = (
+                i >> 24,
+                i >> 16 & 0xFF,
+                i >> 8 & 0xFF,
+                i & 0xFF
+            )
         default:
             (a, r, g, b) = (255, 0, 0, 0)
         }
-        self.init(.sRGB,
-                  red: Double(r) / 255,
-                  green: Double(g) / 255,
-                  blue: Double(b) / 255,
-                  opacity: Double(a) / 255)
-    }
-}
-
-struct GradientButtonStyle: ButtonStyle {
-    func makeBody(configuration: Configuration) -> some View {
-        configuration.label
-            .scaleEffect(configuration.isPressed ? 0.97 : 1.0)
-            .animation(.spring(response: 0.25, dampingFraction: 0.7), value: configuration.isPressed)
+        self.init(
+            .sRGB,
+            red: Double(r) / 255,
+            green: Double(g) / 255,
+            blue: Double(b) / 255,
+            opacity: Double(a) / 255
+        )
     }
 }
