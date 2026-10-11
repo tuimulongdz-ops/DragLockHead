@@ -22,7 +22,13 @@ final class ViewController: UIViewController, WKNavigationDelegate, WKUIDelegate
         let config = WKWebViewConfiguration()
         config.allowsInlineMediaPlayback = true
         config.mediaTypesRequiringUserActionForPlayback = []
-        config.preferences.javaScriptEnabled = true
+
+        if #available(iOS 14.0, *) {
+            let pagePrefs = WKWebpagePreferences()
+            pagePrefs.allowsContentJavaScript = true
+            config.defaultWebpagePreferences = pagePrefs
+        }
+
         config.preferences.setValue(true, forKey: "allowFileAccessFromFileURLs")
         config.preferences.setValue(true, forKey: "allowUniversalAccessFromFileURLs")
 
@@ -44,7 +50,6 @@ final class ViewController: UIViewController, WKNavigationDelegate, WKUIDelegate
     }
 
     private func loadHTML() {
-        // Thử nhiều case tên file và thư mục khác nhau
         let candidates: [(String, String, String?)] = [
             ("index", "html", "web"),
             ("index", "html", "Web"),
@@ -64,12 +69,10 @@ final class ViewController: UIViewController, WKNavigationDelegate, WKUIDelegate
             }
         }
 
-        // Không tìm thấy file - hiển thị thông báo trên màn hình
         print("[ERR] Không tìm thấy file HTML trong bundle")
         showErrorPage()
     }
 
-    // Hiển thị trang lỗi nếu không load được HTML
     private func showErrorPage() {
         let html = """
         <!DOCTYPE html>
@@ -88,7 +91,6 @@ final class ViewController: UIViewController, WKNavigationDelegate, WKUIDelegate
         webView.loadHTMLString(html, baseURL: nil)
     }
 
-    // Cho phép alert() của JavaScript hiển thị
     func webView(_ webView: WKWebView,
                  runJavaScriptAlertPanelWithMessage message: String,
                  initiatedByFrame frame: WKFrameInfo,
@@ -102,7 +104,6 @@ final class ViewController: UIViewController, WKNavigationDelegate, WKUIDelegate
         present(alert, animated: true)
     }
 
-    // Cho phép confirm() của JavaScript
     func webView(_ webView: WKWebView,
                  runJavaScriptConfirmPanelWithMessage message: String,
                  initiatedByFrame frame: WKFrameInfo,
