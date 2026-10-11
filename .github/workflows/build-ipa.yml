@@ -5,27 +5,54 @@ on:
     branches: [ main, master ]
   workflow_dispatch:
 
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
 jobs:
   build:
     runs-on: macos-latest
     timeout-minutes: 40
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@v4
 
-      - name: Hiển thị môi trường
+      - name: Debug cấu trúc repo
         run: |
-          sw_vers
-          xcodebuild -version
-          ls /Applications | grep -i xcode
+          ls -la
+          ls -la DragLockHead || true
+          ls -la DragLockHead/web || true
 
-      - name: Cài XcodeGen
-        run: brew install xcodegen
+      - name: Chọn Xcode mới nhất
+        run: |
+          XC=$(ls -d /Applications/Xcode*.app 2>/dev/null | sort -V | tail -1)
+          echo "Chọn: $XC"
+          sudo xcode-select -s "$XC/Contents/Developer"
+          xcodebuild -version
+          echo "DEVELOPER_DIR=$XC/Contents/Developer" >> $GITHUB_ENV
+
+      - name: Cài XcodeGen (tránh lỗi permission)
+        run: |
+          # Cài đặt vào thư mục người dùng thay vì /usr/local
+          export XCODEGEN_PREFIX="$HOME/.local"
+          brew install xcodegen || {
+            echo "Homebrew thất bại, thử cài từ source..."
+            git clone https://github.com/yonaskolb/XcodeGen.git /tmp/xcodegen
+            cd /tmp/xcodegen
+            swift build -c release
+            mkdir -p "$HOME/.local/bin"
+            cp .build/release/xcodegen "$HOME/.local/bin/"
+            echo "$HOME/.local/bin" >> $GITHUB_PATH
+          }
+          # Nếu brew thành công, thêm đường dẫn mặc định
+          which xcodegen || echo "$HOME/.local/bin/xcodegen"
 
       - name: Sinh project
-        run: xcodegen generate
+        run: |
+          xcodegen generate
+          xcodebuild -list -project DragLockHead.xcodeproj
 
-      - name: Build
+      - name: Build app
         run: |
           xcodebuild \
             -project DragLockHead.xcodeproj \
@@ -47,8 +74,11 @@ jobs:
           cp -R build/Build/Products/Release-iphoneos/DragLockHead.app Payload/
           zip -qr DragLockHead.ipa Payload/
           rm -rf Payload
+          ls -lh DragLockHead.ipa
 
-      - uses: actions/upload-artifact@v4
+      - name: Upload IPA
+        uses: actions/upload-artifact@v4
         with:
           name: DragLockHead-IPA
           path: DragLockHead.ipa
+          retention-days: 30
