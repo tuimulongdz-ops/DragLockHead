@@ -118,6 +118,8 @@ struct MainMenuContent: View {
             GameTab(state: state)
         case "theme":
             ThemeTab(state: state)
+        case "access":
+            AccessTab(state: state)
         case "system":
             SystemTab(state: state)
         default:
@@ -296,7 +298,7 @@ struct HeaderBar: View {
                 .font(.system(size: 13.5, weight: .black))
                 .foregroundColor(state.accentColor)
                 .lineLimit(1)
-            Text("SUPER MENU V12 DELUXE")
+            Text("SUPER MENU V14")
                 .font(.system(size: 8, weight: .bold))
                 .foregroundColor(Color(hex: "9ca3af"))
         }
@@ -460,6 +462,7 @@ struct TabBar: View {
         "perf",
         "game",
         "theme",
+        "access",
         "system"
     ]
 
@@ -472,6 +475,7 @@ struct TabBar: View {
         "HIỆU NĂNG",
         "GAME",
         "MÀU",
+        "TRỢ NĂNG",
         "HỆ THỐNG"
     ]
 
@@ -484,6 +488,7 @@ struct TabBar: View {
         "speedometer",
         "gamecontroller.fill",
         "paintpalette.fill",
+        "accessibility",
         "gearshape.fill"
     ]
 
@@ -1322,7 +1327,7 @@ struct GameTab: View {
                 )
                 InfoRow(
                     key: "PHIÊN BẢN",
-                    value: "12.0"
+                    value: "14.0"
                 )
             }
         }
@@ -1359,12 +1364,13 @@ struct GameCard: View {
             HStack(spacing: 10) {
                 ZStack {
                     if selected {
-                        RoundedRectangle(cornerRadius: 11)
-                            .fill(
+                        RoundedRectangle(corner:Radius: 11)
+                             .fill1(
                                 LinearGradient(
-                                    colors: [
+                                    colors:),
+ [
                                         accent,
-                                        Color(hex: "ff0033")
+                                        Color(hex:            "ff0033")
                                     ],
                                     startPoint: .topLeading,
                                     endPoint: .bottomTrailing
@@ -1531,13 +1537,12 @@ struct ThemeTab: View {
                 spacing: 10
             ) {
                 ForEach(0..<Theme.accents.count, id: \.self) { i in
-                    let a = Theme.accents[i]
                     ThemeSwatch(
-                        name: a.0,
-                        hex: a.1,
-                        selected: state.accentHex == a.1
+                        name: Theme.accents[i].0,
+                        hex: Theme.accents[i].1,
+                        selected: state.accentHex == Theme.accents[i].1
                     ) {
-                        state.setAccent(a.1)
+                        state.setAccent(Theme.accents[i].1)
                     }
                 }
             }
@@ -1671,6 +1676,190 @@ struct ThemeSwatch: View {
     }
 }
 
+struct AccessTab: View {
+    @ObservedObject var state: StateManager
+
+    private let items: [MenuEntry] = [
+        MenuEntry("a_pointer", "cursorarrow.motionlines", "CON TRỎ ẢO", "Chuột ảo kéo tâm 1px"),
+        MenuEntry("a_touch", "hand.point.up.braille.fill", "TOUCH ỔN ĐỊNH", "Chống rung ngón tay"),
+        MenuEntry("a_zoom", "plus.magnifyingglass", "ZOOM NGẮM", "Phóng to vùng tâm"),
+        MenuEntry("a_back", "hand.tap.fill", "BACK TAP", "Chạm lưng máy"),
+        MenuEntry("a_guided", "lock.shield.fill", "GUIDED ACCESS", "Khóa cảm ứng"),
+        MenuEntry("a_switch", "switch.2", "SWITCH CONTROL", "Điều khiển công tắc"),
+        MenuEntry("a_head", "face.smiling.fill", "HEAD TRACKING", "Điều khiển bằng đầu"),
+        MenuEntry("a_assist", "circle.circle.fill", "ASSISTIVE TOUCH", "Nút ảo trên màn hình")
+    ]
+
+    var body: some View {
+        VStack(spacing: 10) {
+            SectionTitle(text: "TRỢ NĂNG iOS", icon: "accessibility")
+            InfoCard {
+                InfoRow(key: "CÁCH DÙNG", value: "BẬT TRONG SETTINGS")
+                InfoRow(key: "MỞ NHANH", value: "NÚT BÊN DƯỚI")
+                InfoRow(key: "HIỆU QUẢ", value: "KÉO TÂM 1PX")
+            }
+
+            SectionTitle(text: "KÍCH HOẠT NHANH", icon: "bolt.fill")
+            HStack(spacing: 8) {
+                quickBtn(
+                    "SETTINGS",
+                    "gearshape.fill",
+                    Color(hex: "0099ff")
+                ) {
+                    state.openAppSettings()
+                }
+                quickBtn(
+                    "MỞ GAME",
+                    "play.fill",
+                    Color(hex: "22c55e")
+                ) {
+                    state.openSelectedGame()
+                }
+            }
+
+            SectionTitle(text: "BẬT / TẮT", icon: "switch.2")
+            ForEach(0..<items.count, id: \.self) { i in
+                buildCard(items[i])
+            }
+
+            SectionTitle(text: "HƯỚNG DẪN CHI TIẾT", icon: "book.fill")
+            guideBox(
+                "CON TRỎ ẢO",
+                "Settings - Accessibility - Touch - AssistiveTouch - BẬT - Devices - chọn iPhone - Pointer Style. Kết nối chuột Bluetooth để kéo tâm chính xác 1 pixel."
+            )
+            guideBox(
+                "TOUCH ỔN ĐỊNH",
+                "Settings - Accessibility - Touch - Touch Accommodations - BẬT - Hold Duration 0.10s - Ignore Repeat 0.10s. Giảm rung ngón tay khi kéo tâm."
+            )
+            guideBox(
+                "ZOOM NGẮM",
+                "Settings - Accessibility - Zoom - BẬT - Follow Focus. Chạm 3 ngón 2 lần để phóng to vùng tâm 2x-15x."
+            )
+            guideBox(
+                "BACK TAP",
+                "Settings - Accessibility - Touch - Back Tap - Double Tap - chọn Shortcut. Chạm 2 lần lưng máy kích hoạt nhanh."
+            )
+            guideBox(
+                "GUIDED ACCESS",
+                "Settings - Accessibility - Guided Access - BẬT - Passcode. Khóa cảm ứng ngoài vùng ngắm, chống tap nhầm."
+            )
+            guideBox(
+                "SWITCH CONTROL",
+                "Settings - Accessibility - Switch Control - BẬT - Switches - Add. Điều khiển tâm bằng công tắc Bluetooth."
+            )
+            guideBox(
+                "HEAD TRACKING",
+                "Settings - Accessibility - Pointer Control - Head Tracking - BẬT. Dùng chuyển động đầu điều khiển tâm."
+            )
+            guideBox(
+                "ASSISTIVE TOUCH",
+                "Settings - Accessibility - Touch - AssistiveTouch - BẬT - Custom Top Level Menu. Tạo nút ảo kéo tâm."
+            )
+
+            SectionTitle(text: "GHI CHÚ", icon: "info.circle.fill")
+            InfoCard {
+                InfoRow(key: "INJECT GAME", value: "KHÔNG HỖ TRỢ")
+                InfoRow(key: "LÝ DO", value: "IOS SANDBOX")
+                InfoRow(key: "THAY THẾ", value: "TRỢ NĂNG HỆ THỐNG")
+            }
+        }
+    }
+
+    private func buildCard(_ e: MenuEntry) -> some View {
+        FeatureCard(
+            icon: e.icon,
+            title: e.title,
+            subtitle: e.sub,
+            isOn: state.isOn(e.key),
+            accent: state.accentColor,
+            code: nil
+        ) {
+            state.toggle(e.key)
+        }
+    }
+
+    private func quickBtn(
+        _ title: String,
+        _ icon: String,
+        _ color: Color,
+        _ action: @escaping () -> Void
+    ) -> some View {
+        Button(action: {
+            action()
+            UIImpactFeedbackGenerator(style: .medium)
+                .impactOccurred()
+        }) {
+            VStack(spacing: 6) {
+                Image(systemName: icon)
+                    .font(.system(size: 18, weight: .bold))
+                    .foregroundColor(.white)
+                Text(title)
+                    .font(.system(size: 10, weight: .black))
+                    .foregroundColor(.white)
+            }
+            .frame(maxWidth: .infinity)
+            .padding(.vertical, 14)
+            .background(
+                LinearGradient(
+                    colors: [
+                        color.opacity(0.7),
+                        color.opacity(0.3)
+                    ],
+                    startPoint: .topLeading,
+                    endPoint: .bottomTrailing
+                )
+            )
+            .cornerRadius(12)
+            .overlay(
+                RoundedRectangle(cornerRadius: 12)
+                    .stroke(
+                        color.opacity(0.7),
+                        lineWidth: 1
+                    )
+            )
+        }
+        .buttonStyle(.plain)
+    }
+
+    private func guideBox(
+        _ title: String,
+        _ content: String
+    ) -> some View {
+        VStack(alignment: .leading, spacing: 6) {
+            HStack(spacing: 6) {
+                Image(systemName: "checkmark.seal.fill")
+                    .font(.system(size: 10, weight: .bold))
+                    .foregroundColor(state.accentColor)
+                Text(title)
+                    .font(.system(size: 11, weight: .black))
+                    .foregroundColor(state.accentColor)
+                Spacer()
+            }
+            Text(content)
+                .font(.system(size: 10))
+                .foregroundColor(Color(hex: "9ca3af"))
+                .fixedSize(
+                    horizontal: false,
+                    vertical: true
+                )
+        }
+        .padding(10)
+        .frame(
+            maxWidth: .infinity,
+            alignment: .leading
+        )
+        .background(Color.white.opacity(0.03))
+        .cornerRadius(10)
+        .overlay(
+            RoundedRectangle(cornerRadius: 10)
+                .stroke(
+                    Color.white.opacity(0.08),
+                    lineWidth: 1
+                )
+        )
+    }
+}
+
 struct SystemTab: View {
     @ObservedObject var state: StateManager
 
@@ -1691,7 +1880,7 @@ struct SystemTab: View {
             InfoCard {
                 InfoRow(
                     key: "PHIÊN BẢN",
-                    value: "V12 DELUXE"
+                    value: "V14 ACCESS"
                 )
                 InfoRow(
                     key: "BUILD",
@@ -1719,6 +1908,39 @@ struct SystemTab: View {
             ForEach(0..<items.count, id: \.self) { i in
                 buildCard(items[i])
             }
+
+            SectionTitle(text: "KÍCH HOẠT BUFF", icon: "bolt.fill")
+            Button(action: {
+                state.runBuffSequence()
+                UIImpactFeedbackGenerator(style: .heavy)
+                    .impactOccurred()
+            }) {
+                HStack(spacing: 6) {
+                    Image(systemName: "play.fill")
+                        .font(.system(size: 13, weight: .bold))
+                    Text("INJECT + MỞ GAME")
+                        .font(.system(size: 12, weight: .black))
+                }
+                .foregroundColor(.white)
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, 13)
+                .background(
+                    LinearGradient(
+                        colors: [
+                            state.accentColor,
+                            Color(hex: "ff0033")
+                        ],
+                        startPoint: .leading,
+                        endPoint: .trailing
+                    )
+                )
+                .cornerRadius(12)
+                .shadow(
+                    color: state.accentColor.opacity(0.7),
+                    radius: 14
+                )
+            }
+            .buttonStyle(.plain)
 
             SectionTitle(text: "HÀNH ĐỘNG", icon: "bolt.fill")
             HStack(spacing: 8) {
@@ -1884,8 +2106,7 @@ struct InfoRow: View {
         .overlay(
             Rectangle()
                 .fill(Color.white.opacity(0.05))
-                .frame(height: 1),
-            alignment: .bottom
+                .frame(height alignment: .bottom
         )
     }
 }
@@ -1923,67 +2144,120 @@ struct ToastView: View {
 
 struct InjectOverlay: View {
     @ObservedObject var state: StateManager
-    @State private var dots: Int = 0
     @State private var rotate: Bool = false
+    @State private var progress: Double = 0.0
+    @State private var dotCount: Int = 0
+    @State private var pulse: Bool = false
 
     var body: some View {
         ZStack {
-            Color.black.opacity(0.92)
+            Color.black.opacity(0.95)
                 .ignoresSafeArea()
-            VStack(spacing: 18) {
-                ZStack {
-                    Circle()
-                        .stroke(
-                            state.accentColor.opacity(0.2),
-                            lineWidth: 3
-                        )
-                        .frame(width: 70, height: 70)
-                    Circle()
-                        .trim(from: 0, to: 0.25)
-                        .stroke(
-                            state.accentColor,
-                            style: StrokeStyle(
-                                lineWidth: 3,
-                                lineCap: .round
-                            )
-                        )
-                        .frame(width: 70, height: 70)
-                        .rotationEffect(
-                            .degrees(rotationValue)
-                        )
+
+            RadialGradient(
+                gradient: Gradient(colors: [
+                    state.accentColor.opacity(0.25),
+                    Color.clear
+                ]),
+                center: .center,
+                startRadius: 0,
+                endRadius: 320
+            )
+            .ignoresSafeArea()
+
+            VStack(spacing: 22) {
+                Spacer()
+
+                ringView
+
+                VStack(spacing: 8) {
+                    Text("HỆ THỐNG ĐANG INJECT VÀO GAME")
+                        .font(.system(size: 13, weight: .black))
+                        .foregroundColor(.white)
+                        .multilineTextAlignment(.center)
+                        .padding(.horizontal, 20)
+
+                    Text("VUI LÒNG CHỜ" + dots)
+                        .font(.system(
+                            size: 11,
+                            weight: .heavy,
+                            design: .monospaced
+                        ))
+                        .foregroundColor(state.accentColor)
                 }
-                .onAppear {
-                    withAnimation(
-                        .linear(duration: 1.2)
-                            .repeatForever(autoreverses: false)
-                    ) {
-                        rotate = true
-                    }
-                }
-                Text("ĐANG INJECT")
-                    .font(.system(
-                        size: 14,
-                        weight: .black
-                    ))
-                    .foregroundColor(state.accentColor)
-                Text(String(
-                    repeating: ".",
-                    count: dots % 4
-                ))
-                .font(.system(
-                    size: 18,
-                    weight: .black
-                ))
-                .foregroundColor(state.accentColor)
+
+                barView
+
+                stepBox
+
+                Spacer()
+
+                footerNote
             }
+            .padding(20)
         }
-        .onAppear {
-            Timer.scheduledTimer(
-                withTimeInterval: 0.3,
-                repeats: true
-            ) { _ in
-                dots = dots + 1
-            }
+        .onAppear(perform: start)
+    }
+
+    private var dots: String {
+        var s = ""
+        var i = 0
+        while i < (dotCount % 4) {
+            s = s + "."
+            i = i + 1
+        }
+        return s
+    }
+
+    private var ringView: some View {
+        ZStack {
+            Circle()
+                .stroke(
+                    state.accentColor.opacity(0.15),
+                    lineWidth: 4
+                )
+                .frame(width: 120, height: 120)
+
+            Circle()
+                .trim(from: 0, to: 0.3)
+                .stroke(
+                    LinearGradient(
+                        colors: [
+                            state.accentColor,
+                            Color(hex: "ff0033")
+                        ],
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    ),
+                    style: StrokeStyle(
+                        lineWidth: 4,
+                        lineCap: .round
+                    )
+                )
+                .frame(width: 120, height: 120)
+                .rotationEffect(.degrees(rotationValue))
+
+            Circle()
+                .fill(
+                    LinearGradient(
+                        colors: [
+                            state.accentColor.opacity(0.3),
+                            Color(hex: "ff0033").opacity(0.15)
+                        ],
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    )
+                )
+                .frame(width: 90, height: 90)
+
+            Image(systemName: "shield.lefthalf.filled")
+                .font(.system(size: 38, weight: .bold))
+                .foregroundColor(.white)
+                .shadow(
+                    color: state.accentColor.opacity(0.9),
+                    radius: 12
+                )
+                .scaleEffect(pulse ? 1.08 : 1.0)
         }
     }
 
@@ -1992,6 +2266,135 @@ struct InjectOverlay: View {
             return 360
         }
         return 0
+    }
+
+    private var barView: some View {
+        VStack(spacing: 6) {
+            GeometryReader { g in
+                ZStack(alignment: .leading) {
+                    Capsule()
+                        .fill(Color.white.opacity(0.08))
+                    Capsule()
+                        .fill(
+                            LinearGradient(
+                                colors: [
+                                    state.accentColor,
+                                    Color(hex: "ff0033")
+                                ],
+                                startPoint: .leading,
+                                endPoint: .trailing
+                            )
+                        )
+                        .frame(
+                            width: g.size.width
+                                * CGFloat(progress)
+                        )
+                        .shadow(
+                            color: state.accentColor.opacity(0.7),
+                            radius: 8
+                        )
+                }
+            }
+            .frame(height: 6)
+
+            HStack {
+                Text("TIẾN ĐỘ")
+                    .font(.system(size: 9, weight: .heavy))
+                    .foregroundColor(Color(hex: "9ca3af"))
+                Spacer()
+                Text("\(Int(progress * 100))%")
+                    .font(.system(
+                        size: 10,
+                        weight: .black,
+                        design: .monospaced
+                    ))
+                    .foregroundColor(state.accentColor)
+            }
+        }
+        .padding(.horizontal, 40)
+    }
+
+    private var stepBox: some View {
+        HStack(spacing: 8) {
+            Circle()
+                .fill(state.accentColor)
+                .frame(width: 6, height: 6)
+                .shadow(
+                    color: state.accentColor,
+                    radius: 6
+                )
+            Text(stepText)
+                .font(.system(
+                    size: 10,
+                    weight: .heavy
+                ))
+                .foregroundColor(Color(hex: "9ca3af"))
+        }
+        .padding(.horizontal, 14)
+        .padding(.vertical, 8)
+        .background(Color.white.opacity(0.04))
+        .cornerRadius(10)
+        .overlay(
+            RoundedRectangle(cornerRadius: 10)
+                .stroke(
+                    Color.white.opacity(0.08),
+                    lineWidth: 1
+                )
+        )
+    }
+
+    private var stepText: String {
+        if progress < 0.25 {
+            return "ĐANG PHÂN TÍCH"
+        }
+        if progress < 0.50 {
+            return "ĐANG NẠP MODULE"
+        }
+        if progress < 0.75 {
+            return "ĐANG KÍCH HOẠT BUFF"
+        }
+        if progress < 0.95 {
+            return "ĐANG MỞ GAME"
+        }
+        return "HOÀN TẤT"
+    }
+
+    private var footerNote: some View {
+        HStack(spacing: 6) {
+            Image(systemName: "info.circle.fill")
+                .font(.system(size: 9))
+                .foregroundColor(Color(hex: "6b7280"))
+            Text("KHÔNG THOÁT ỨNG DỤNG")
+                .font(.system(size: 9, weight: .heavy))
+                .foregroundColor(Color(hex: "6b7280"))
+        }
+    }
+
+    private func start() {
+        withAnimation(
+            .linear(duration: 1.0)
+                .repeatForever(autoreverses: false)
+        ) {
+            rotate = true
+        }
+        withAnimation(
+            .easeInOut(duration: 0.8)
+                .repeatForever(autoreverses: true)
+        ) {
+            pulse = true
+        }
+        withAnimation(.linear(duration: 2.8)) {
+            progress = 1.0
+        }
+        Timer.scheduledTimer(
+            withTimeInterval: 0.35,
+            repeats: true
+        ) { t in
+            dotCount = dotCount + 1
+            if dotCount > 40 {
+                t.invalidate()
+            }
+        }
     }
 }
 
@@ -2021,7 +2424,7 @@ struct FooterBar: View {
             Image(systemName: "shield.lefthalf.filled")
                 .font(.system(size: 8))
                 .foregroundColor(Color.white.opacity(0.3))
-            Text("ZWILZ HLONG V12")
+            Text("ZWILZ HLONG V14")
                 .font(.system(size: 8, weight: .heavy))
                 .foregroundColor(Color.white.opacity(0.3))
         }
