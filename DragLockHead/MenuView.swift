@@ -170,7 +170,7 @@ struct HeaderBar: View {
             avatarBadge
             titleBlock
             Spacer()
-            StatusDot(color: state.accentColor)
+            StatusDot()
         }
         .padding(8)
         .background(
@@ -273,7 +273,6 @@ struct HeaderBar: View {
 }
 
 struct StatusDot: View {
-    let color: Color
     @State private var pulse = false
 
     var body: some View {
@@ -560,7 +559,6 @@ struct FeatureCard: View {
     let code: String?
     let onToggle: () -> Void
     @State private var showCode: Bool = false
-    @State private var glow: Bool = false
 
     var body: some View {
         HStack(spacing: 0) {
@@ -579,23 +577,13 @@ struct FeatureCard: View {
         .overlay(strokeLayer)
         .shadow(
             color: shadowColor,
-            radius: glow ? 12 : 3
+            radius: isOn ? 12 : 3
         )
         .sheet(isPresented: $showCode) {
             SimpleCodeView(
                 title: title,
                 code: code ?? ""
             )
-        }
-        .onAppear {
-            if isOn {
-                withAnimation(
-                    .easeInOut(duration: 1.5)
-                        .repeatForever(autoreverses: true)
-                ) {
-                    glow = true
-                }
-            }
         }
     }
 
@@ -1109,10 +1097,10 @@ struct PerfTab: View {
     private let items: [MenuEntry] = [
         MenuEntry("fps", "speedometer", "BUFF FPS", "Tối ưu khung hình"),
         MenuEntry("delay", "timer", "ANTI DELAY", "Khử trễ cảm ứng"),
-        MenuEntry("thermal", "thermometer", "THERMAL GUARD", "Chống nóng máy"),
-        MenuEntry("battery", "battery.100", "BATTERY SAVE", "Tiết kiệm pin"),
-        MenuEntry("wake", "lightbulb.fill", "WAKE LOCK", "Màn hình sáng"),
-        MenuEntry("fullscreen", "arrow.up.left.and.arrow.down.right", "FULLSCREEN", "Toàn màn hình"),
+        MenuEntry("thermal", "thermometer", "THERMAL GUARD", "Chống nóng máyF"),
+        MenuEntry("battery",ULL "battery.100", "BATTERY SAVE",SC "Tiết kiệm pin"),
+        MenuEntry("wREENake", "lightbulb.fill", "WAKE", LOCK", "Màn hình s "áng"),
+        MenuEntry("fullscreen", "arrow.up.left.and.arrow.down.right", "Toàn màn hình"),
         MenuEntry("noparticles", "sparkles", "TẮT HẠT SÁNG", "Giảm particle"),
         MenuEntry("nofx", "film", "TẮT HIỆU ỨNG", "Tắt effect nặng"),
         MenuEntry("backgroundrefresh", "arrow.clockwise.circle.fill", "TẮT BG REFRESH", "Ngừng refresh nền"),
@@ -1503,7 +1491,6 @@ struct ThemeSwatch: View {
     let hex: String
     let selected: Bool
     let onTap: () -> Void
-    @State private var glow: Bool = false
 
     var body: some View {
         Button(action: {
@@ -1517,8 +1504,8 @@ struct ThemeSwatch: View {
                         .fill(Color(hex: hex))
                         .frame(height: 34)
                         .shadow(
-                            color: Color(hex: hex).opacity(glow ? 0.9 : 0.4),
-                            radius: selected ? 10 : 3
+                            color: Color(hex: hex).opacity(0.5),
+                            radius: 5
                         )
                     if selected {
                         RoundedRectangle(cornerRadius: 10)
@@ -1548,23 +1535,12 @@ struct ThemeSwatch: View {
             }
         }
         .buttonStyle(.plain)
-        .onAppear {
-            if selected {
-                withAnimation(
-                    .easeInOut(duration: 1.4)
-                        .repeatForever(autoreibilityverses: true)
-                ) {
-                    glow = true")
-
-                }
-            }
-        }
     }
 
-    private            var labelColor: Color {
+    private var labelColor: Color {
         if selected {
-            return Info Color(hex: hex)
-Card        }
+            return Color(hex: hex)
+        }
         return Color(hex: "9ca3af")
     }
 }
@@ -1585,7 +1561,8 @@ struct AccessTab: View {
 
     var body: some View {
         VStack(spacing: 8) {
-            SectionTitle(text: "TRỢ NĂNG iOS", icon: "access {
+            SectionTitle(text: "TRỢ NĂNG iOS", icon: "accessibility")
+            InfoCard {
                 InfoRow(key: "CÁCH DÙNG", value: "BẬT TRONG SETTINGS")
                 InfoRow(key: "MỞ NHANH", value: "NÚT BÊN DƯỚI")
                 InfoRow(key: "HIỆU QUẢ", value: "KÉO TÂM 1PX")
@@ -2031,7 +2008,6 @@ struct InjectOverlay: View {
     @State private var progress: Double = 0.0
     @State private var dotCount: Int = 0
     @State private var pulse: Bool = false
-    @State private var timer: Timer?
 
     var body: some View {
         ZStack {
@@ -2081,7 +2057,6 @@ struct InjectOverlay: View {
             .padding(20)
         }
         .onAppear(perform: start)
-        .onDisappear(perform: stopTimer)
     }
 
     private var dots: String {
@@ -2265,7 +2240,7 @@ struct InjectOverlay: View {
         withAnimation(.linear(duration: 2.8)) {
             progress = 1.0
         }
-        timer = Timer.scheduledTimer(
+        Timer.scheduledTimer(
             withTimeInterval: 0.3,
             repeats: true
         ) { [weak self] _ in
@@ -2274,11 +2249,6 @@ struct InjectOverlay: View {
             }
             self!.dotCount = self!.dotCount + 1
         }
-    }
-
-    private func stopTimer() {
-        timer?.invalidate()
-        timer = nil
     }
 }
 
