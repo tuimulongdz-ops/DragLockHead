@@ -5,40 +5,27 @@ on:
     branches: [ main, master ]
   workflow_dispatch:
 
-env:
-  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
-
 jobs:
   build:
-    runs-on: macos-15
+    runs-on: macos-latest
     timeout-minutes: 40
 
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      - name: Debug cấu trúc repo
+      - name: Hiển thị môi trường
         run: |
-          ls -la
-          ls -la DragLockHead || true
-          ls -la DragLockHead/web || true
-
-      - name: Chọn Xcode mới nhất
-        run: |
-          XC=$(ls -d /Applications/Xcode*.app 2>/dev/null | sort -V | tail -1)
-          echo "Chọn: $XC"
-          sudo xcode-select -s "$XC/Contents/Developer"
+          sw_vers
           xcodebuild -version
+          ls /Applications | grep -i xcode
 
       - name: Cài XcodeGen
         run: brew install xcodegen
 
       - name: Sinh project
-        run: |
-          xcodegen generate
-          xcodebuild -list -project DragLockHead.xcodeproj
+        run: xcodegen generate
 
-      - name: Build app
+      - name: Build
         run: |
           xcodebuild \
             -project DragLockHead.xcodeproj \
@@ -60,11 +47,8 @@ jobs:
           cp -R build/Build/Products/Release-iphoneos/DragLockHead.app Payload/
           zip -qr DragLockHead.ipa Payload/
           rm -rf Payload
-          ls -lh DragLockHead.ipa
 
-      - name: Upload IPA
-        uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v4
         with:
           name: DragLockHead-IPA
           path: DragLockHead.ipa
-          retention-days: 30
