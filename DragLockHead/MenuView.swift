@@ -35,8 +35,7 @@ struct MainMenuContent: View {
             AnimatedMenuBackground()
 
             VStack(spacing: 10) {
-                HeaderBar()
-                HudRow(state: state)
+                HeaderBar(state: state)
                 TabBar(state: state)
 
                 ScrollView(.vertical, showsIndicators: false) {
@@ -150,7 +149,6 @@ struct HeaderBar: View {
                     .lineLimit(1)
                 Text("DRAGLOCK UTRAL - v9.0")
                     .font(.system(size: 8, weight: .bold))
-                    .kerning(1.8)
                     .foregroundColor(Theme.smoke2)
             }
 
@@ -235,7 +233,6 @@ struct HudItem: View {
         VStack(spacing: 2) {
             Text(label)
                 .font(.system(size: 8, weight: .heavy))
-                .kerning(1.5)
                 .foregroundColor(Theme.smoke2)
             Text(value)
                 .font(.system(size: 12, weight: .black, design: .monospaced))
@@ -289,7 +286,6 @@ struct TabBar: View {
                             }
                             Text(label)
                                 .font(.system(size: 10, weight: .heavy))
-                                .kerning(0.6)
                                 .foregroundColor(state.selectedTab == key ? .white : Theme.smoke2)
                                 .padding(.horizontal, 13)
                                 .padding(.vertical, 10)
@@ -323,7 +319,6 @@ struct SectionTitle: View {
                 .shadow(color: Theme.sea1, radius: 4)
             Text(text)
                 .font(.system(size: 10, weight: .black))
-                .kerning(2)
                 .foregroundColor(Theme.sea2)
             Spacer()
             RoundedRectangle(cornerRadius: 1)
@@ -535,7 +530,6 @@ struct InfoRow: View {
         HStack {
             Text(key)
                 .font(.system(size: 11, weight: .bold))
-                .kerning(0.8)
                 .foregroundColor(Theme.smoke2)
             Spacer()
             Text(value)
@@ -563,7 +557,6 @@ struct FooterBar: View {
                         .font(.system(size: 14, weight: .bold))
                     Text("DAT LAI")
                         .font(.system(size: 9, weight: .black))
-                        .kerning(1)
                 }
                 .frame(maxWidth: .infinity)
                 .padding(.vertical, 12)
@@ -583,7 +576,6 @@ struct FooterBar: View {
                         .font(.system(size: 14, weight: .bold))
                     Text("TAM AO")
                         .font(.system(size: 9, weight: .black))
-                        .kerning(1)
                 }
                 .frame(maxWidth: .infinity)
                 .padding(.vertical, 12)
@@ -606,7 +598,6 @@ struct FooterBar: View {
                     }
                     Text(state.isInjecting ? "DANG INJECT..." : "INJECT")
                         .font(.system(size: 12, weight: .black))
-                        .kerning(1.5)
                 }
                 .frame(maxWidth: .infinity)
                 .padding(.vertical, 16)
@@ -728,7 +719,6 @@ struct ToastView: View {
             Circle().fill(Theme.sea2).frame(width: 6, height: 6)
             Text(text)
                 .font(.system(size: 12, weight: .heavy))
-                .kerning(1)
                 .foregroundColor(.white)
         }
         .padding(.horizontal, 20)
@@ -790,12 +780,10 @@ struct InjectOverlay: View {
 
                 Text(message)
                     .font(.system(size: 13, weight: .black))
-                    .kerning(2)
                     .foregroundColor(.white)
 
                 Text("ZWILZ HLONG UTRAL ENGINE")
                     .font(.system(size: 9, weight: .heavy))
-                    .kerning(3)
                     .foregroundColor(Theme.smoke2)
             }
         }
@@ -1164,7 +1152,6 @@ struct GameCard: View {
 
                 Text(selected ? "ON" : "OFF")
                     .font(.system(size: 11, weight: .black))
-                    .kerning(1)
                     .foregroundColor(selected ? Theme.sea2 : Theme.smoke2)
                     .frame(width: 42, height: 26)
                     .background(selected ? Theme.sea1.opacity(0.2) : Color.white.opacity(0.05))
