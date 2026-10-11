@@ -1,5 +1,40 @@
 import SwiftUI
 
+struct MenuEntry {
+    let key: String
+    let icon: String
+    let title: String
+    let sub: String
+    let codeName: String?
+
+    init(
+        _ key: String,
+        _ icon: String,
+        _ title: String,
+        _ sub: String,
+        _ codeName: String? = nil
+    ) {
+        self.key = key
+        self.icon = icon
+        self.title = title
+        self.sub = sub
+        self.codeName = codeName
+    }
+}
+
+func findSnippet(_ name: String?) -> String? {
+    guard let n = name else { return nil }
+    var i = 0
+    let arr = CodeLibrary.snippets
+    while i < arr.count {
+        if arr[i].name == n {
+            return arr[i].code
+        }
+        i += 1
+    }
+    return nil
+}
+
 struct MenuView: View {
     @StateObject private var state = StateManager()
     @State private var isVerified: Bool = false
@@ -114,6 +149,7 @@ struct MainMenuContent: View {
 
 struct HeaderBar: View {
     @ObservedObject var state: StateManager
+    @State private var shimmer: Bool = false
 
     var body: some View {
         HStack(spacing: 10) {
@@ -124,18 +160,37 @@ struct HeaderBar: View {
         }
         .padding(12)
         .background(
-            RoundedRectangle(cornerRadius: 18)
-                .fill(
-                    LinearGradient(
-                        colors: [
-                            state.accentColor.opacity(0.16),
-                            Color(hex: "0d1117").opacity(0.88),
-                            Color(hex: "ff0033").opacity(0.12)
-                        ],
-                        startPoint: .topLeading,
-                        endPoint: .bottomTrailing
+            ZStack {
+                RoundedRectangle(cornerRadius: 18)
+                    .fill(
+                        LinearGradient(
+                            colors: [
+                                state.accentColor.opacity(0.16),
+                                Color(hex: "0d1117").opacity(0.88),
+                                Color(hex: "ff0033").opacity(0.12)
+                            ],
+                            startPoint: .topLeading,
+                            endPoint: .bottomTrailing
+                        )
                     )
-                )
+                RoundedRectangle(cornerRadius: 18)
+                    .fill(
+                        LinearGradient(
+                            colors: [
+                                Color.white.opacity(0),
+                                Color.white.opacity(
+                                    shimmer ? 0.12 : 0
+                                ),
+                                Color.white.opacity(0)
+                            ],
+                            startPoint: .leading,
+                            endPoint: .trailing
+                        )
+                    )
+                    .mask(
+                        RoundedRectangle(cornerRadius: 18)
+                    )
+            }
         )
         .overlay(
             RoundedRectangle(cornerRadius: 18)
@@ -148,6 +203,14 @@ struct HeaderBar: View {
             color: state.accentColor.opacity(0.25),
             radius: 12
         )
+        .onAppear {
+            withAnimation(
+                .linear(duration: 2.5)
+                    .repeatForever(autoreverses: false)
+            ) {
+                shimmer = true
+            }
+        }
     }
 
     @ViewBuilder
@@ -215,7 +278,7 @@ struct HeaderBar: View {
                 .font(.system(size: 13.5, weight: .black))
                 .foregroundColor(state.accentColor)
                 .lineLimit(1)
-            Text("SUPER MENU V11 TITAN")
+            Text("SUPER MENU V12 DELUXE")
                 .font(.system(size: 8, weight: .bold))
                 .foregroundColor(Color(hex: "9ca3af"))
         }
@@ -230,15 +293,20 @@ struct StatusDot: View {
         ZStack {
             Circle()
                 .fill(Color(hex: "22c55e"))
-                .frame(width: 10, height: 10)
-                .scaleEffect(pulse ? 1.5 : 1.0)
-                .opacity(pulse ? 0.3 : 1.0)
+                .frame(width: 12, height: 12)
+                .scaleEffect(pulse ? 1.8 : 1.0)
+                .opacity(pulse ? 0.15 : 1.0)
             Circle()
                 .fill(Color(hex: "22c55e"))
-                .frame(width: 6, height: 6)
+                .frame(width: 8, height: 8)
+                .scaleEffect(pulse ? 1.2 : 1.0)
+                .opacity(pulse ? 0.4 : 1.0)
+            Circle()
+                .fill(Color(hex: "22c55e"))
+                .frame(width: 5, height: 5)
                 .shadow(
                     color: Color(hex: "22c55e"),
-                    radius: 6
+                    radius: 8
                 )
         }
         .onAppear {
@@ -260,11 +328,15 @@ struct HudRow: View {
             HudItem(
                 label: "FPS",
                 value: "\(state.fps)",
+                icon: "speedometer",
                 color: Color(hex: "22c55e")
             )
             HudItem(
                 label: "PIN",
                 value: "\(state.batteryPct)%",
+                icon: state.charging
+                    ? "bolt.fill"
+                    : "battery.100",
                 color: state.charging
                     ? Color(hex: "fbbf24")
                     : state.accentColor
@@ -272,11 +344,13 @@ struct HudRow: View {
             HudItem(
                 label: "PING",
                 value: "\(state.ping)",
+                icon: "wifi",
                 color: state.accentColor
             )
             HudItem(
                 label: "RAM",
                 value: "\(state.ram)%",
+                icon: "memorychip",
                 color: Color(hex: "a855f7")
             )
         }
@@ -286,13 +360,19 @@ struct HudRow: View {
 struct HudItem: View {
     let label: String
     let value: String
+    let icon: String
     let color: Color
 
     var body: some View {
-        VStack(spacing: 2) {
-            Text(label)
-                .font(.system(size: 8, weight: .heavy))
-                .foregroundColor(Color(hex: "9ca3af"))
+        VStack(spacing: 3) {
+            HStack(spacing: 3) {
+                Image(systemName: icon)
+                    .font(.system(size: 7, weight: .bold))
+                    .foregroundColor(color)
+                Text(label)
+                    .font(.system(size: 7.5, weight: .heavy))
+                    .foregroundColor(Color(hex: "9ca3af"))
+            }
             Text(value)
                 .font(.system(
                     size: 12,
@@ -315,23 +395,31 @@ struct HudItem: View {
 struct TabBar: View {
     @ObservedObject var state: StateManager
 
-    private let tabs: [(String, String)] = [
-        ("aim", "KÉO TÂM"),
-        ("advanced", "NÂNG CAO"),
-        ("code", "CODE"),
-        ("js", "JS RUN"),
-        ("clean", "DỌN DẸP"),
-        ("perf", "HIỆU NĂNG"),
-        ("game", "GAME"),
-        ("theme", "MÀU"),
-        ("system", "HỆ THỐNG")
+    private let keys: [String] = [
+        "aim", "advanced", "code", "js",
+        "clean", "perf", "game", "theme", "system"
+    ]
+
+    private let labels: [String] = [
+        "KÉO TÂM", "NÂNG CAO", "CODE", "JS RUN",
+        "DỌN DẸP", "HIỆU NĂNG", "GAME", "MÀU", "HỆ THỐNG"
+    ]
+
+    private let icons: [String] = [
+        "target", "sparkles", "chevron.left.forwardslash.chevron.right",
+        "terminal", "trash.fill", "speedometer",
+        "gamecontroller.fill", "paintpalette.fill", "gearshape.fill"
     ]
 
     var body: some View {
         ScrollView(.horizontal, showsIndicators: false) {
             HStack(spacing: 5) {
-                ForEach(tabs, id: \.0) { item in
-                    tabBtn(key: item.0, label: item.1)
+                ForEach(0..<keys.count, id: \.self) { i in
+                    tabBtn(
+                        key: keys[i],
+                        label: labels[i],
+                        icon: icons[i]
+                    )
                 }
             }
             .padding(4)
@@ -349,7 +437,8 @@ struct TabBar: View {
 
     private func tabBtn(
         key: String,
-        label: String
+        label: String,
+        icon: String
     ) -> some View {
         Button(action: {
             withAnimation(
@@ -379,15 +468,19 @@ struct TabBar: View {
                         radius: 8
                     )
                 }
-                Text(label)
-                    .font(.system(size: 10, weight: .heavy))
-                    .foregroundColor(
-                        state.selectedTab == key
-                            ? .white
-                            : Color(hex: "9ca3af")
-                    )
-                    .padding(.horizontal, 13)
-                    .padding(.vertical, 10)
+                HStack(spacing: 5) {
+                    Image(systemName: icon)
+                        .font(.system(size: 9, weight: .bold))
+                    Text(label)
+                        .font(.system(size: 10, weight: .heavy))
+                }
+                .foregroundColor(
+                    state.selectedTab == key
+                        ? .white
+                        : Color(hex: "9ca3af")
+                )
+                .padding(.horizontal, 11)
+                .padding(.vertical, 10)
             }
         }
         .buttonStyle(.plain)
@@ -396,6 +489,12 @@ struct TabBar: View {
 
 struct SectionTitle: View {
     let text: String
+    let icon: String
+
+    init(text: String, icon: String = "circle.fill") {
+        self.text = text
+        self.icon = icon
+    }
 
     var body: some View {
         HStack(spacing: 8) {
@@ -416,6 +515,9 @@ struct SectionTitle: View {
                     color: Color(hex: "0099ff"),
                     radius: 4
                 )
+            Image(systemName: icon)
+                .font(.system(size: 9, weight: .bold))
+                .foregroundColor(Color(hex: "00d4ff"))
             Text(text)
                 .font(.system(size: 10, weight: .black))
                 .foregroundColor(Color(hex: "00d4ff"))
@@ -435,6 +537,7 @@ struct FeatureCard: View {
     let code: String?
     let onToggle: () -> Void
     @State private var showCode: Bool = false
+    @State private var glow: Bool = false
 
     var body: some View {
         HStack(spacing: 0) {
@@ -451,11 +554,37 @@ struct FeatureCard: View {
         .background(bgLayer)
         .cornerRadius(16)
         .overlay(strokeLayer)
+        .shadow(
+            color: isOn ? accent.opacity(0.3) : .clear,
+            radius: glow ? 14 : 4
+        )
         .sheet(isPresented: $showCode) {
             SimpleCodeView(
                 title: title,
                 code: code ?? ""
             )
+        }
+        .onAppear {
+            if isOn {
+                withAnimation(
+                    .easeInOut(duration: 1.5)
+                        .repeatForever(autoreverses: true)
+                ) {
+                    glow = true
+                }
+            }
+        }
+        .onChange(of: isOn) { newValue in
+            if newValue {
+                withAnimation(
+                    .easeInOut(duration: 1.5)
+                        .repeatForever(autoreverses: true)
+                ) {
+                    glow = true
+                }
+            } else {
+                glow = false
+            }
         }
     }
 
@@ -510,8 +639,8 @@ struct FeatureCard: View {
                     )
                     .frame(width: 40, height: 40)
                     .shadow(
-                        color: accent.opacity(0.5),
-                        radius: 8
+                        color: accent.opacity(0.6),
+                        radius: 10
                     )
             } else {
                 RoundedRectangle(cornerRadius: 11)
@@ -562,8 +691,8 @@ struct FeatureCard: View {
                     )
                     .frame(width: 48, height: 28)
                     .shadow(
-                        color: accent.opacity(0.6),
-                        radius: 8
+                        color: accent.opacity(0.7),
+                        radius: 10
                     )
             } else {
                 Capsule()
@@ -579,6 +708,13 @@ struct FeatureCard: View {
                 )
                 .offset(x: isOn ? 10 : -10)
         }
+        .animation(
+            .spring(
+                response: 0.3,
+                dampingFraction: 0.6
+            ),
+            value: isOn
+        )
     }
 
     private var bgLayer: some View {
@@ -586,9 +722,9 @@ struct FeatureCard: View {
             if isOn {
                 LinearGradient(
                     colors: [
-                        accent.opacity(0.2),
+                        accent.opacity(0.22),
                         Color(hex: "0d1117").opacity(0.85),
-                        Color(hex: "ff0033").opacity(0.15)
+                        Color(hex: "ff0033").opacity(0.16)
                     ],
                     startPoint: .topLeading,
                     endPoint: .bottomTrailing
@@ -603,7 +739,7 @@ struct FeatureCard: View {
         RoundedRectangle(cornerRadius: 16)
             .stroke(
                 isOn
-                    ? accent.opacity(0.6)
+                    ? accent.opacity(0.65)
                     : Color.white.opacity(0.08),
                 lineWidth: 1
             )
@@ -637,6 +773,9 @@ struct SimpleCodeView: View {
 
     private var header: some View {
         HStack {
+            Image(systemName: "chevron.left.forwardslash.chevron.right")
+                .font(.system(size: 12, weight: .bold))
+                .foregroundColor(Color(hex: "00d4ff"))
             Text(title)
                 .font(.system(size: 15, weight: .black))
                 .foregroundColor(.white)
@@ -722,119 +861,100 @@ struct SimpleCodeView: View {
 struct AimTab: View {
     @ObservedObject var state: StateManager
 
-    private let items: [(String, String, String, String)] = [
-        ("microaim", "hand.point.up.left.fill", "NHẸ TÂM", "Micro pull chuẩn xác"),
-        ("headlock", "scope", "BÁM ĐẦU", "Head track dự đoán"),
-        . ("dragaim", "hand.draw.fill",first "DRAG { AIM", "Kéo aim theo $ ngón tay"),
-       0 ("aimassist", "wand.and.stars",.name "AIM ASSIST", "Kéo mượt + dự đoán"),
-        ("aimlock", "target", "AIM LOCK", "Khóa mục tiêu"),
-        ("smooth", "arrow.left.arrow.right", "SMOOTH TARGET", "Chuyển mục tiêu mượt")
+    private let items: [MenuEntry] = [
+        MenuEntry("microaim", "hand.point.up.left.fill", "NHẸ TÂM", "Micro pull chuẩn xác", "MICRO PULL JS"),
+        MenuEntry("headlock", "scope", "BÁM ĐẦU", "Head track dự đoán", "HEAD TRACK C#"),
+        MenuEntry("dragaim", "hand.draw.fill", "DRAG AIM", "Kéo aim theo ngón tay", "AIMLOCK C++"),
+        MenuEntry("aimassist", "wand.and.stars", "AIM ASSIST", "Kéo mượt + dự đoán", "AIM ASSIST C++"),
+        MenuEntry("aimlock", "target", "AIM LOCK", "Khóa mục tiêu", "AIMLOCK C++"),
+        MenuEntry("smooth", "arrow.left.arrow.right", "SMOOTH TARGET", "Chuyển mục tiêu mượt", "PREDICTION"),
+        MenuEntry("boneaim", "figure.stand", "BONE AIM", "Ngắm theo xương", "BONE SCANNER"),
+        MenuEntry("flickaim", "bolt.horizontal.fill", "FLICK AIM", "Bật tâm siêu nhanh", nil),
+        MenuEntry("microadjust", "slider.horizontal.3", "MICRO ADJUST", "Vi chỉnh tâm", nil),
+        MenuEntry("stickyaim", "pin.fill", "STICKY AIM", "Dính mục tiêu", nil)
     ]
 
     var body: some View {
         VStack(spacing: 10) {
-            SectionTitle(text: "HỖ TRỢ KÉO TÂM")
-            ForEach(items, id: \.0) { i in
+            SectionTitle(text: "HỖ TRỢ KÉO TÂM", icon: "target")
+            ForEach(0..<items.count, id: \.self) { i in
+                let e = items[i]
                 FeatureCard(
-                    icon: i.1,
-                    title: i.2,
-                    subtitle: i.3,
-                    isOn: state.isOn(i.0),
+                    icon: e.icon,
+                    title: e.title,
+                    subtitle: e.sub,
+                    isOn: state.isOn(e.key),
                     accent: state.accentColor,
-                    code: findCode(i.0)
+                    code: findSnippet(e.codeName)
                 ) {
-                    state.toggle(i.0)
+                    state.toggle(e.key)
                 }
             }
         }
-    }
-
-    private func findCode(_ k: String) -> String? {
-        let map: [String: String] = [
-            "microaim": "MICRO PULL JS",
-            "headlock": "HEAD TRACK C#",
-            "dragaim": "AIMLOCK C++",
-            "aimassist": "AIM ASSIST C++",
-            "aimlock": "AIMLOCK C++",
-            "smooth": "PREDICTION"
-        ]
-        guard let n = map[k] else { return nil }
-        return CodeLibrary.snippets
-            .first { $0.name == n }?.code
     }
 }
 
 struct AdvancedTab: View {
     @ObservedObject var state: StateManager
 
-    private let items: [(String, String, String, String)] = [
-        ("predict", "location.fill", "PREDICTION", "Dự đoán di chuyển"),
-        ("trigger", "bolt.fill", "TRIGGER BOT", "Tự bắn khi có target"),
-        ("recoil", "arrow.up.arrow.down", "RECOIL FIX", "Giảm giật súng"),
-        ("nospread", "circle.dashed", "NO SPREAD", "Không tản mác"),
-        ("silent", "eye.slash.fill", "SILENT AIM", "Ngắm không lộ"),
-        ("flick", "arrow.up.right", "FLICK AIM", "Bật tâm tức thời"),
-        ("scope", "viewfinder", "QUICK SCOPE", "Ngắm nhanh scope"),
-        ("burst", "flame.fill", "BURST LOCK", "Khóa loạt đạn"),
-        ("swap", "arrow.left.arrow.right.square", "FAST SWAP", "Đổi súng nhanh"),
-        ("rung", "waveform", "FIX RUNG", "Khử rung tâm"),
-        ("lo", "drop.fill", "FIX LỐ SMOOTH", "SmoothDamp"),
-        ("nhay", "arrow.up.circle.fill", "NHẠY TÂM", "HeadLock Boost"),
-        ("nhe5", "sparkles", "NHẸ TÂM V5", "SmoothAim 90%"),
-        ("move", "arrow.right", "MOVE TOWARD", "Di chuyển cơ bản"),
-        ("core", "cpu", "AIM DATA CORE", "AimData Structure")
+    private let items: [MenuEntry] = [
+        MenuEntry("predict", "location.fill", "PREDICTION", "Dự đoán di chuyển", "PREDICTION"),
+        MenuEntry("trigger", "bolt.fill", "TRIGGER BOT", "Tự bắn khi có target", "TRIGGER BOT"),
+        MenuEntry("recoil", "arrow.up.arrow.down", "RECOIL FIX", "Giảm giật súng", "RECOIL FIX"),
+        MenuEntry("nospread", "circle.dashed", "NO SPREAD", "Không tản mác", nil),
+        MenuEntry("silent", "eye.slash.fill", "SILENT AIM", "Ngắm không lộ", nil),
+        MenuEntry("flick", "arrow.up.right", "FLICK AIM", "Bật tâm tức thời", nil),
+        MenuEntry("scope", "viewfinder", "QUICK SCOPE", "Ngắm nhanh scope", nil),
+        MenuEntry("burst", "flame.fill", "BURST LOCK", "Khóa loạt đạn", nil),
+        MenuEntry("swap", "arrow.left.arrow.right.square", "FAST SWAP", "Đổi súng nhanh", nil),
+        MenuEntry("rung", "waveform", "FIX RUNG", "Khử rung tâm", "AIM DATA CORE"),
+        MenuEntry("lo", "drop.fill", "FIX LỐ SMOOTH", "SmoothDamp", "PREDICTION"),
+        MenuEntry("nhay", "arrow.up.circle.fill", "NHẠY TÂM", "HeadLock Boost", "AIM DATA CORE"),
+        MenuEntry("nhe5", "sparkles", "NHẸ TÂM V5", "SmoothAim 90%", "AIM ASSIST C++"),
+        MenuEntry("move", "arrow.right", "MOVE TOWARD", "Di chuyển cơ bản", "MOVE TOWARDS"),
+        MenuEntry("core", "cpu", "AIM DATA CORE", "AimData Structure", "AIM DATA CORE"),
+        MenuEntry("wallcheck", "rectangle.on.rectangle.slash", "WALL CHECK", "Kiểm tra vật cản", nil),
+        MenuEntry("fovcircle", "circle.circle", "FOV CIRCLE", "Vẽ vòng FOV", nil),
+        MenuEntry("hitbox", "square.dashed", "HITBOX VIEW", "Hiện hitbox", nil)
     ]
 
     var body: some View {
         VStack(spacing: 10) {
-            SectionTitle(text: "CHỨC NĂNG NÂNG CAO")
-            ForEach(items, id: \.0) { i in
+            SectionTitle(text: "CHỨC NĂNG NÂNG CAO", icon: "sparkles")
+            ForEach(0..<items.count, id: \.self) { i in
+                let e = items[i]
                 FeatureCard(
-                    icon: i.1,
-                    title: i.2,
-                    subtitle: i.3,
-                    isOn: state.isOn(i.0),
+                    icon: e.icon,
+                    title: e.title,
+                    subtitle: e.sub,
+                    isOn: state.isOn(e.key),
                     accent: state.accentColor,
-                    code: findCode(i.0)
+                    code: findSnippet(e.codeName)
                 ) {
-                    state.toggle(i.0)
+                    state.toggle(e.key)
                 }
             }
         }
-    }
-
-    private func findCode(_ k: String) -> String? {
-        let map: [String: String] = [
-            "predict": "PREDICTION",
-            "trigger": "TRIGGER BOT",
-            "recoil": "RECOIL FIX",
-            "rung": "AIM DATA CORE",
-            "lo": "PREDICTION",
-            "nhay": "AIM DATA CORE",
-            "nhe5": "AIM ASSIST C++",
-            "move": "MOVE TOWARDS",
-            "core": "AIM DATA CORE"
-        ]
-        guard let n = map[k] else { return nil }
-        return CodeLibrary.snippets
-            == n }?.code
     }
 }
 
 struct CleanTab: View {
     @ObservedObject var state: StateManager
 
-    private let items: [(String, String, String, String)] = [
-        ("clearcache", "trash.fill", "DỌN CACHE", "Xóa cache hệ thống"),
-        ("clearls", "internaldrive", "DỌN STORAGE", "Xóa dữ liệu lưu trữ"),
-        ("clearidb", "cylinder.fill", "DỌN DATA", "Xóa database"),
-        ("clearimagecache", "photo.fill", "DỌN ẢNH", "Xóa cache ảnh"),
-        ("clearcookies", "doc.text.fill", "DỌN COOKIES", "Xóa cookies")
+    private let items: [MenuEntry] = [
+        MenuEntry("clearcache", "trash.fill", "DỌN CACHE", "Xóa cache hệ thống"),
+        MenuEntry("clearls", "internaldrive", "DỌN STORAGE", "Xóa dữ liệu lưu trữ"),
+        MenuEntry("clearidb", "cylinder.fill", "DỌN DATA", "Xóa database"),
+        MenuEntry("clearimagecache", "photo.fill", "DỌN ẢNH", "Xóa cache ảnh"),
+        MenuEntry("clearcookies", "doc.text.fill", "DỌN COOKIES", "Xóa cookies"),
+        MenuEntry("clearlogs", "doc.plaintext.fill", "DỌN LOGS", "Xóa log files"),
+        MenuEntry("cleartemp", "folder.fill", "DỌN TEMP", "Xóa file tạm"),
+        MenuEntry("clearall", "xmark.bin.fill", "DỌN TẤT CẢ", "Xóa toàn bộ cache")
     ]
 
     var body: some View {
         VStack(spacing: 10) {
-            SectionTitle(text: "NHẬN DIỆN THIẾT BỊ")
+            SectionTitle(text: "NHẬN DIỆN THIẾT BỊ", icon: "iphone")
             InfoCard {
                 InfoRow(
                     key: "MODEL",
@@ -870,21 +990,22 @@ struct CleanTab: View {
                 )
             }
 
-            SectionTitle(text: "DỌN DẸP HỆ THỐNG")
-            ForEach(items, id: \.0) { i in
+            SectionTitle(text: "DỌN DẸP HỆ THỐNG", icon: "trash.fill")
+            ForEach(0..<items.count, id: \.self) { i in
+                let e = items[i]
                 FeatureCard(
-                    icon: i.1,
-                    title: i.2,
-                    subtitle: i.3,
-                    isOn: state.isOn(i.0),
+                    icon: e.icon,
+                    title: e.title,
+                    subtitle: e.sub,
+                    isOn: state.isOn(e.key),
                     accent: state.accentColor,
                     code: nil
                 ) {
-                    state.toggle(i.0)
+                    state.toggle(e.key)
                 }
             }
 
-            SectionTitle(text: "DỌN DẸP NHANH")
+            SectionTitle(text: "DỌN DẸP NHANH", icon: "bolt.fill")
             HStack(spacing: 8) {
                 cleanBtn("RAM", "memorychip", "DỌN RAM")
                 cleanBtn("CACHE", "trash.fill", "DỌN CACHE")
@@ -943,34 +1064,39 @@ struct CleanTab: View {
 struct PerfTab: View {
     @ObservedObject var state: StateManager
 
-    private let items: [(String, String, String, String)] = [
-        ("fps", "speedometer", "BUFF FPS", "Tối ưu khung hình"),
-        ("delay", "timer", "ANTI DELAY", "Khử trễ cảm ứng"),
-        ("thermal", "thermometer", "THERMAL GUARD", "Chống nóng máy"),
-        ("battery", "battery.100", "BATTERY SAVE", "Tiết kiệm pin"),
-        ("wake", "lightbulb.fill", "WAKE LOCK", "Màn hình sáng"),
-        ("fullscreen", "arrow.up.left.and.arrow.down.right", "FULLSCREEN", "Toàn màn hình"),
-        ("noparticles", "sparkles", "TẮT HẠT SÁNG", "Giảm particle"),
-        ("nofx", "film", "TẮT HIỆU ỨNG", "Tắt effect nặng")
+    private let items: [MenuEntry] = [
+        MenuEntry("fps", "speedometer", "BUFF FPS", "Tối ưu khung hình"),
+        MenuEntry("delay", "timer", "ANTI DELAY", "Khử trễ cảm ứng"),
+        MenuEntry("thermal", "thermometer", "THERMAL GUARD", "Chống nóng máy"),
+        MenuEntry("battery", "battery.100", "BATTERY SAVE", "Tiết kiệm pin"),
+        MenuEntry("wake", "lightbulb.fill", "WAKE LOCK", "Màn hình sáng"),
+        MenuEntry("fullscreen", "arrow.up.left.and.arrow.down.right", "FULLSCREEN", "Toàn màn hình"),
+        MenuEntry("noparticles", "sparkles", "TẮT HẠT SÁNG", "Giảm particle"),
+        MenuEntry("nofx", "film", "TẮT HIỆU ỨNG", "Tắt effect nặng"),
+        MenuEntry("backgroundrefresh", "arrow.clockwise.circle.fill", "TẮT BG REFRESH", "Ngừng refresh nền"),
+        MenuEntry("reduce", "minus.circle.fill", "GIẢM CHI TIẾT", "Low quality mode"),
+        MenuEntry("priority", "arrow.up.square.fill", "PRIORITY BOOST", "Ưu tiên CPU"),
+        MenuEntry("memory", "memorychip.fill", "MEMORY BOOST", "Giải phóng RAM")
     ]
 
     var body: some View {
         VStack(spacing: 10) {
-            SectionTitle(text: "TỐI ƯU HIỆU NĂNG")
-            ForEach(items, id: \.0) { i in
+            SectionTitle(text: "TỐI ƯU HIỆU NĂNG", icon: "speedometer")
+            ForEach(0..<items.count, id: \.self) { i in
+                let e = items[i]
                 FeatureCard(
-                    icon: i.1,
-                    title: i.2,
-                    subtitle: i.3,
-                    isOn: state.isOn(i.0),
+                    icon: e.icon,
+                    title: e.title,
+                    subtitle: e.sub,
+                    isOn: state.isOn(e.key),
                     accent: state.accentColor,
                     code: nil
                 ) {
-                    state.toggle(i.0)
+                    state.toggle(e.key)
                 }
             }
 
-            SectionTitle(text: "ĐO THỜI GIAN THỰC")
+            SectionTitle(text: "ĐO THỜI GIAN THỰC", icon: "chart.bar.fill")
             InfoCard {
                 InfoRow(
                     key: "FPS",
@@ -988,6 +1114,12 @@ struct PerfTab: View {
                     key: "PIN",
                     value: "\(state.batteryPct)%"
                 )
+                InfoRow(
+                    key: "CHARGING",
+                    value: state.charging
+                        ? "CÓ"
+                        : "KHÔNG"
+                )
             }
         }
     }
@@ -998,7 +1130,7 @@ struct GameTab: View {
 
     var body: some View {
         VStack(spacing: 10) {
-            SectionTitle(text: "CHỌN GAME")
+            SectionTitle(text: "CHỌN GAME", icon: "gamecontroller.fill")
             GameCard(
                 icon: "flame.fill",
                 name: "FREE FIRE",
@@ -1006,7 +1138,11 @@ struct GameTab: View {
                 selected: state.game == "ff",
                 accent: state.accentColor
             ) {
-                state.game = state.game == "ff" ? nil : "ff"
+                if state.game == "ff" {
+                    state.game = nil
+                } else {
+                    state.game = "ff"
+                }
             }
             GameCard(
                 icon: "bolt.fill",
@@ -1015,9 +1151,11 @@ struct GameTab: View {
                 selected: state.game == "ffmax",
                 accent: state.accentColor
             ) {
-                state.game = state.game == "ffmax"
-                    ? nil
-                    : "ffmax"
+                if state.game == "ffmax" {
+                    state.game = nil
+                } else {
+                    state.game = "ffmax"
+                }
             }
             GameCard(
                 icon: "square.stack.3d.up.fill",
@@ -1026,12 +1164,14 @@ struct GameTab: View {
                 selected: state.game == "both",
                 accent: state.accentColor
             ) {
-                state.game = state.game == "both"
-                    ? nil
-                    : "both"
+                if state.game == "both" {
+                    state.game = nil
+                } else {
+                    state.game = "both"
+                }
             }
 
-            SectionTitle(text: "THÔNG TIN")
+            SectionTitle(text: "THÔNG TIN", icon: "info.circle.fill")
             InfoCard {
                 InfoRow(
                     key: "GAME",
@@ -1043,7 +1183,7 @@ struct GameTab: View {
                 )
                 InfoRow(
                     key: "PHIÊN BẢN",
-                    value: "11.0"
+                    value: "12.0"
                 )
             }
         }
@@ -1088,6 +1228,10 @@ struct GameCard: View {
                                 )
                             )
                             .frame(width: 40, height: 40)
+                            .shadow(
+                                color: accent.opacity(0.6),
+                                radius: 10
+                            )
                     } else {
                         RoundedRectangle(cornerRadius: 11)
                             .fill(Color.white.opacity(0.05))
@@ -1182,9 +1326,25 @@ struct GameCard: View {
 struct ThemeTab: View {
     @ObservedObject var state: StateManager
 
+    private let effectKeys: [String] = [
+        "particles", "grid", "aurora",
+        "nebula", "stars", "rings", "orbit"
+    ]
+
+    private let effectIcons: [String] = [
+        "circle.grid.3x3.fill", "grid", "wave.3.right",
+        "cloud.fill", "star.fill", "circle.dashed",
+        "circle.grid.cross"
+    ]
+
+    private let effectTitles: [String] = [
+        "HẠT BAY", "LƯỚI", "CỰC QUANG",
+        "TINH VÂN", "SAO BĂNG", "VÒNG XUNG", "QUỸ ĐẠO"
+    ]
+
     var body: some View {
         VStack(spacing: 10) {
-            SectionTitle(text: "MÀU CHỦ ĐỀ")
+            SectionTitle(text: "MÀU CHỦ ĐỀ", icon: "paintpalette.fill")
             LazyVGrid(
                 columns: [
                     GridItem(.flexible()),
@@ -1193,7 +1353,8 @@ struct ThemeTab: View {
                 ],
                 spacing: 10
             ) {
-                ForEach(Theme.accents, id: \.0) { a in
+                ForEach(0..<Theme.accents.count, id: \.self) { i in
+                    let a = Theme.accents[i]
                     ThemeSwatch(
                         name: a.0,
                         hex: a.1,
@@ -1204,16 +1365,21 @@ struct ThemeTab: View {
                 }
             }
 
-            SectionTitle(text: "HIỆU ỨNG NỀN")
-            effectRow("particles", "circle.grid.3x3.fill", "HẠT BAY")
-            effectRow("grid", "grid", "LƯỚI")
-            effectRow("aurora", "wave.3.right", "CỰC QUANG")
-            effectRow("nebula", "cloud.fill", "TINH VÂN")
-            effectRow("stars", "star.fill", "SAO BĂNG")
-            effectRow("rings", "circle.dashed", "VÒNG XUNG")
-            effectRow("orbit", "circle.grid.cross", "QUỸ ĐẠO")
+            SectionTitle(text: "HIỆU ỨNG NỀN", icon: "wand.and.stars")
+            ForEach(0..<effectKeys.count, id: \.self) { i in
+                FeatureCard(
+                    icon: effectIcons[i],
+                    title: effectTitles[i],
+                    subtitle: "Hiệu ứng nền",
+                    isOn: state.isOn(effectKeys[i]),
+                    accent: state.accentColor,
+                    code: nil
+                ) {
+                    state.toggle(effectKeys[i])
+                }
+            }
 
-            SectionTitle(text: "XEM TRƯỚC")
+            SectionTitle(text: "XEM TRƯỚC", icon: "eye.fill")
             InfoCard {
                 InfoRow(
                     key: "MÀU HIỆN TẠI",
@@ -1223,25 +1389,24 @@ struct ThemeTab: View {
                     key: "SỐ MÀU",
                     value: "\(Theme.accents.count)"
                 )
+                InfoRow(
+                    key: "HIỆU ỨNG BẬT",
+                    value: "\(countEffects())"
+                )
             }
         }
     }
 
-    private func effectRow(
-        _ key: String,
-        _ icon: String,
-        _ title: String
-    ) -> some View {
-        FeatureCard(
-            icon: icon,
-            title: title,
-            subtitle: "Hiệu ứng nền",
-            isOn: state.isOn(key),
-            accent: state.accentColor,
-            code: nil
-        ) {
-            state.toggle(key)
+    private func countEffects() -> Int {
+        var c = 0
+        var i = 0
+        while i < effectKeys.count {
+            if state.isOn(effectKeys[i]) {
+                c += 1
+            }
+            i += 1
         }
+        return c
     }
 }
 
@@ -1250,6 +1415,7 @@ struct ThemeSwatch: View {
     let hex: String
     let selected: Bool
     let onTap: () -> Void
+    @State private var glow: Bool = false
 
     var body: some View {
         Button(action: {
@@ -1264,8 +1430,8 @@ struct ThemeSwatch: View {
                         .frame(height: 42)
                         .shadow(
                             color: Color(hex: hex)
-                                .opacity(0.6),
-                            radius: selected ? 12 : 4
+                                .opacity(glow ? 0.9 : 0.4),
+                            radius: selected ? 14 : 4
                         )
                     if selected {
                         RoundedRectangle(cornerRadius: 12)
@@ -1299,28 +1465,40 @@ struct ThemeSwatch: View {
             }
         }
         .buttonStyle(.plain)
+        .onAppear {
+            if selected {
+                withAnimation(
+                    .easeInOut(duration: 1.4)
+                        .repeatForever(autoreverses: true)
+                ) {
+                    glow = true
+                }
+            }
+        }
     }
 }
 
 struct SystemTab: View {
     @ObservedObject var state: StateManager
 
-    private let items: [(String, String, String, String)] = [
-        ("autosave", "square.and.arrow.down.fill", "TỰ ĐỘNG LƯU", "Lưu cài đặt"),
-        ("haptic", "hand.tap.fill", "RUNG PHẢN HỒI", "Haptic feedback"),
-        ("sound", "speaker.wave.2.fill", "ÂM THANH", "Sound effect"),
-        ("debug", "ant.fill", "CHẾ ĐỘ DEBUG", "Debug info"),
-        ("safe", "checkmark.shield.fill", "CHẾ ĐỘ AN TOÀN", "Safe mode"),
-        ("killswitch", "xmark.octagon.fill", "KILL SWITCH", "Tắt toàn bộ")
+    private let items: [MenuEntry] = [
+        MenuEntry("autosave", "square.and.arrow.down.fill", "TỰ ĐỘNG LƯU", "Lưu cài đặt"),
+        MenuEntry("haptic", "hand.tap.fill", "RUNG PHẢN HỒI", "Haptic feedback"),
+        MenuEntry("sound", "speaker.wave.2.fill", "ÂM THANH", "Sound effect"),
+        MenuEntry("debug", "ant.fill", "CHẾ ĐỘ DEBUG", "Debug info"),
+        MenuEntry("safe", "checkmark.shield.fill", "CHẾ ĐỘ AN TOÀN", "Safe mode"),
+        MenuEntry("killswitch", "xmark.octagon.fill", "KILL SWITCH", "Tắt toàn bộ"),
+        MenuEntry("notify", "bell.fill", "THÔNG BÁO", "Notification"),
+        MenuEntry("logmode", "doc.text.magnifyingglass", "LOG MODE", "Ghi log hoạt động")
     ]
 
     var body: some View {
         VStack(spacing: 10) {
-            SectionTitle(text: "THÔNG TIN HỆ THỐNG")
+            SectionTitle(text: "THÔNG TIN HỆ THỐNG", icon: "info.circle.fill")
             InfoCard {
                 InfoRow(
                     key: "PHIÊN BẢN",
-                    value: "V11 TITAN"
+                    value: "V12 DELUXE"
                 )
                 InfoRow(
                     key: "BUILD",
@@ -1338,23 +1516,28 @@ struct SystemTab: View {
                     key: "KEY",
                     value: maskKey()
                 )
+                InfoRow(
+                    key: "CHỨC NĂNG",
+                    value: "\(state.activeCount())"
+                )
             }
 
-            SectionTitle(text: "CÀI ĐẶT")
-            ForEach(items, id: \.0) { i in
+            SectionTitle(text: "CÀI ĐẶT", icon: "gearshape.fill")
+            ForEach(0..<items.count, id: \.self) { i in
+                let e = items[i]
                 FeatureCard(
-                    icon: i.1,
-                    title: i.2,
-                    subtitle: i.3,
-                    isOn: state.isOn(i.0),
+                    icon: e.icon,
+                    title: e.title,
+                    subtitle: e.sub,
+                    isOn: state.isOn(e.key),
                     accent: state.accentColor,
                     code: nil
                 ) {
-                    state.toggle(i.0)
+                    state.toggle(e.key)
                 }
             }
 
-            SectionTitle(text: "HÀNH ĐỘNG")
+            SectionTitle(text: "HÀNH ĐỘNG", icon: "bolt.fill")
             HStack(spacing: 8) {
                 actionBtn(
                     "RESET",
@@ -1537,19 +1720,42 @@ struct ToastView: View {
 struct InjectOverlay: View {
     @ObservedObject var state: StateManager
     @State private var dots: Int = 0
+    @State private var rotate: Bool = false
 
     var body: some View {
         ZStack {
             Color.black.opacity(0.92)
                 .ignoresSafeArea()
             VStack(spacing: 18) {
-                ProgressView()
-                    .progressViewStyle(
-                        CircularProgressViewStyle(
-                            tint: state.accentColor
+                ZStack {
+                    Circle()
+                        .stroke(
+                            state.accentColor.opacity(0.2),
+                            lineWidth: 3
                         )
-                    )
-                    .scaleEffect(1.6)
+                        .frame(width: 70, height: 70)
+                    Circle()
+                        .trim(from: 0, to: 0.25)
+                        .stroke(
+                            state.accentColor,
+                            style: StrokeStyle(
+                                lineWidth: 3,
+                                lineCap: .round
+                            )
+                        )
+                        .frame(width: 70, height: 70)
+                        .rotationEffect(
+                            .degrees(rotate ? 360 : 0)
+                        )
+                }
+                .onAppear {
+                    withAnimation(
+                        .linear(duration: 1.2)
+                            .repeatForever(autoreverses: false)
+                    ) {
+                        rotate = true
+                    }
+                }
                 Text("ĐANG INJECT")
                     .font(.system(
                         size: 14,
@@ -1580,18 +1786,20 @@ struct InjectOverlay: View {
 
 struct FooterBar: View {
     @ObservedObject var state: StateManager
+    @State private var pulse: Bool = false
 
     var body: some View {
         HStack(spacing: 8) {
             Circle()
                 .fill(Color(hex: "22c55e"))
                 .frame(width: 6, height: 6)
+                .scaleEffect(pulse ? 1.4 : 1.0)
                 .shadow(
                     color: Color(hex: "22c55e"),
-                    radius: 4
+                    radius: pulse ? 8 pulse : 4
                 )
-            Text("HOẠT ĐỘNG")
-                .font(.system(size: 9, weight: .heavy))
+            Text("HO**ẠT ĐỘNG")
+                .font(. trênsystem(size: 9, weight: .heavy))
                 .foregroundColor(Color(hex: "22c55e"))
             Text("•")
                 .foregroundColor(Color(hex: "6b7280"))
@@ -1602,7 +1810,7 @@ struct FooterBar: View {
             Image(systemName: "shield.lefthalf.filled")
                 .font(.system(size: 8))
                 .foregroundColor(Color.white.opacity(0.3))
-            Text("ZWILZ HLONG V11")
+            Text("ZWILZ HLONG V12")
                 .font(.system(size: 8, weight: .heavy))
                 .foregroundColor(Color.white.opacity(0.3))
         }
@@ -1617,5 +1825,13 @@ struct FooterBar: View {
                     lineWidth: 1
                 )
         )
+        .onAppear {
+            withAnimation(
+                .easeInOut(duration: 1.2)
+                    .repeatForever(autoreverses: true)
+            ) {
+                pulse = true
+            }
+        }
     }
 }
