@@ -2,7 +2,7 @@ name: DragLockHead
 options:
   bundleIdPrefix: com.zwilz
   deploymentTarget:
-    iOS: "14.0"
+    iOS: "15.0"
   createIntermediateGroups: true
 targets:
   DragLockHead:
@@ -15,7 +15,7 @@ targets:
       properties:
         CFBundleDevelopmentRegion: vi
         CFBundleDisplayName: Zwilz HLong
-        CFBundleShortVersionString: "11.0.0"
+        CFBundleShortVersionString: "12.0.0"
         CFBundleVersion: "20251011"
         LSRequiresIPhoneOS: true
         UILaunchScreen: {}
@@ -33,7 +33,7 @@ targets:
         PRODUCT_NAME: DragLockHead
         TARGETED_DEVICE_FAMILY: "1"
         SWIFT_VERSION: "5.0"
-        MARKETING_VERSION: "11.0.0"
+        MARKETING_VERSION: "12.0.0"
         CURRENT_PROJECT_VERSION: "20251011"
         GENERATE_INFOPLIST_FILE: NO
         ENABLE_BITCODE: NO
