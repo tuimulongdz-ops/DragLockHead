@@ -338,13 +338,12 @@ final class StateManager: ObservableObject {
         metricsTimer = Timer.scheduledTimer(
             withTimeInterval: 1.0,
             repeats: true
-        ) { weakSelf in
-            let s = weakSelf
-            if s == nil {
+        ) { [weak self] _ in
+            if self == nil {
                 return
             }
-            s!.ping = Int.random(in: 6...18)
-            s!.ram = s!.getRamUsage()
+            self!.ping = Int.random(in: 6...18)
+            self!.ram = self!.getRamUsage()
         }
     }
 
@@ -388,16 +387,22 @@ final class StateManager: ObservableObject {
                 UIDevice.batteryLevelDidChangeNotification,
             object: nil,
             queue: .main
-        ) { weakSelf in
-            weakSelf?.updateBattery()
+        ) { [weak self] _ in
+            if self == nil {
+                return
+            }
+            self!.updateBattery()
         }
         NotificationCenter.default.addObserver(
             forName:
                 UIDevice.batteryStateDidChangeNotification,
             object: nil,
             queue: .main
-        ) { weakSelf in
-            weakSelf?.updateBattery()
+        ) { [weak self] _ in
+            if self == nil {
+                return
+            }
+            self!.updateBattery()
         }
     }
 
