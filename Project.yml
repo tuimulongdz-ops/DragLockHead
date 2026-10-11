@@ -1,1 +1,29 @@
-
+name: DragLockHead
+options:
+  bundleIdPrefix: com.zwilz
+  deploymentTarget:
+    iOS: "14.0"
+targets:
+  DragLockHead:
+    type: application
+    platform: iOS
+    sources:
+      - path: DragLockHead
+      - path: DragLockHead/web
+        type: folder
+        buildPhase: resources
+    info:
+      path: DragLockHead/Info.plist
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.zwilz.draglockhead
+        PRODUCT_NAME: DragLockHead
+        TARGETED_DEVICE_FAMILY: "1"
+        SWIFT_VERSION: "5.0"
+        MARKETING_VERSION: "7.0.0"
+        CURRENT_PROJECT_VERSION: "20251011"
+        GENERATE_INFOPLIST_FILE: NO
+        ENABLE_BITCODE: NO
+        CODE_SIGNING_REQUIRED: NO
+        CODE_SIGNING_ALLOWED: NO
+        CODE_SIGN_IDENTITY: ""
