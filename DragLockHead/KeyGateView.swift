@@ -11,7 +11,6 @@ struct KeyGateView: View {
     @State private var particles: [ParticleData] = []
 
     private let deviceId: String
-    @FocusState private var isFocused: Bool
 
     init(isVerified: Binding<Bool>, deviceId: String) {
         self._isVerified = isVerified
@@ -21,9 +20,7 @@ struct KeyGateView: View {
     var body: some View {
         ZStack {
             Theme.dark1.ignoresSafeArea()
-
             AnimatedBackground()
-
             ParticleField(particles: particles)
 
             ScrollView(showsIndicators: false) {
@@ -32,9 +29,12 @@ struct KeyGateView: View {
 
                     ZStack {
                         Circle()
-                            .stroke(LinearGradient(
-                                colors: [Theme.sea1, Theme.sea2, Theme.red1],
-                                startPoint: .top, endPoint: .bottom), lineWidth: 2)
+                            .stroke(
+                                LinearGradient(
+                                    colors: [Theme.sea1, Theme.sea2, Theme.red1],
+                                    startPoint: .top,
+                                    endPoint: .bottom),
+                                lineWidth: 2)
                             .frame(width: 130, height: 130)
                             .rotationEffect(.degrees(rotation))
 
@@ -44,9 +44,12 @@ struct KeyGateView: View {
                             .rotationEffect(.degrees(-rotation * 1.5))
 
                         Circle()
-                            .fill(LinearGradient(
-                                colors: [Theme.sea1, Theme.sea2, Theme.red1],
-                                startPoint: .topLeading, endPoint: .bottomTrailing))
+                            .fill(
+                                LinearGradient(
+                                    colors: [Theme.sea1, Theme.sea2, Theme.red1],
+                                    startPoint: .topLeading,
+                                    endPoint: .bottomTrailing)
+                            )
                             .frame(width: 90, height: 90)
                             .shadow(color: Theme.sea1.opacity(0.8), radius: 24)
 
@@ -63,7 +66,7 @@ struct KeyGateView: View {
                             .shadow(color: Theme.sea2.opacity(0.5), radius: 8)
                         Text("PREMIUM EDITION - v9.0")
                             .font(.system(size: 10, weight: .bold))
-                            .tracking(3)
+                            .kerning(3)
                             .foregroundColor(Theme.smoke2)
                     }
 
@@ -71,12 +74,10 @@ struct KeyGateView: View {
 
                     VStack(alignment: .leading, spacing: 10) {
                         HStack(spacing: 6) {
-                            Circle()
-                                .fill(Theme.sea2)
-                                .frame(width: 6, height: 6)
+                            Circle().fill(Theme.sea2).frame(width: 6, height: 6)
                             Text("KEY KICH HOAT")
                                 .font(.system(size: 11, weight: .heavy))
-                                .tracking(2)
+                                .kerning(2)
                                 .foregroundColor(Theme.sea2)
                         }
 
@@ -87,17 +88,15 @@ struct KeyGateView: View {
                             .autocapitalization(.allCharacters)
                             .disableAutocorrection(true)
                             .keyboardType(.asciiCapable)
-                            .focused($isFocused)
                             .padding(.vertical, 16)
                             .padding(.horizontal, 12)
                             .background(Color.black.opacity(0.7))
                             .cornerRadius(14)
                             .overlay(
                                 RoundedRectangle(cornerRadius: 14)
-                                    .stroke(isFocused ? Theme.sea2 : Color.white.opacity(0.15),
-                                            lineWidth: isFocused ? 1.5 : 1)
+                                    .stroke(Theme.sea2.opacity(0.5), lineWidth: 1)
                             )
-                            .shadow(color: isFocused ? Theme.sea2.opacity(0.4) : .clear, radius: 12)
+                            .shadow(color: Theme.sea2.opacity(0.15), radius: 12)
 
                         Button(action: verify) {
                             HStack(spacing: 10) {
@@ -108,7 +107,7 @@ struct KeyGateView: View {
                                 }
                                 Text(isLoading ? "DANG KIEM TRA..." : "KICH HOAT")
                                     .font(.system(size: 15, weight: .black))
-                                    .tracking(2)
+                                    .kerning(2)
                             }
                             .frame(maxWidth: .infinity)
                             .padding(.vertical, 17)
@@ -117,7 +116,8 @@ struct KeyGateView: View {
                                     colors: isLoading
                                         ? [Theme.smoke, Theme.smoke2]
                                         : [Theme.sea1, Theme.sea2, Theme.red1],
-                                    startPoint: .leading, endPoint: .trailing)
+                                    startPoint: .leading,
+                                    endPoint: .trailing)
                             )
                             .foregroundColor(.white)
                             .cornerRadius(14)
@@ -128,9 +128,7 @@ struct KeyGateView: View {
 
                         if !statusText.isEmpty {
                             HStack(spacing: 6) {
-                                Circle()
-                                    .fill(statusColor)
-                                    .frame(width: 5, height: 5)
+                                Circle().fill(statusColor).frame(width: 5, height: 5)
                                 Text(statusText)
                                     .font(.system(size: 12, weight: .heavy))
                                     .foregroundColor(statusColor)
@@ -144,19 +142,28 @@ struct KeyGateView: View {
                     .padding(22)
                     .background(
                         RoundedRectangle(cornerRadius: 26)
-                            .fill(LinearGradient(
-                                colors: [Theme.sea1.opacity(0.15),
-                                         Theme.dark2.opacity(0.92),
-                                         Theme.red1.opacity(0.12)],
-                                startPoint: .topLeading, endPoint: .bottomTrailing))
+                            .fill(
+                                LinearGradient(
+                                    colors: [
+                                        Theme.sea1.opacity(0.15),
+                                        Theme.dark2.opacity(0.92),
+                                        Theme.red1.opacity(0.12)
+                                    ],
+                                    startPoint: .topLeading,
+                                    endPoint: .bottomTrailing)
+                            )
                     )
                     .overlay(
                         RoundedRectangle(cornerRadius: 26)
-                            .stroke(LinearGradient(
-                                colors: [Theme.sea1.opacity(0.5),
-                                         Theme.sea2.opacity(0.3),
-                                         Theme.red1.opacity(0.5)],
-                                startPoint: .topLeading, endPoint: .bottomTrailing),
+                            .stroke(
+                                LinearGradient(
+                                    colors: [
+                                        Theme.sea1.opacity(0.5),
+                                        Theme.sea2.opacity(0.3),
+                                        Theme.red1.opacity(0.5)
+                                    ],
+                                    startPoint: .topLeading,
+                                    endPoint: .bottomTrailing),
                                 lineWidth: 1)
                     )
                     .shadow(color: Theme.sea1.opacity(0.3), radius: 20)
@@ -167,7 +174,7 @@ struct KeyGateView: View {
                             .font(.system(size: 9))
                         Text("POWERED BY ZWILZ HLONG 2026")
                             .font(.system(size: 9, weight: .bold))
-                            .tracking(2)
+                            .kerning(2)
                     }
                     .foregroundColor(Color.white.opacity(0.3))
 
@@ -201,7 +208,8 @@ struct KeyGateView: View {
     }
 
     private func verify() {
-        isFocused = false
+        UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder),
+                                        to: nil, from: nil, for: nil)
         let trimmed = keyInput.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !trimmed.isEmpty else {
             withAnimation {
@@ -291,16 +299,25 @@ struct AnimatedBackground: View {
 
     var body: some View {
         ZStack {
-            RadialGradient(gradient: Gradient(colors: [Theme.sea1.opacity(0.35), .clear]),
-                           center: .topLeading, startRadius: 0, endRadius: 500)
+            RadialGradient(
+                gradient: Gradient(colors: [Theme.sea1.opacity(0.35), .clear]),
+                center: .topLeading,
+                startRadius: 0,
+                endRadius: 500)
                 .offset(x: sin(phase) * 40, y: cos(phase) * 40)
 
-            RadialGradient(gradient: Gradient(colors: [Theme.red1.opacity(0.28), .clear]),
-                           center: .bottomTrailing, startRadius: 0, endRadius: 500)
+            RadialGradient(
+                gradient: Gradient(colors: [Theme.red1.opacity(0.28), .clear]),
+                center: .bottomTrailing,
+                startRadius: 0,
+                endRadius: 500)
                 .offset(x: cos(phase) * 40, y: sin(phase) * 40)
 
-            RadialGradient(gradient: Gradient(colors: [Theme.purple.opacity(0.2), .clear]),
-                           center: .bottomLeading, startRadius: 0, endRadius: 400)
+            RadialGradient(
+                gradient: Gradient(colors: [Theme.purple.opacity(0.2), .clear]),
+                center: .bottomLeading,
+                startRadius: 0,
+                endRadius: 400)
                 .offset(x: sin(phase * 0.7) * 30, y: cos(phase * 0.7) * 30)
         }
         .ignoresSafeArea()
