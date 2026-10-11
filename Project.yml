@@ -3,15 +3,12 @@ options:
   bundleIdPrefix: com.zwilz
   deploymentTarget:
     iOS: "14.0"
-  createIntermediateGroups: true
 
 targets:
   DragLockHead:
     type: application
     platform: iOS
-    sources:
-      - path: DragLockHead
-    DragLockHead/Info.plist
+    sources: [DragLockHead]
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.zwilz.draglockhead
@@ -21,6 +18,7 @@ targets:
         MARKETING_VERSION: "8.0.0"
         CURRENT_PROJECT_VERSION: "20251011"
         GENERATE_INFOPLIST_FILE: NO
+        INFOPLIST_FILE: DragLockHead/Info.plist
         ENABLE_BITCODE: NO
         CODE_SIGNING_REQUIRED: NO
         CODE_SIGNING_ALLOWED: NO
