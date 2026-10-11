@@ -13,7 +13,7 @@ struct CodeLibrary {
     static let snippets: [CodeSnippet] = [
         CodeSnippet(
             name: "AIMLOCK C++",
-            icon: "A",
+            icon: "1",
             description: "Khoa muc tieu tu dong",
             language: "C++",
             code: """
@@ -67,7 +67,7 @@ private:
         ),
         CodeSnippet(
             name: "MICRO PULL JS",
-            icon: "B",
+            icon: "2",
             description: "Nhe tam cam ung muot",
             language: "JavaScript",
             code: """
@@ -96,7 +96,7 @@ private:
         ),
         CodeSnippet(
             name: "HEAD TRACK C#",
-            icon: "C",
+            icon: "3",
             description: "Bam dau du doan",
             language: "C#",
             code: """
@@ -157,7 +157,7 @@ public class HeadTrackAdvanced : MonoBehaviour {
         ),
         CodeSnippet(
             name: "TOUCH DELAY FIX",
-            icon: "D",
+            icon: "4",
             description: "Khu tre cam ung iOS",
             language: "Swift",
             code: """
@@ -191,7 +191,7 @@ class TouchOptimizer {
         ),
         CodeSnippet(
             name: "AIM ASSIST C++",
-            icon: "E",
+            icon: "5",
             description: "Keo muot + du doan",
             language: "C++",
             code: """
@@ -237,7 +237,7 @@ public:
         ),
         CodeSnippet(
             name: "RECOIL FIX",
-            icon: "F",
+            icon: "6",
             description: "Giam giat sung",
             language: "C#",
             code: """
@@ -273,7 +273,7 @@ public class RecoilFix : MonoBehaviour {
         ),
         CodeSnippet(
             name: "TRIGGER BOT",
-            icon: "G",
+            icon: "7",
             description: "Tu ban khi co target",
             language: "C++",
             code: """
@@ -313,7 +313,7 @@ public:
         ),
         CodeSnippet(
             name: "PREDICTION",
-            icon: "H",
+            icon: "8",
             description: "Du doan di chuyen dich",
             language: "C#",
             code: """
@@ -347,7 +347,7 @@ public class Prediction {
         ),
         CodeSnippet(
             name: "FPS BOOST",
-            icon: "I",
+            icon: "9",
             description: "Toi uu hieu nang iOS",
             language: "Swift",
             code: """
@@ -385,6 +385,7 @@ class PerformanceBooster {
     ]
 }
 
+// MARK: - CODE LIBRARY VIEW
 struct CodeLibraryView: View {
     @State private var selectedSnippet: CodeSnippet?
     @State private var searchText: String = ""
@@ -443,7 +444,7 @@ struct StatBox: View {
                 .foregroundColor(Theme.sea2)
             Text(label)
                 .font(.system(size: 8, weight: .heavy))
-                .tracking(1.2)
+                .kerning(1.2)
                 .foregroundColor(Theme.smoke2)
         }
         .frame(maxWidth: .infinity)
@@ -465,9 +466,12 @@ struct CodeCard: View {
                     .font(.system(size: 18, weight: .black))
                     .foregroundColor(.white)
                     .frame(width: 42, height: 42)
-                    .background(LinearGradient(
-                        colors: [Theme.sea1.opacity(0.6), Theme.sea2.opacity(0.3)],
-                        startPoint: .topLeading, endPoint: .bottomTrailing))
+                    .background(
+                        LinearGradient(
+                            colors: [Theme.sea1.opacity(0.6), Theme.sea2.opacity(0.3)],
+                            startPoint: .topLeading,
+                            endPoint: .bottomTrailing)
+                    )
                     .cornerRadius(12)
                     .overlay(RoundedRectangle(cornerRadius: 12).stroke(Theme.sea2.opacity(0.3), lineWidth: 1))
 
@@ -485,7 +489,7 @@ struct CodeCard: View {
                 VStack(spacing: 2) {
                     Text(snippet.language)
                         .font(.system(size: 9, weight: .heavy))
-                        .tracking(1)
+                        .kerning(1)
                         .foregroundColor(Theme.sea2)
                         .padding(.horizontal, 8)
                         .padding(.vertical, 4)
@@ -521,9 +525,12 @@ struct CodeDetailView: View {
                         .font(.system(size: 20, weight: .black))
                         .foregroundColor(.white)
                         .frame(width: 40, height: 40)
-                        .background(LinearGradient(
-                            colors: [Theme.sea1, Theme.sea2],
-                            startPoint: .topLeading, endPoint: .bottomTrailing))
+                        .background(
+                            LinearGradient(
+                                colors: [Theme.sea1, Theme.sea2],
+                                startPoint: .topLeading,
+                                endPoint: .bottomTrailing)
+                        )
                         .cornerRadius(10)
 
                     VStack(alignment: .leading, spacing: 2) {
@@ -532,7 +539,7 @@ struct CodeDetailView: View {
                             .foregroundColor(.white)
                         Text(snippet.language)
                             .font(.system(size: 10, weight: .heavy))
-                            .tracking(1.5)
+                            .kerning(1.5)
                             .foregroundColor(Theme.sea2)
                     }
 
@@ -574,13 +581,16 @@ struct CodeDetailView: View {
                         Text(copied ? "DA COPY" : "COPY CODE")
                     }
                     .font(.system(size: 13, weight: .black))
-                    .tracking(1)
+                    .kerning(1)
                     .foregroundColor(.white)
                     .frame(maxWidth: .infinity)
                     .padding(.vertical, 15)
-                    .background(LinearGradient(
-                        colors: [Theme.sea1, Theme.sea2],
-                        startPoint: .leading, endPoint: .trailing))
+                    .background(
+                        LinearGradient(
+                            colors: [Theme.sea1, Theme.sea2],
+                            startPoint: .leading,
+                            endPoint: .trailing)
+                    )
                     .cornerRadius(12)
                 }
                 .buttonStyle(GradientButtonStyle())
