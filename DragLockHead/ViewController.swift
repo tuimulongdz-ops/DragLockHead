@@ -13,7 +13,10 @@ final class ViewController: UIViewController, WKNavigationDelegate, WKUIDelegate
     }
 
     override var prefersStatusBarHidden: Bool { return true }
-    override var supportedInterfaceOrientations: UIInterfaceOrientationMask { return .portrait }
+
+    override var supportedInterfaceOrientations: UIInterfaceOrientationMask {
+        return .portrait
+    }
 
     private func setupWebView() {
         let config = WKWebViewConfiguration()
@@ -41,21 +44,78 @@ final class ViewController: UIViewController, WKNavigationDelegate, WKUIDelegate
     }
 
     private func loadHTML() {
-        guard let url = Bundle.main.url(forResource: "index",
-                                        withExtension: "html",
-                                        subdirectory: "web") else {
-            print("[ERR] index.html không tìm thấy")
-            return
+        // Thử nhiều case tên file và thư mục khác nhau
+        let candidates: [(String, String, String?)] = [
+            ("index", "html", "web"),
+            ("index", "html", "Web"),
+            ("Index", "html", "web"),
+            ("Index", "html", "Web"),
+            ("index", "html", nil),
+            ("Index", "html", nil)
+        ]
+
+        for (name, ext, sub) in candidates {
+            if let url = Bundle.main.url(forResource: name,
+                                         withExtension: ext,
+                                         subdirectory: sub) {
+                print("[OK] Tìm thấy file: \(sub ?? "root")/\(name).\(ext)")
+                webView.loadFileURL(url, allowingReadAccessTo: url.deletingLastPathComponent())
+                return
+            }
         }
-        webView.loadFileURL(url, allowingReadAccessTo: url.deletingLastPathComponent())
+
+        // Không tìm thấy file - hiển thị thông báo trên màn hình
+        print("[ERR] Không tìm thấy file HTML trong bundle")
+        showErrorPage()
     }
 
+    // Hiển thị trang lỗi nếu không load được HTML
+    private func showErrorPage() {
+        let html = """
+        <!DOCTYPE html>
+        <html>
+        <head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
+        <body style="background:#06080d;color:#fff;font-family:-apple-system;padding:40px;text-align:center;">
+        <h1 style="color:#ff0033;">LỖI TẢI MENU</h1>
+        <p>Không tìm thấy file index.html trong bundle.</p>
+        <p style="color:#9ca3af;font-size:12px;margin-top:20px;">
+        Kiểm tra lại cấu trúc thư mục:<br>
+        DragLockHead/web/index.html
+        </p>
+        </body>
+        </html>
+        """
+        webView.loadHTMLString(html, baseURL: nil)
+    }
+
+    // Cho phép alert() của JavaScript hiển thị
     func webView(_ webView: WKWebView,
                  runJavaScriptAlertPanelWithMessage message: String,
                  initiatedByFrame frame: WKFrameInfo,
                  completionHandler: @escaping () -> Void) {
-        let a = UIAlertController(title: "THÔNG BÁO", message: message, preferredStyle: .alert)
-        a.addAction(UIAlertAction(title: "OK", style: .default) { _ in completionHandler() })
-        present(a, animated: true)
+        let alert = UIAlertController(title: "THÔNG BÁO",
+                                      message: message,
+                                      preferredStyle: .alert)
+        alert.addAction(UIAlertAction(title: "OK", style: .default) { _ in
+            completionHandler()
+        })
+        present(alert, animated: true)
+    }
+
+    // Cho phép confirm() của JavaScript
+    func webView(_ webView: WKWebView,
+                 runJavaScriptConfirmPanelWithMessage message: String,
+                 initiatedByFrame frame: WKFrameInfo,
+                 completionHandler: @escaping (Bool) -> Void) {
+        let alert = UIAlertController(title: "XÁC NHẬN",
+                                      message: message,
+                                      preferredStyle: .alert)
+        alert.addAction(UIAlertAction(title: "OK", style: .default) { _ in
+            completionHandler(true)
+        })
+        alert.addAction(UIAlertAction(title: "HỦY", style: .cancel) { _ in
+            completionHandler(false)
+        })
+        present(alert, animated: true)
     }
 }
