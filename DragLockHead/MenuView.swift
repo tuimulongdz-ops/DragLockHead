@@ -472,20 +472,24 @@ struct FeatureCard: View {
         Button(action: {
             showCode = true
         }) {
-            Text("CODE")
-                .font(.system(size: 8, weight: .black))
-                .foregroundColor(accent)
-                .padding(.horizontal, 6)
-                .padding(.vertical, 3)
-                .background(accent.opacity(0.15))
-                .cornerRadius(6)
-                .overlay(
-                    RoundedRectangle(cornerRadius: 6)
-                        .stroke(
-                            accent.opacity(0.4),
-                            lineWidth: 1
-                        )
-                )
+            HStack(spacing: 4) {
+                Image(systemName: "chevron.left.forwardslash.chevron.right")
+                    .font(.system(size: 8, weight: .black))
+                Text("CODE")
+                    .font(.system(size: 8, weight: .black))
+            }
+            .foregroundColor(accent)
+            .padding(.horizontal, 6)
+            .padding(.vertical, 3)
+            .background(accent.opacity(0.15))
+            .cornerRadius(6)
+            .overlay(
+                RoundedRectangle(cornerRadius: 6)
+                    .stroke(
+                        accent.opacity(0.4),
+                        lineWidth: 1
+                    )
+            )
         }
         .padding(.leading, 6)
     }
@@ -514,7 +518,11 @@ struct FeatureCard: View {
                     .fill(Color.white.opacity(0.05))
                     .frame(width: 40, height: 40)
             }
-            Text(icon).font(.system(size: 18))
+            Image(systemName: icon)
+                .font(.system(size: 16, weight: .bold))
+                .foregroundColor(
+                    isOn ? .white : accent
+                )
         }
         .overlay(
             RoundedRectangle(cornerRadius: 11)
@@ -636,8 +644,8 @@ struct SimpleCodeView: View {
             Button(action: {
                 pm.wrappedValue.dismiss()
             }) {
-                Text("✕")
-                    .font(.system(size: 16, weight: .bold))
+                Image(systemName: "xmark")
+                    .font(.system(size: 14, weight: .bold))
                     .foregroundColor(.white)
                     .frame(width: 32, height: 32)
                     .background(
@@ -681,7 +689,10 @@ struct SimpleCodeView: View {
             }
         }) {
             HStack(spacing: 8) {
-                Text(copied ? "✓" : "📋")
+                Image(systemName: copied
+                    ? "checkmark.circle.fill"
+                    : "doc.on.doc.fill")
+                    .font(.system(size: 14, weight: .black))
                 Text(copied ? "ĐÃ COPY" : "COPY CODE")
                     .font(.system(
                         size: 13,
@@ -712,12 +723,12 @@ struct AimTab: View {
     @ObservedObject var state: StateManager
 
     private let items: [(String, String, String, String)] = [
-        ("microaim", "👆", "NHẸ TÂM", "Micro pull chuẩn xác"),
-        ("headlock", "💀", "BÁM ĐẦU", "Head track dự đoán"),
-        ("dragaim", "🎯", "DRAG AIM", "Kéo aim theo ngón tay"),
-        ("aimassist", "🌀", "AIM ASSIST", "Kéo mượt + dự đoán"),
-        ("aimlock", "🔒", "AIM LOCK", "Khóa mục tiêu"),
-        ("smooth", "🌊", "SMOOTH TARGET", "Chuyển mục tiêu mượt")
+        ("microaim", "hand.point.up.left.fill", "NHẸ TÂM", "Micro pull chuẩn xác"),
+        ("headlock", "scope", "BÁM ĐẦU", "Head track dự đoán"),
+        . ("dragaim", "hand.draw.fill",first "DRAG { AIM", "Kéo aim theo $ ngón tay"),
+       0 ("aimassist", "wand.and.stars",.name "AIM ASSIST", "Kéo mượt + dự đoán"),
+        ("aimlock", "target", "AIM LOCK", "Khóa mục tiêu"),
+        ("smooth", "arrow.left.arrow.right", "SMOOTH TARGET", "Chuyển mục tiêu mượt")
     ]
 
     var body: some View {
@@ -757,22 +768,21 @@ struct AdvancedTab: View {
     @ObservedObject var state: StateManager
 
     private let items: [(String, String, String, String)] = [
-        ("predict", "🔮", "PREDICTION", "Dự đoán di chuyển"),
-        ("trigger", "⚡", "TRIGGER BOT", "Tự bắn khi có target"),
-        ("recoil", "🎚️", "RECOIL FIX", "Giảm giật súng"),
-        ("nospread", "🎯", "NO SPREAD", "Không tản mác"),
-        ("silent", "🤫", "SILENT AIM", "Ngắm không lộ"),
-        ("flick", "💫", "FLICK AIM", "Bật tâm tức thời"),
-        ("scope", "🔭", "QUICK SCOPE", "Ngắm nhanh scope"),
-        ("burst", "🔥", "BURST LOCK", "Khóa loạt đạn"),
-        ("swap", "⚡", "FAST SWAP", "Đổi súng nhanh"),
-        ("rung", "🛡️", "FIX RUNG", "Khử rung tâm"),
-        ("lo", "🌊", "FIX LỐ SMOOTH", "SmoothDamp"),
-        (":nhay", "🎚️ state", "NHẠY.ac TÂM", "HeadLockcentColor,
- Boost"),
-        ("nhe5", "✨", "NHẸ TÂM V5", "SmoothAim 90%"),
-        ("move", "➡️", "MOVE TOWARD", "Di chuyển cơ bản"),
-        ("core", "💾", "AIM DATA CORE", "AimData Structure")
+        ("predict", "location.fill", "PREDICTION", "Dự đoán di chuyển"),
+        ("trigger", "bolt.fill", "TRIGGER BOT", "Tự bắn khi có target"),
+        ("recoil", "arrow.up.arrow.down", "RECOIL FIX", "Giảm giật súng"),
+        ("nospread", "circle.dashed", "NO SPREAD", "Không tản mác"),
+        ("silent", "eye.slash.fill", "SILENT AIM", "Ngắm không lộ"),
+        ("flick", "arrow.up.right", "FLICK AIM", "Bật tâm tức thời"),
+        ("scope", "viewfinder", "QUICK SCOPE", "Ngắm nhanh scope"),
+        ("burst", "flame.fill", "BURST LOCK", "Khóa loạt đạn"),
+        ("swap", "arrow.left.arrow.right.square", "FAST SWAP", "Đổi súng nhanh"),
+        ("rung", "waveform", "FIX RUNG", "Khử rung tâm"),
+        ("lo", "drop.fill", "FIX LỐ SMOOTH", "SmoothDamp"),
+        ("nhay", "arrow.up.circle.fill", "NHẠY TÂM", "HeadLock Boost"),
+        ("nhe5", "sparkles", "NHẸ TÂM V5", "SmoothAim 90%"),
+        ("move", "arrow.right", "MOVE TOWARD", "Di chuyển cơ bản"),
+        ("core", "cpu", "AIM DATA CORE", "AimData Structure")
     ]
 
     var body: some View {
@@ -784,7 +794,8 @@ struct AdvancedTab: View {
                     title: i.2,
                     subtitle: i.3,
                     isOn: state.isOn(i.0),
-                    accent                    code: findCode(i.0)
+                    accent: state.accentColor,
+                    code: findCode(i.0)
                 ) {
                     state.toggle(i.0)
                 }
@@ -806,7 +817,7 @@ struct AdvancedTab: View {
         ]
         guard let n = map[k] else { return nil }
         return CodeLibrary.snippets
-            .first { $0.name == n }?.code
+            == n }?.code
     }
 }
 
@@ -814,11 +825,11 @@ struct CleanTab: View {
     @ObservedObject var state: StateManager
 
     private let items: [(String, String, String, String)] = [
-        ("clearcache", "🗑️", "DỌN CACHE", "Xóa cache hệ thống"),
-        ("clearls", "💾", "DỌN STORAGE", "Xóa dữ liệu lưu trữ"),
-        ("clearidb", "🗄️", "DỌN DATA", "Xóa database"),
-        ("clearimagecache", "🖼️", "DỌN ẢNH", "Xóa cache ảnh"),
-        ("clearcookies", "🍪", "DỌN COOKIES", "Xóa cookies")
+        ("clearcache", "trash.fill", "DỌN CACHE", "Xóa cache hệ thống"),
+        ("clearls", "internaldrive", "DỌN STORAGE", "Xóa dữ liệu lưu trữ"),
+        ("clearidb", "cylinder.fill", "DỌN DATA", "Xóa database"),
+        ("clearimagecache", "photo.fill", "DỌN ẢNH", "Xóa cache ảnh"),
+        ("clearcookies", "doc.text.fill", "DỌN COOKIES", "Xóa cookies")
     ]
 
     var body: some View {
@@ -875,9 +886,9 @@ struct CleanTab: View {
 
             SectionTitle(text: "DỌN DẸP NHANH")
             HStack(spacing: 8) {
-                cleanBtn("RAM", "🧹", "DỌN RAM")
-                cleanBtn("CACHE", "🗑️", "DỌN CACHE")
-                cleanBtn("ALL", "⚡", "DỌN TẤT CẢ")
+                cleanBtn("RAM", "memorychip", "DỌN RAM")
+                cleanBtn("CACHE", "trash.fill", "DỌN CACHE")
+                cleanBtn("ALL", "bolt.fill", "DỌN TẤT CẢ")
             }
         }
     }
@@ -892,8 +903,10 @@ struct CleanTab: View {
             UIImpactFeedbackGenerator(style: .heavy)
                 .impactOccurred()
         }) {
-            VStack(spacing: 4) {
-                Text(icon).font(.system(size: 22))
+            VStack(spacing: 6) {
+                Image(systemName: icon)
+                    .font(.system(size: 20, weight: .bold))
+                    .foregroundColor(.white)
                 Text(title)
                     .font(.system(
                         size: 9,
@@ -931,14 +944,14 @@ struct PerfTab: View {
     @ObservedObject var state: StateManager
 
     private let items: [(String, String, String, String)] = [
-        ("fps", "💥", "BUFF FPS", "Tối ưu khung hình"),
-        ("delay", "⚡", "ANTI DELAY", "Khử trễ cảm ứng"),
-        ("thermal", "🌡️", "THERMAL GUARD", "Chống nóng máy"),
-        ("battery", "🔋", "BATTERY SAVE", "Tiết kiệm pin"),
-        ("wake", "💡", "WAKE LOCK", "Màn hình sáng"),
-        ("fullscreen", "🖥️", "FULLSCREEN", "Toàn màn hình"),
-        ("noparticles", "✨", "TẮT HẠT SÁNG", "Giảm particle"),
-        ("nofx", "🎬", "TẮT HIỆU ỨNG", "Tắt effect nặng")
+        ("fps", "speedometer", "BUFF FPS", "Tối ưu khung hình"),
+        ("delay", "timer", "ANTI DELAY", "Khử trễ cảm ứng"),
+        ("thermal", "thermometer", "THERMAL GUARD", "Chống nóng máy"),
+        ("battery", "battery.100", "BATTERY SAVE", "Tiết kiệm pin"),
+        ("wake", "lightbulb.fill", "WAKE LOCK", "Màn hình sáng"),
+        ("fullscreen", "arrow.up.left.and.arrow.down.right", "FULLSCREEN", "Toàn màn hình"),
+        ("noparticles", "sparkles", "TẮT HẠT SÁNG", "Giảm particle"),
+        ("nofx", "film", "TẮT HIỆU ỨNG", "Tắt effect nặng")
     ]
 
     var body: some View {
@@ -987,7 +1000,7 @@ struct GameTab: View {
         VStack(spacing: 10) {
             SectionTitle(text: "CHỌN GAME")
             GameCard(
-                icon: "🔥",
+                icon: "flame.fill",
                 name: "FREE FIRE",
                 id: "com.dts.freefireth",
                 selected: state.game == "ff",
@@ -996,7 +1009,7 @@ struct GameTab: View {
                 state.game = state.game == "ff" ? nil : "ff"
             }
             GameCard(
-                icon: "💥",
+                icon: "bolt.fill",
                 name: "FREE FIRE MAX",
                 id: "com.dts.freefiremax",
                 selected: state.game == "ffmax",
@@ -1007,7 +1020,7 @@ struct GameTab: View {
                     : "ffmax"
             }
             GameCard(
-                icon: "⚡",
+                icon: "square.stack.3d.up.fill",
                 name: "CẢ HAI GAME",
                 id: "FREE FIRE + MAX",
                 selected: state.game == "both",
@@ -1080,7 +1093,11 @@ struct GameCard: View {
                             .fill(Color.white.opacity(0.05))
                             .frame(width: 40, height: 40)
                     }
-                    Text(icon).font(.system(size: 18))
+                    Image(systemName: icon)
+                        .font(.system(size: 16, weight: .bold))
+                        .foregroundColor(
+                            selected ? .white : accent
+                        )
                 }
                 .overlay(
                     RoundedRectangle(cornerRadius: 11)
@@ -1188,13 +1205,13 @@ struct ThemeTab: View {
             }
 
             SectionTitle(text: "HIỆU ỨNG NỀN")
-            effectRow("particles", "✨", "HẠT BAY")
-            effectRow("grid", "🔲", "LƯỚI")
-            effectRow("aurora", "🌈", "CỰC QUANG")
-            effectRow("nebula", "🌌", "TINH VÂN")
-            effectRow("stars", "⭐", "SAO BĂNG")
-            effectRow("rings", "◎", "VÒNG XUNG")
-            effectRow("orbit", "🪐", "QUỸ ĐẠO")
+            effectRow("particles", "circle.grid.3x3.fill", "HẠT BAY")
+            effectRow("grid", "grid", "LƯỚI")
+            effectRow("aurora", "wave.3.right", "CỰC QUANG")
+            effectRow("nebula", "cloud.fill", "TINH VÂN")
+            effectRow("stars", "star.fill", "SAO BĂNG")
+            effectRow("rings", "circle.dashed", "VÒNG XUNG")
+            effectRow("orbit", "circle.grid.cross", "QUỸ ĐẠO")
 
             SectionTitle(text: "XEM TRƯỚC")
             InfoCard {
@@ -1257,7 +1274,7 @@ struct ThemeSwatch: View {
                                 lineWidth: 2
                             )
                             .frame(height: 42)
-                        Text("✓")
+                        Image(systemName: "checkmark")
                             .font(.system(
                                 size: 18,
                                 weight: .black
@@ -1289,12 +1306,12 @@ struct SystemTab: View {
     @ObservedObject var state: StateManager
 
     private let items: [(String, String, String, String)] = [
-        ("autosave", "💾", "TỰ ĐỘNG LƯU", "Lưu cài đặt"),
-        ("haptic", "📳", "RUNG PHẢN HỒI", "Haptic feedback"),
-        ("sound", "🔊", "ÂM THANH", "Sound effect"),
-        ("debug", "🐛", "CHẾ ĐỘ DEBUG", "Debug info"),
-        ("safe", "🛡️", "CHẾ ĐỘ AN TOÀN", "Safe mode"),
-        ("killswitch", "⛔", "KILL SWITCH", "Tắt toàn bộ")
+        ("autosave", "square.and.arrow.down.fill", "TỰ ĐỘNG LƯU", "Lưu cài đặt"),
+        ("haptic", "hand.tap.fill", "RUNG PHẢN HỒI", "Haptic feedback"),
+        ("sound", "speaker.wave.2.fill", "ÂM THANH", "Sound effect"),
+        ("debug", "ant.fill", "CHẾ ĐỘ DEBUG", "Debug info"),
+        ("safe", "checkmark.shield.fill", "CHẾ ĐỘ AN TOÀN", "Safe mode"),
+        ("killswitch", "xmark.octagon.fill", "KILL SWITCH", "Tắt toàn bộ")
     ]
 
     var body: some View {
@@ -1341,7 +1358,7 @@ struct SystemTab: View {
             HStack(spacing: 8) {
                 actionBtn(
                     "RESET",
-                    "↺",
+                    "arrow.counterclockwise",
                     Color(hex: "fbbf24")
                 ) {
                     state.resetAll()
@@ -1349,7 +1366,7 @@ struct SystemTab: View {
                 }
                 actionBtn(
                     "LOGOUT",
-                    "🚪",
+                    "arrow.right.square.fill",
                     Color(hex: "ff0033")
                 ) {
                     UserDefaults.standard.removeObject(
@@ -1393,7 +1410,11 @@ struct SystemTab: View {
                 .impactOccurred()
         }) {
             HStack(spacing: 6) {
-                Text(icon)
+                Image(systemName: icon)
+                    .font(.system(
+                        size: 14,
+                        weight: .bold
+                    ))
                 Text(title)
                     .font(.system(
                         size: 12,
@@ -1488,10 +1509,9 @@ struct ToastView: View {
 
     var body: some View {
         HStack(spacing: 8) {
-            Circle()
-                .fill(color)
-                .frame(width: 8, height: 8)
-                .shadow(color: color, radius: 6)
+            Image(systemName: "checkmark.circle.fill")
+                .font(.system(size: 12, weight: .black))
+                .foregroundColor(color)
             Text(text)
                 .font(.system(size: 12, weight: .black))
                 .foregroundColor(.white)
@@ -1579,6 +1599,9 @@ struct FooterBar: View {
                 .font(.system(size: 9, weight: .heavy))
                 .foregroundColor(Color(hex: "9ca3af"))
             Spacer()
+            Image(systemName: "shield.lefthalf.filled")
+                .font(.system(size: 8))
+                .foregroundColor(Color.white.opacity(0.3))
             Text("ZWILZ HLONG V11")
                 .font(.system(size: 8, weight: .heavy))
                 .foregroundColor(Color.white.opacity(0.3))
