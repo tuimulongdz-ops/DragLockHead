@@ -6,14 +6,36 @@ struct KeyInfo {
 }
 
 final class FirestoreService {
+
     static let shared = FirestoreService()
     private let projectId = "hlong-key-sever"
 
-    func verify(key: String, device: String, completion: @escaping (Result<KeyInfo, Error>) -> Void) {
-        let upper = key.trimmingCharacters(in: .whitespacesAndNewlines).uppercased()
-        guard let url = URL(string: "https://firestore.googleapis.com/v1/projects/\(projectId)/databases/(default)/documents:runQuery") else {
-            completion(.failure(NSError(domain: "verify", code: -1,
-                userInfo: [NSLocalizedDescriptionKey: "URL invalid"])))
+    func verify(
+        key: String,
+        device: String,
+        completion: @escaping (
+            Result<KeyInfo, Error>
+        ) -> Void
+    ) {
+        let upper = key
+            .trimmingCharacters(
+                in: .whitespacesAndNewlines
+            )
+            .uppercased()
+
+        let urlStr =
+            "https://firestore.googleapis.com/v1"
+            + "/projects/\(projectId)"
+            + "/databases/(default)/documents:runQuery"
+
+        guard let url = URL(string: urlStr) else {
+            completion(.failure(NSError(
+                domain: "v", code: -1,
+                userInfo: [
+                    NSLocalizedDescriptionKey:
+                        "URL invalid"
+                ]
+            )))
             return
         }
 
@@ -25,14 +47,22 @@ final class FirestoreService {
                         "op": "AND",
                         "filters": [
                             ["fieldFilter": [
-                                "field": ["fieldPath": "key"],
+                                "field": [
+                                    "fieldPath": "key"
+                                ],
                                 "op": "EQUAL",
-                                "value": ["stringValue": upper]
+                                "value": [
+                                    "stringValue": upper
+                                ]
                             ]],
                             ["fieldFilter": [
-                                "field": ["fieldPath": "active"],
+                                "field": [
+                                    "fieldPath": "active"
+                                ],
                                 "op": "EQUAL",
-                                "value": ["booleanValue": true]
+                                "value": [
+                                    "booleanValue": true
+                                ]
                             ]]
                         ]
                     ]
@@ -43,76 +73,157 @@ final class FirestoreService {
 
         var req = URLRequest(url: url)
         req.httpMethod = "POST"
-        req.setValue("application/json", forHTTPHeaderField: "Content-Type")
-        req.httpBody = try? JSONSerialization.data(withJSONObject: body)
+        req.setValue(
+            "application/json",
+            forHTTPHeaderField: "Content-Type"
+        )
+        req.httpBody = try? JSONSerialization
+            .data(withJSONObject: body)
         req.timeoutInterval = 12
 
-        URLSession.shared.dataTask(with: req) { [weak self] data, _, error in
+        URLSession.shared.dataTask(
+            with: req
+        ) { [weak self] data, _, error in
             guard let self = self else { return }
+            _ = self
 
-            if let error = error {
-                completion(.failure(NSError(domain: "verify", code: -2,
-                    userInfo: [NSLocalizedDescriptionKey: "Loi ket noi: \(error.localizedDescription)"])))
+            if error != nil {
+                completion(.failure(NSError(
+                    domain: "v", code: -2,
+                    userInfo: [
+                        NSLocalizedDescriptionKey:
+                            "Lỗi kết nối"
+                    ]
+                )))
                 return
             }
 
             guard let data = data,
-                  let json = try? JSONSerialization.jsonObject(with: data) as? [[String: Any]],
+                  let json = try? JSONSerialization
+                    .jsonObject(with: data)
+                    as? [[String: Any]],
                   let first = json.first,
-                  let doc = first["document"] as? [String: Any],
-                  let fields = doc["fields"] as? [String: Any] else {
-                completion(.failure(NSError(domain: "verify", code: 404,
-                    userInfo: [NSLocalizedDescriptionKey: "KEY KHONG TON TAI HOAC DA BI KHOA"])))
+                  let doc = first["document"]
+                    as? [String: Any],
+                  let fields = doc["fields"]
+                    as? [String: Any]
+            else {
+                completion(.failure(NSError(
+                    domain: "v", code: 404,
+                    userInfo: [
+                        NSLocalizedDescriptionKey:
+                            "KEY KHONG TON TAI"
+                    ]
+                )))
                 return
             }
 
-            if let ef = fields["expiry"] as? [String: Any],
-               let ts = ef["timestampValue"] as? String {
-                let formatter = ISO8601DateFormatter()
-                formatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
-                var date = formatter.date(from: ts)
-                if date == nil {
-                    formatter.formatOptions = [.withInternetDateTime]
-                    date = formatter.date(from: ts)
+            if let ef = fields["expiry"]
+                as? [String: Any],
+               let ts = ef["timestampValue"]
+                as? String {
+                let f = ISO8601DateFormatter()
+                f.formatOptions = [
+                    .withInternetDateTime,
+                    .withFractionalSeconds
+                ]
+                var d = f.date(from: ts)
+                if d == nil {
+                    f.formatOptions = [
+                        .withInternetDateTime
+                    ]
+                    d = f.date(from: ts)
                 }
-                if let d = date, d < Date() {
-                    completion(.failure(NSError(domain: "verify", code: 401,
-                        userInfo: [NSLocalizedDescriptionKey: "KEY DA HET HAN"])))
+                if let dd = d, dd < Date() {
+                    completion(.failure(NSError(
+                        domain: "v", code: 401,
+                        userInfo: [
+                            NSLocalizedDescriptionKey:
+                                "KEY DA HET HAN"
+                        ]
+                    )))
                     return
                 }
             }
 
-            var devices: [String] = []
-            if let df = fields["devices"] as? [String: Any],
-               let arr = df["arrayValue"] as? [String: Any],
-               let vals = arr["values"] as? [[String: Any]] {
-                devices = vals.compactMap { $0["stringValue"] as? String }
+            var devs: [String] = []
+            if let df = fields["devices"]
+                as? [String: Any],
+               let arr = df["arrayValue"]
+                as? [String: Any],
+               let vals = arr["values"]
+                as? [[String: Any]] {
+                devs = vals.compactMap {
+                    $0["stringValue"] as? String
+                }
             }
-            if !devices.isEmpty && !devices.contains(device) {
-                completion(.failure(NSError(domain: "verify", code: 403,
-                    userInfo: [NSLocalizedDescriptionKey: "KEY DA DUNG TREN THIET BI KHAC"])))
+
+            if !devs.isEmpty && !devs.contains(device) {
+                completion(.failure(NSError(
+                    domain: "v", code: 403,
+                    userInfo: [
+                        NSLocalizedDescriptionKey:
+                            "KEY DA DUNG MAY KHAC"
+                    ]
+                )))
                 return
             }
 
-            if devices.isEmpty, let docName = doc["name"] as? String {
-                self.patchDevice(docName: docName, device: device)
+            if devs.isEmpty,
+               let docName = doc["name"] as? String {
+                FirestoreService.patchDevice(
+                    docName: docName,
+                    device: device
+                )
             }
 
-            let tier = (fields["tier"] as? [String: Any])?["stringValue"] as? String ?? "VIP"
-            let expiry = (fields["expiry"] as? [String: Any])?["timestampValue"] as? String
-            completion(.success(KeyInfo(tier: tier, expiry: expiry)))
+            let tier = (fields["tier"]
+                as? [String: Any])?["stringValue"]
+                as? String ?? "VIP"
+            let exp = (fields["expiry"]
+                as? [String: Any])?["timestampValue"]
+                as? String
+
+            completion(.success(
+                KeyInfo(tier: tier, expiry: exp)
+            ))
         }.resume()
     }
 
-    private func patchDevice(docName: String, device: String) {
-        guard let url = URL(string: "https://firestore.googleapis.com/v1/\(docName)?updateMask.fieldPaths=devices") else { return }
+    private static func patchDevice(
+        docName: String,
+        device: String
+    ) {
+        let urlStr =
+            "https://firestore.googleapis.com/v1/"
+            + docName
+            + "?updateMask.fieldPaths=devices"
+        guard let url = URL(string: urlStr)
+        else { return }
+
         let body: [String: Any] = [
-            "fields": ["devices": ["arrayValue": ["values": [["stringValue": device]]]]]
+            "fields": [
+                "devices": [
+                    "arrayValue": [
+                        "values": [[
+                            "stringValue": device
+                        ]]
+                    ]
+                ]
+            ]
         ]
+
         var req = URLRequest(url: url)
         req.httpMethod = "PATCH"
-        req.setValue("application/json", forHTTPHeaderField: "Content-Type")
-        req.httpBody = try? JSONSerialization.data(withJSONObject: body)
-        URLSession.shared.dataTask(with: req).resume()
+        req.setValue(
+            "application/json",
+            forHTTPHeaderField: "Content-Type"
+        )
+        req.httpBody = try? JSONSerialization
+            .data(withJSONObject: body)
+
+        URLSession.shared.dataTask(
+            with: req
+        ).resume()
     }
 }
