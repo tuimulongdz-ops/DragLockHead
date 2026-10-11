@@ -1058,4 +1058,421 @@ struct GameCard: View {
             .cornerRadius(16)
             .overlay(stroke)
         }
-        .
+        .buttonStyle(.plain)
+    }
+
+    private var bg: some View {
+        ZStack {
+            if selected {
+                LinearGradient(
+                    colors: [
+                        accent.opacity(0.2),
+                        Color(hex: "0d1117").opacity(0.85),
+                        Color(hex: "ff0033").opacity(0.15)
+                    ],
+                    startPoint: .topLeading,
+                    endPoint: .bottomTrailing)
+            } else {
+                Color.white.opacity(0.03)
+            }
+        }
+    }
+
+    private var stroke: some View {
+        RoundedRectangle(cornerRadius: 16)
+            .stroke(
+                selected
+                    ? accent.opacity(0.6)
+                    : Color.white.opacity(0.08),
+                lineWidth: 1)
+    }
+}
+
+struct ThemeTab: View {
+    @ObservedObject var state: StateManager
+
+    var body: some View {
+        VStack(spacing: 10) {
+            SectionTitle(text: "MÀU CHỦ ĐỀ")
+            LazyVGrid(
+                columns: [
+                    GridItem(.flexible()),
+                    GridItem(.flexible()),
+                    GridItem(.flexible())
+                ],
+                spacing: 10
+            ) {
+                ForEach(
+                    Theme.accents,
+                    id: \.0
+                ) { a in
+                    ThemeSwatch(
+                        name: a.0,
+                        hex: a.1,
+                        selected: state.accentHex == a.1
+                    ) {
+                        state.setAccent(a.1)
+                    }
+                }
+            }
+
+            SectionTitle(text: "HIỆU ỨNG NỀN")
+            effectRow("particles", "✨", "HẠT BAY")
+            effectRow("grid", "🔲", "LƯỚI")
+            effectRow("aurora", "🌈", "CỰC QUANG")
+            effectRow("nebula", "🌌", "TINH VÂN")
+            effectRow("stars", "⭐", "SAO BĂNG")
+            effectRow("rings", "◎", "VÒNG XUNG")
+            effectRow("orbit", "🪐", "QUỸ ĐẠO")
+
+            SectionTitle(text: "XEM TRƯỚC")
+            InfoCard {
+                InfoRow(
+                    key: "MÀU HIỆN TẠI",
+                    value: "#\(state.accentHex.uppercased())")
+                InfoRow(
+                    key: "SỐ MÀU",
+                    value: "\(Theme.accents.count)")
+            }
+        }
+    }
+
+    private func effectRow(
+        _ key: String,
+        _ icon: String,
+        _ title: String
+    ) -> some View {
+        FeatureCard(
+            icon: icon,
+            title: title,
+            subtitle: "Hiệu ứng nền",
+            isOn: state.isOn(key),
+            accent: state.accentColor,
+            code: nil
+        ) {
+            state.toggle(key)
+        }
+    }
+}
+
+struct ThemeSwatch: View {
+    let name: String
+    let hex: String
+    let selected: Bool
+    let onTap: () -> Void
+
+    var body: some View {
+        Button(action: {
+            onTap()
+            UIImpactFeedbackGenerator(style: .medium)
+                .impactOccurred()
+        }) {
+            VStack(spacing: 6) {
+                ZStack {
+                    RoundedRectangle(cornerRadius: 12)
+                        .fill(Color(hex: hex))
+                        .frame(height: 42)
+                        .shadow(
+                            color: Color(hex: hex).opacity(0.6),
+                            radius: selected ? 12 : 4)
+                    if selected {
+                        RoundedRectangle(cornerRadius: 12)
+                            .stroke(Color.white, lineWidth: 2)
+                            .frame(height: 42)
+                        Text("✓")
+                            .font(.system(
+                                size: 18,
+                                weight: .black))
+                            .foregroundColor(.white)
+                            .shadow(color: .black, radius: 2)
+                    }
+                }
+                Text(name)
+                    .font(.system(size: 9, weight: .heavy))
+                    .foregroundColor(
+                        selected
+                            ? Color(hex: hex)
+                            : Color(hex: "9ca3af"))
+            }
+        }
+        .buttonStyle(.plain)
+    }
+}
+
+struct SystemTab: View {
+    @ObservedObject var state: StateManager
+
+    private let items: [(String, String, String, String)] = [
+        ("autosave", "💾", "TỰ ĐỘNG LƯU", "Lưu cài đặt"),
+        ("haptic", "📳", "RUNG PHẢN HỒI", "Haptic feedback"),
+        ("sound", "🔊", "ÂM THANH", "Sound effect"),
+        ("debug", "🐛", "CHẾ ĐỘ DEBUG", "Debug info"),
+        ("safe", "🛡️", "CHẾ ĐỘ AN TOÀN", "Safe mode"),
+        ("killswitch", "⛔", "KILL SWITCH", "Tắt toàn bộ")
+    ]
+
+    var body: some View {
+        VStack(spacing: 10) {
+            SectionTitle(text: "THÔNG TIN HỆ THỐNG")
+            InfoCard {
+                InfoRow(key: "PHIÊN BẢN", value: "V11 TITAN")
+                InfoRow(key: "BUILD", value: "20251011")
+                InfoRow(
+                    key: "DEVICE ID",
+                    value: state.deviceId)
+                InfoRow(key: "TIER", value: tier())
+                InfoRow(key: "KEY", value: maskKey())
+            }
+
+            SectionTitle(text: "CÀI ĐẶT")
+            ForEach(items, id: \.0) { i in
+                FeatureCard(
+                    icon: i.1,
+                    title: i.2,
+                    subtitle: i.3,
+                    isOn: state.isOn(i.0),
+                    accent: state.accentColor,
+                    code: nil
+                ) {
+                    state.toggle(i.0)
+                }
+            }
+
+            SectionTitle(text: "HÀNH ĐỘNG")
+            HStack(spacing: 8) {
+                actionBtn(
+                    "RESET",
+                    "↺",
+                    Color(hex: "fbbf24")
+                ) {
+                    state.resetAll()
+                    state.showToastMessage("ĐÃ RESET TẤT CẢ")
+                }
+                actionBtn(
+                    "LOGOUT",
+                    "🚪",
+                    Color(hex: "ff0033")
+                ) {
+                    UserDefaults.standard.removeObject(
+                        forKey: "dl_utral_auth")
+                    UserDefaults.standard.removeObject(
+                        forKey: "dl_utral_tier")
+                    exit(0)
+                }
+            }
+        }
+    }
+
+    private func tier() -> String {
+        return UserDefaults.standard.string(
+            forKey: "dl_utral_tier"
+        ) ?? "VIP"
+    }
+
+    private func maskKey() -> String {
+        guard let k = UserDefaults.standard.string(
+            forKey: "dl_utral_auth"
+        ), k.count > 8 else {
+            return "------"
+        }
+        let pre = k.prefix(4)
+        let suf = k.suffix(4)
+        return "\(pre)-****-\(suf)"
+    }
+
+    private func actionBtn(
+        _ title: String,
+        _ icon: String,
+        _ color: Color,
+        _ action: @escaping () -> Void
+    ) -> some View {
+        Button(action: {
+            action()
+            UIImpactFeedbackGenerator(style: .heavy)
+                .impactOccurred()
+        }) {
+            HStack(spacing: 6) {
+                Text(icon)
+                Text(title)
+                    .font(.system(size: 12, weight: .black))
+            }
+            .foregroundColor(.white)
+            .frame(maxWidth: .infinity)
+            .padding(.vertical, 14)
+            .background(
+                LinearGradient(
+                    colors: [
+                        color.opacity(0.6),
+                        color.opacity(0.25)
+                    ],
+                    startPoint: .topLeading,
+                    endPoint: .bottomTrailing)
+            )
+            .cornerRadius(12)
+            .overlay(
+                RoundedRectangle(cornerRadius: 12)
+                    .stroke(
+                        color.opacity(0.6),
+                        lineWidth: 1)
+            )
+        }
+        .buttonStyle(.plain)
+    }
+}
+
+struct InfoCard<Content: View>: View {
+    @ViewBuilder let content: () -> Content
+
+    var body: some View {
+        VStack(spacing: 0) {
+            content()
+        }
+        .padding(12)
+        .background(
+            RoundedRectangle(cornerRadius: 14)
+                .fill(Color.white.opacity(0.03))
+        )
+        .overlay(
+            RoundedRectangle(cornerRadius: 14)
+                .stroke(
+                    Color.white.opacity(0.08),
+                    lineWidth: 1)
+        )
+    }
+}
+
+struct InfoRow: View {
+    let key: String
+    let value: String
+
+    var body: some View {
+        HStack {
+            Text(key)
+                .font(.system(size: 10, weight: .heavy))
+                .foregroundColor(Color(hex: "9ca3af"))
+            Spacer()
+            Text(value)
+                .font(.system(
+                    size: 11,
+                    weight: .black,
+                    design: .monospaced))
+                .foregroundColor(Color(hex: "00d4ff"))
+                .lineLimit(1)
+        }
+        .padding(.vertical, 6)
+        .padding(.horizontal, 4)
+        .overlay(
+            Rectangle()
+                .fill(Color.white.opacity(0.05))
+                .frame(height: 1),
+            alignment: .bottom
+        )
+    }
+}
+
+struct ToastView: View {
+    let text: String
+    let color: Color
+
+    var body: some View {
+        HStack(spacing: 8) {
+            Circle()
+                .fill(color)
+                .frame(width: 8, height: 8)
+                .shadow(color: color, radius: 6)
+            Text(text)
+                .font(.system(size: 12, weight: .black))
+                .foregroundColor(.white)
+        }
+        .padding(.horizontal, 16)
+        .padding(.vertical, 12)
+        .background(
+            RoundedRectangle(cornerRadius: 14)
+                .fill(Color.black.opacity(0.9))
+        )
+        .overlay(
+            RoundedRectangle(cornerRadius: 14)
+                .stroke(color.opacity(0.7), lineWidth: 1)
+        )
+        .shadow(color: color.opacity(0.4), radius: 12)
+        .transition(
+            .move(edge: .top)
+                .combined(with: .opacity))
+    }
+}
+
+struct InjectOverlay: View {
+    @ObservedObject var state: StateManager
+    @State private var dots: Int = 0
+
+    var body: some View {
+        ZStack {
+            Color.black.opacity(0.92)
+                .ignoresSafeArea()
+            VStack(spacing: 18) {
+                ProgressView()
+                    .progressViewStyle(
+                        CircularProgressViewStyle(
+                            tint: state.accentColor))
+                    .scaleEffect(1.6)
+                Text("ĐANG INJECT")
+                    .font(.system(
+                        size: 14,
+                        weight: .black))
+                    .foregroundColor(state.accentColor)
+                Text(String(
+                    repeating: ".",
+                    count: dots % 4))
+                    .font(.system(
+                        size: 18,
+                        weight: .black))
+                    .foregroundColor(state.accentColor)
+            }
+        }
+        .onAppear {
+            Timer.scheduledTimer(
+                withTimeInterval: 0.3,
+                repeats: true
+            ) { _ in
+                dots += 1
+            }
+        }
+    }
+}
+
+struct FooterBar: View {
+    @ObservedObject var state: StateManager
+
+    var body: some View {
+        HStack(spacing: 8) {
+            Circle()
+                .fill(Color(hex: "22c55e"))
+                .frame(width: 6, height: 6)
+                .shadow(
+                    color: Color(hex: "22c55e"),
+                    radius: 4)
+            Text("HO generic trongẠT ĐỘNG")
+                .font(.system(size: 9, weight: .heavy))
+                .foregroundColor(Color(hex: "22c55e"))
+            Text("•")
+                .foregroundColor(Color(hex: "6b7280"))
+            Text("\(state.activeCount()) CHỨC NĂNG")
+                .font(.system(size: 9, weight: .heavy))
+                .foregroundColor(Color(hex: "9ca3af"))
+            Spacer()
+            Text("ZWILZ HLONG V11")
+                .font(.system(size: 8, weight: .heavy))
+                .foregroundColor(Color.white.opacity(0.3))
+        }
+        .padding(.horizontal, 12)
+        .padding(.vertical, 8)
+        .background(Color.white.opacity(0.03))
+        .cornerRadius(10)
+        .overlay(
+            RoundedRectangle(cornerRadius: 10)
+                .stroke(
+                    Color.white.opacity(0.06),
+                    lineWidth: 1)
+        )
+    }
+}
