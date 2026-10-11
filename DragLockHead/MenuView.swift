@@ -23,14 +23,17 @@ struct MenuEntry {
 }
 
 func findSnippet(_ name: String?) -> String? {
-    guard let n = name else { return nil }
+    if name == nil {
+        return nil
+    }
+    let n = name!
     var i = 0
     let arr = CodeLibrary.snippets
     while i < arr.count {
         if arr[i].name == n {
             return arr[i].code
         }
-        i += 1
+        i = i + 1
     }
     return nil
 }
@@ -99,16 +102,26 @@ struct MainMenuContent: View {
     @ViewBuilder
     private var contentForTab: some View {
         switch state.selectedTab {
-        case "aim": AimTab(state: state)
-        case "advanced": AdvancedTab(state: state)
-        case "code": CodeLibraryView()
-        case "js": JSRunnerView()
-        case "clean": CleanTab(state: state)
-        case "perf": PerfTab(state: state)
-        case "game": GameTab(state: state)
-        case "theme": ThemeTab(state: state)
-        case "system": SystemTab(state: state)
-        default: EmptyView()
+        case "aim":
+            AimTab(state: state)
+        case "advanced":
+            AdvancedTab(state: state)
+        case "code":
+            CodeLibraryView()
+        case "js":
+            JSRunnerView()
+        case "clean":
+            CleanTab(state: state)
+        case "perf":
+            PerfTab(state: state)
+        case "game":
+            GameTab(state: state)
+        case "theme":
+            ThemeTab(state: state)
+        case "system":
+            SystemTab(state: state)
+        default:
+            EmptyView()
         }
     }
 
@@ -177,11 +190,9 @@ struct HeaderBar: View {
                     .fill(
                         LinearGradient(
                             colors: [
-                                Color.white.opacity(0),
-                                Color.white.opacity(
-                                    shimmer ? 0.12 : 0
-                                ),
-                                Color.white.opacity(0)
+                                Color.white.opacity(0.0),
+                                Color.white.opacity(shimmerValue),
+                                Color.white.opacity(0.0)
                             ],
                             startPoint: .leading,
                             endPoint: .trailing
@@ -211,6 +222,13 @@ struct HeaderBar: View {
                 shimmer = true
             }
         }
+    }
+
+    private var shimmerValue: Double {
+        if shimmer {
+            return 0.12
+        }
+        return 0.0
     }
 
     @ViewBuilder
@@ -294,13 +312,13 @@ struct StatusDot: View {
             Circle()
                 .fill(Color(hex: "22c55e"))
                 .frame(width: 12, height: 12)
-                .scaleEffect(pulse ? 1.8 : 1.0)
-                .opacity(pulse ? 0.15 : 1.0)
+                .scaleEffect(pulseScale1)
+                .opacity(pulseOpacity1)
             Circle()
                 .fill(Color(hex: "22c55e"))
                 .frame(width: 8, height: 8)
-                .scaleEffect(pulse ? 1.2 : 1.0)
-                .opacity(pulse ? 0.4 : 1.0)
+                .scaleEffect(pulseScale2)
+                .opacity(pulseOpacity2)
             Circle()
                 .fill(Color(hex: "22c55e"))
                 .frame(width: 5, height: 5)
@@ -318,6 +336,34 @@ struct StatusDot: View {
             }
         }
     }
+
+    private var pulseScale1: CGFloat {
+        if pulse {
+            return 1.8
+        }
+        return 1.0
+    }
+
+    private var pulseOpacity1: Double {
+        if pulse {
+            return 0.15
+        }
+        return 1.0
+    }
+
+    private var pulseScale2: CGFloat {
+        if pulse {
+            return 1.2
+        }
+        return 1.0
+    }
+
+    private var pulseOpacity2: Double {
+        if pulse {
+            return 0.4
+        }
+        return 1.0
+    }
 }
 
 struct HudRow: View {
@@ -334,12 +380,8 @@ struct HudRow: View {
             HudItem(
                 label: "PIN",
                 value: "\(state.batteryPct)%",
-                icon: state.charging
-                    ? "bolt.fill"
-                    : "battery.100",
-                color: state.charging
-                    ? Color(hex: "fbbf24")
-                    : state.accentColor
+                icon: batteryIcon,
+                color: batteryColor
             )
             HudItem(
                 label: "PING",
@@ -354,6 +396,20 @@ struct HudRow: View {
                 color: Color(hex: "a855f7")
             )
         }
+    }
+
+    private var batteryIcon: String {
+        if state.charging {
+            return "bolt.fill"
+        }
+        return "battery.100"
+    }
+
+    private var batteryColor: Color {
+        if state.charging {
+            return Color(hex: "fbbf24")
+        }
+        return state.accentColor
     }
 }
 
@@ -396,19 +452,39 @@ struct TabBar: View {
     @ObservedObject var state: StateManager
 
     private let keys: [String] = [
-        "aim", "advanced", "code", "js",
-        "clean", "perf", "game", "theme", "system"
+        "aim",
+        "advanced",
+        "code",
+        "js",
+        "clean",
+        "perf",
+        "game",
+        "theme",
+        "system"
     ]
 
     private let labels: [String] = [
-        "KÉO TÂM", "NÂNG CAO", "CODE", "JS RUN",
-        "DỌN DẸP", "HIỆU NĂNG", "GAME", "MÀU", "HỆ THỐNG"
+        "KÉO TÂM",
+        "NÂNG CAO",
+        "CODE",
+        "JS RUN",
+        "DỌN DẸP",
+        "HIỆU NĂNG",
+        "GAME",
+        "MÀU",
+        "HỆ THỐNG"
     ]
 
     private let icons: [String] = [
-        "target", "sparkles", "chevron.left.forwardslash.chevron.right",
-        "terminal", "trash.fill", "speedometer",
-        "gamecontroller.fill", "paintpalette.fill", "gearshape.fill"
+        "target",
+        "sparkles",
+        "chevron.left.forwardslash.chevron.right",
+        "terminal",
+        "trash.fill",
+        "speedometer",
+        "gamecontroller.fill",
+        "paintpalette.fill",
+        "gearshape.fill"
     ]
 
     var body: some View {
@@ -474,16 +550,19 @@ struct TabBar: View {
                     Text(label)
                         .font(.system(size: 10, weight: .heavy))
                 }
-                .foregroundColor(
-                    state.selectedTab == key
-                        ? .white
-                        : Color(hex: "9ca3af")
-                )
+                .foregroundColor(tabColor(key))
                 .padding(.horizontal, 11)
                 .padding(.vertical, 10)
             }
         }
         .buttonStyle(.plain)
+    }
+
+    private func tabColor(_ key: String) -> Color {
+        if state.selectedTab == key {
+            return Color.white
+        }
+        return Color(hex: "9ca3af")
     }
 }
 
@@ -555,8 +634,8 @@ struct FeatureCard: View {
         .cornerRadius(16)
         .overlay(strokeLayer)
         .shadow(
-            color: isOn ? accent.opacity(0.3) : .clear,
-            radius: glow ? 14 : 4
+            color: shadowColor,
+            radius: shadowRadius
         )
         .sheet(isPresented: $showCode) {
             SimpleCodeView(
@@ -586,6 +665,20 @@ struct FeatureCard: View {
                 glow = false
             }
         }
+    }
+
+    private var shadowColor: Color {
+        if isOn {
+            return accent.opacity(0.3)
+        }
+        return Color.clear
+    }
+
+    private var shadowRadius: CGFloat {
+        if glow {
+            return 14
+        }
+        return 4
     }
 
     private var cardContent: some View {
@@ -649,9 +742,7 @@ struct FeatureCard: View {
             }
             Image(systemName: icon)
                 .font(.system(size: 16, weight: .bold))
-                .foregroundColor(
-                    isOn ? .white : accent
-                )
+                .foregroundColor(iconColor)
         }
         .overlay(
             RoundedRectangle(cornerRadius: 11)
@@ -660,6 +751,13 @@ struct FeatureCard: View {
                     lineWidth: 1
                 )
         )
+    }
+
+    private var iconColor: Color {
+        if isOn {
+            return Color.white
+        }
+        return accent
     }
 
     private var textBox: some View {
@@ -706,7 +804,7 @@ struct FeatureCard: View {
                     color: .black.opacity(0.4),
                     radius: 2
                 )
-                .offset(x: isOn ? 10 : -10)
+                .offset(x: knobOffset)
         }
         .animation(
             .spring(
@@ -715,6 +813,13 @@ struct FeatureCard: View {
             ),
             value: isOn
         )
+    }
+
+    private var knobOffset: CGFloat {
+        if isOn {
+            return 10
+        }
+        return -10
     }
 
     private var bgLayer: some View {
@@ -738,11 +843,16 @@ struct FeatureCard: View {
     private var strokeLayer: some View {
         RoundedRectangle(cornerRadius: 16)
             .stroke(
-                isOn
-                    ? accent.opacity(0.65)
-                    : Color.white.opacity(0.08),
+                strokeColor,
                 lineWidth: 1
             )
+    }
+
+    private var strokeColor: Color {
+        if isOn {
+            return accent.opacity(0.65)
+        }
+        return Color.white.opacity(0.08)
     }
 }
 
@@ -828,11 +938,9 @@ struct SimpleCodeView: View {
             }
         }) {
             HStack(spacing: 8) {
-                Image(systemName: copied
-                    ? "checkmark.circle.fill"
-                    : "doc.on.doc.fill")
+                Image(systemName: copyIcon)
                     .font(.system(size: 14, weight: .black))
-                Text(copied ? "ĐÃ COPY" : "COPY CODE")
+                Text(copyLabel)
                     .font(.system(
                         size: 13,
                         weight: .black
@@ -856,6 +964,20 @@ struct SimpleCodeView: View {
         .padding(16)
         .background(Color(hex: "0d1117"))
     }
+
+    private var copyIcon: String {
+        if copied {
+            return "checkmark.circle.fill"
+        }
+        return "doc.on.doc.fill"
+    }
+
+    private var copyLabel: String {
+        if copied {
+            return "ĐÃ COPY"
+        }
+        return "COPY CODE"
+    }
 }
 
 struct AimTab: View {
@@ -878,18 +1000,21 @@ struct AimTab: View {
         VStack(spacing: 10) {
             SectionTitle(text: "HỖ TRỢ KÉO TÂM", icon: "target")
             ForEach(0..<items.count, id: \.self) { i in
-                let e = items[i]
-                FeatureCard(
-                    icon: e.icon,
-                    title: e.title,
-                    subtitle: e.sub,
-                    isOn: state.isOn(e.key),
-                    accent: state.accentColor,
-                    code: findSnippet(e.codeName)
-                ) {
-                    state.toggle(e.key)
-                }
+                buildCard(items[i])
             }
+        }
+    }
+
+    private func buildCard(_ e: MenuEntry) -> some View {
+        FeatureCard(
+            icon: e.icon,
+            title: e.title,
+            subtitle: e.sub,
+            isOn: state.isOn(e.key),
+            accent: state.accentColor,
+            code: findSnippet(e.codeName)
+        ) {
+            state.toggle(e.key)
         }
     }
 }
@@ -922,18 +1047,21 @@ struct AdvancedTab: View {
         VStack(spacing: 10) {
             SectionTitle(text: "CHỨC NĂNG NÂNG CAO", icon: "sparkles")
             ForEach(0..<items.count, id: \.self) { i in
-                let e = items[i]
-                FeatureCard(
-                    icon: e.icon,
-                    title: e.title,
-                    subtitle: e.sub,
-                    isOn: state.isOn(e.key),
-                    accent: state.accentColor,
-                    code: findSnippet(e.codeName)
-                ) {
-                    state.toggle(e.key)
-                }
+                buildCard(items[i])
             }
+        }
+    }
+
+    private func buildCard(_ e: MenuEntry) -> some View {
+        FeatureCard(
+            icon: e.icon,
+            title: e.title,
+            subtitle: e.sub,
+            isOn: state.isOn(e.key),
+            accent: state.accentColor,
+            code: findSnippet(e.codeName)
+        ) {
+            state.toggle(e.key)
         }
     }
 }
@@ -992,17 +1120,7 @@ struct CleanTab: View {
 
             SectionTitle(text: "DỌN DẸP HỆ THỐNG", icon: "trash.fill")
             ForEach(0..<items.count, id: \.self) { i in
-                let e = items[i]
-                FeatureCard(
-                    icon: e.icon,
-                    title: e.title,
-                    subtitle: e.sub,
-                    isOn: state.isOn(e.key),
-                    accent: state.accentColor,
-                    code: nil
-                ) {
-                    state.toggle(e.key)
-                }
+                buildCard(items[i])
             }
 
             SectionTitle(text: "DỌN DẸP NHANH", icon: "bolt.fill")
@@ -1011,6 +1129,19 @@ struct CleanTab: View {
                 cleanBtn("CACHE", "trash.fill", "DỌN CACHE")
                 cleanBtn("ALL", "bolt.fill", "DỌN TẤT CẢ")
             }
+        }
+    }
+
+    private func buildCard(_ e: MenuEntry) -> some View {
+        FeatureCard(
+            icon: e.icon,
+            title: e.title,
+            subtitle: e.sub,
+            isOn: state.isOn(e.key),
+            accent: state.accentColor,
+            code: nil
+        ) {
+            state.toggle(e.key)
         }
     }
 
@@ -1083,17 +1214,7 @@ struct PerfTab: View {
         VStack(spacing: 10) {
             SectionTitle(text: "TỐI ƯU HIỆU NĂNG", icon: "speedometer")
             ForEach(0..<items.count, id: \.self) { i in
-                let e = items[i]
-                FeatureCard(
-                    icon: e.icon,
-                    title: e.title,
-                    subtitle: e.sub,
-                    isOn: state.isOn(e.key),
-                    accent: state.accentColor,
-                    code: nil
-                ) {
-                    state.toggle(e.key)
-                }
+                buildCard(items[i])
             }
 
             SectionTitle(text: "ĐO THỜI GIAN THỰC", icon: "chart.bar.fill")
@@ -1116,11 +1237,29 @@ struct PerfTab: View {
                 )
                 InfoRow(
                     key: "CHARGING",
-                    value: state.charging
-                        ? "CÓ"
-                        : "KHÔNG"
+                    value: chargingText
                 )
             }
+        }
+    }
+
+    private var chargingText: String {
+        if state.charging {
+            return "CÓ"
+        }
+        return "KHÔNG"
+    }
+
+    private func buildCard(_ e: MenuEntry) -> some View {
+        FeatureCard(
+            icon: e.icon,
+            title: e.title,
+            subtitle: e.sub,
+            isOn: state.isOn(e.key),
+            accent: state.accentColor,
+            code: nil
+        ) {
+            state.toggle(e.key)
         }
     }
 }
@@ -1191,10 +1330,14 @@ struct GameTab: View {
 
     private func gameName() -> String {
         switch state.game {
-        case "ff": return "FREE FIRE"
-        case "ffmax": return "FREE FIRE MAX"
-        case "both": return "CẢ HAI"
-        default: return "CHƯA CHỌN"
+        case "ff":
+            return "FREE FIRE"
+        case "ffmax":
+            return "FREE FIRE MAX"
+        case "both":
+            return "CẢ HAI"
+        default:
+            return "CHƯA CHỌN"
         }
     }
 }
@@ -1239,9 +1382,7 @@ struct GameCard: View {
                     }
                     Image(systemName: icon)
                         .font(.system(size: 16, weight: .bold))
-                        .foregroundColor(
-                            selected ? .white : accent
-                        )
+                        .foregroundColor(iconColor)
                 }
                 .overlay(
                     RoundedRectangle(cornerRadius: 11)
@@ -1267,22 +1408,14 @@ struct GameCard: View {
                         )
                 }
                 Spacer()
-                Text(selected ? "ON" : "OFF")
+                Text(onOffText)
                     .font(.system(
                         size: 11,
                         weight: .black
                     ))
-                    .foregroundColor(
-                        selected
-                            ? accent
-                            : Color(hex: "9ca3af")
-                    )
+                    .foregroundColor(onOffColor)
                     .frame(width: 42, height: 26)
-                    .background(
-                        selected
-                            ? accent.opacity(0.2)
-                            : Color.white.opacity(0.05)
-                    )
+                    .background(onOffBg)
                     .cornerRadius(8)
             }
             .padding(.horizontal, 14)
@@ -1292,6 +1425,34 @@ struct GameCard: View {
             .overlay(stroke)
         }
         .buttonStyle(.plain)
+    }
+
+    private var iconColor: Color {
+        if selected {
+            return Color.white
+        }
+        return accent
+    }
+
+    private var onOffText: String {
+        if selected {
+            return "ON"
+        }
+        return "OFF"
+    }
+
+    private var onOffColor: Color {
+        if selected {
+            return accent
+        }
+        return Color(hex: "9ca3af")
+    }
+
+    private var onOffBg: Color {
+        if selected {
+            return accent.opacity(0.2)
+        }
+        return Color.white.opacity(0.05)
     }
 
     private var bg: some View {
@@ -1314,12 +1475,14 @@ struct GameCard: View {
 
     private var stroke: some View {
         RoundedRectangle(cornerRadius: 16)
-            .stroke(
-                selected
-                    ? accent.opacity(0.6)
-                    : Color.white.opacity(0.08),
-                lineWidth: 1
-            )
+            .stroke(strokeColor, lineWidth: 1)
+    }
+
+    private var strokeColor: Color {
+        if selected {
+            return accent.opacity(0.6)
+        }
+        return Color.white.opacity(0.08)
     }
 }
 
@@ -1327,19 +1490,33 @@ struct ThemeTab: View {
     @ObservedObject var state: StateManager
 
     private let effectKeys: [String] = [
-        "particles", "grid", "aurora",
-        "nebula", "stars", "rings", "orbit"
+        "particles",
+        "grid",
+        "aurora",
+        "nebula",
+        "stars",
+        "rings",
+        "orbit"
     ]
 
     private let effectIcons: [String] = [
-        "circle.grid.3x3.fill", "grid", "wave.3.right",
-        "cloud.fill", "star.fill", "circle.dashed",
+        "circle.grid.3x3.fill",
+        "grid",
+        "wave.3.right",
+        "cloud.fill",
+        "star.fill",
+        "circle.dashed",
         "circle.grid.cross"
     ]
 
     private let effectTitles: [String] = [
-        "HẠT BAY", "LƯỚI", "CỰC QUANG",
-        "TINH VÂN", "SAO BĂNG", "VÒNG XUNG", "QUỸ ĐẠO"
+        "HẠT BAY",
+        "LƯỚI",
+        "CỰC QUANG",
+        "TINH VÂN",
+        "SAO BĂNG",
+        "VÒNG XUNG",
+        "QUỸ ĐẠO"
     ]
 
     var body: some View {
@@ -1402,9 +1579,9 @@ struct ThemeTab: View {
         var i = 0
         while i < effectKeys.count {
             if state.isOn(effectKeys[i]) {
-                c += 1
+                c = c + 1
             }
-            i += 1
+            i = i + 1
         }
         return c
     }
@@ -1429,9 +1606,8 @@ struct ThemeSwatch: View {
                         .fill(Color(hex: hex))
                         .frame(height: 42)
                         .shadow(
-                            color: Color(hex: hex)
-                                .opacity(glow ? 0.9 : 0.4),
-                            radius: selected ? 14 : 4
+                            color: Color(hex: hex).opacity(swatchOpacity),
+                            radius: swatchRadius
                         )
                     if selected {
                         RoundedRectangle(cornerRadius: 12)
@@ -1457,11 +1633,7 @@ struct ThemeSwatch: View {
                         size: 9,
                         weight: .heavy
                     ))
-                    .foregroundColor(
-                        selected
-                            ? Color(hex: hex)
-                            : Color(hex: "9ca3af")
-                    )
+                    .foregroundColor(labelColor)
             }
         }
         .buttonStyle(.plain)
@@ -1475,6 +1647,27 @@ struct ThemeSwatch: View {
                 }
             }
         }
+    }
+
+    private var swatchOpacity: Double {
+        if glow {
+            return 0.9
+        }
+        return 0.4
+    }
+
+    private var swatchRadius: CGFloat {
+        if selected {
+            return 14
+        }
+        return 4
+    }
+
+    private var labelColor: Color {
+        if selected {
+            return Color(hex: hex)
+        }
+        return Color(hex: "9ca3af")
     }
 }
 
@@ -1524,17 +1717,7 @@ struct SystemTab: View {
 
             SectionTitle(text: "CÀI ĐẶT", icon: "gearshape.fill")
             ForEach(0..<items.count, id: \.self) { i in
-                let e = items[i]
-                FeatureCard(
-                    icon: e.icon,
-                    title: e.title,
-                    subtitle: e.sub,
-                    isOn: state.isOn(e.key),
-                    accent: state.accentColor,
-                    code: nil
-                ) {
-                    state.toggle(e.key)
-                }
+                buildCard(items[i])
             }
 
             SectionTitle(text: "HÀNH ĐỘNG", icon: "bolt.fill")
@@ -1565,20 +1748,41 @@ struct SystemTab: View {
     }
 
     private func tier() -> String {
-        return UserDefaults.standard.string(
+        let v = UserDefaults.standard.string(
             forKey: "dl_utral_tier"
-        ) ?? "VIP"
+        )
+        if v == nil {
+            return "VIP"
+        }
+        return v!
     }
 
     private func maskKey() -> String {
-        guard let k = UserDefaults.standard.string(
+        let k = UserDefaults.standard.string(
             forKey: "dl_utral_auth"
-        ), k.count > 8 else {
+        )
+        if k == nil {
             return "------"
         }
-        let pre = k.prefix(4)
-        let suf = k.suffix(4)
+        if k!.count <= 8 {
+            return "------"
+        }
+        let pre = k!.prefix(4)
+        let suf = k!.suffix(4)
         return "\(pre)-****-\(suf)"
+    }
+
+    private func buildCard(_ e: MenuEntry) -> some View {
+        FeatureCard(
+            icon: e.icon,
+            title: e.title,
+            subtitle: e.sub,
+            isOn: state.isOn(e.key),
+            accent: state.accentColor,
+            code: nil
+        ) {
+            state.toggle(e.key)
+        }
     }
 
     private func actionBtn(
@@ -1745,7 +1949,7 @@ struct InjectOverlay: View {
                         )
                         .frame(width: 70, height: 70)
                         .rotationEffect(
-                            .degrees(rotate ? 360 : 0)
+                            .degrees(rotationValue)
                         )
                 }
                 .onAppear {
@@ -1778,9 +1982,16 @@ struct InjectOverlay: View {
                 withTimeInterval: 0.3,
                 repeats: true
             ) { _ in
-                dots += 1
+                dots = dots + 1
             }
         }
+    }
+
+    private var rotationValue: Double {
+        if rotate {
+            return 360
+        }
+        return 0
     }
 }
 
@@ -1793,15 +2004,15 @@ struct FooterBar: View {
             Circle()
                 .fill(Color(hex: "22c55e"))
                 .frame(width: 6, height: 6)
-                .scaleEffect(pulse ? 1.4 : 1.0)
+                .scaleEffect(pulseScale)
                 .shadow(
                     color: Color(hex: "22c55e"),
-                    radius: pulse ? 8 pulse : 4
+                    radius: pulseRadius
                 )
-            Text("HO**ẠT ĐỘNG")
-                .font(. trênsystem(size: 9, weight: .heavy))
+            Text("HOẠT ĐỘNG")
+                .font(.system(size: 9, weight: .heavy))
                 .foregroundColor(Color(hex: "22c55e"))
-            Text("•")
+            Text("|")
                 .foregroundColor(Color(hex: "6b7280"))
             Text("\(state.activeCount()) CHỨC NĂNG")
                 .font(.system(size: 9, weight: .heavy))
@@ -1833,5 +2044,19 @@ struct FooterBar: View {
                 pulse = true
             }
         }
+    }
+
+    private var pulseScale: CGFloat {
+        if pulse {
+            return 1.4
+        }
+        return 1.0
+    }
+
+    private var pulseRadius: CGFloat {
+        if pulse {
+            return 8
+        }
+        return 4
     }
 }
