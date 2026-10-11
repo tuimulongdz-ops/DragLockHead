@@ -1,15 +1,19 @@
 import UIKit
 
 struct DeviceInfo {
+
     static var modelName: String {
-        var systemInfo = utsname()
-        uname(&systemInfo)
-        let mirror = Mirror(reflecting: systemInfo.machine)
-        let identifier = mirror.children.reduce("") { id, element in
-            guard let value = element.value as? Int8, value != 0 else { return id }
-            return id + String(UnicodeScalar(UInt8(value)))
+        var s = utsname()
+        uname(&s)
+        let m = Mirror(reflecting: s.machine)
+        let id = m.children.reduce("") { acc, el in
+            guard let v = el.value as? Int8,
+                  v != 0 else { return acc }
+            return acc + String(
+                UnicodeScalar(UInt8(v))
+            )
         }
-        return mapToName(identifier)
+        return mapToName(id)
     }
 
     static var architecture: String {
@@ -23,35 +27,43 @@ struct DeviceInfo {
     }
 
     static var screenSize: String {
-        let bounds = UIScreen.main.bounds
-        return "\(Int(bounds.width))x\(Int(bounds.height))"
+        let b = UIScreen.main.bounds
+        return "\(Int(b.width))x\(Int(b.height))"
     }
 
     static var totalRAM: String {
-        let ram = ProcessInfo.processInfo.physicalMemory
-        let gb = Double(ram) / 1_073_741_824
+        let r = ProcessInfo.processInfo.physicalMemory
+        let gb = Double(r) / 1073741824
         return String(format: "%.1f GB", gb)
     }
 
     static var freeStorage: String {
-        if let attrs = try? FileManager.default.attributesOfFileSystem(forPath: NSHomeDirectory()),
-           let free = attrs[.systemFreeSize] as? Int64 {
-            let gb = Double(free) / 1_073_741_824
+        if let a = try? FileManager.default
+            .attributesOfFileSystem(
+                forPath: NSHomeDirectory()
+            ),
+           let f = a[.systemFreeSize] as? Int64 {
+            let gb = Double(f) / 1073741824
             return String(format: "%.1f GB", gb)
         }
         return "--"
     }
 
     static var uptime: String {
-        let uptime = ProcessInfo.processInfo.systemUptime
-        let h = Int(uptime) / 3600
-        let m = (Int(uptime) % 3600) / 60
-        let s = Int(uptime) % 60
-        return String(format: "%02d:%02d:%02d", h, m, s)
+        let u = ProcessInfo.processInfo.systemUptime
+        let h = Int(u) / 3600
+        let m = (Int(u) % 3600) / 60
+        let s = Int(u) % 60
+        return String(
+            format: "%02d:%02d:%02d",
+            h, m, s
+        )
     }
 
-    private static func mapToName(_ identifier: String) -> String {
-        let map: [String: String] = [
+    private static func mapToName(
+        _ id: String
+    ) -> String {
+        let m: [String: String] = [
             "iPhone14,7": "iPhone 14",
             "iPhone14,8": "iPhone 14 Plus",
             "iPhone15,2": "iPhone 14 Pro",
@@ -67,12 +79,8 @@ struct DeviceInfo {
             "iPad14,1": "iPad mini 6",
             "iPad14,2": "iPad mini 6",
             "iPad13,18": "iPad 10",
-            "iPad13,19": "iPad 10",
-            "iPad14,3": "iPad Pro 11 M2",
-            "iPad14,4": "iPad Pro 11 M2",
-            "iPad14,5": "iPad Pro 12.9 M2",
-            "iPad14,6": "iPad Pro 12.9 M2"
+            "iPad13,19": "iPad 10"
         ]
-        return map[identifier] ?? identifier
+        return m[id] ?? id
     }
 }
