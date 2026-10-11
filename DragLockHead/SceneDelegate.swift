@@ -12,10 +12,5 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         w.backgroundColor = .black
         self.window = w
         w.makeKeyAndVisible()
-
-        if #available(iOS 15.0, *) {
-            windowScene.preferredFrameRateRange =
-                CAFrameRateRange(minimum: 60, maximum: 120, preferred: 120)
-        }
     }
 }
