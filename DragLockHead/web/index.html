@@ -60,7 +60,6 @@ html,body{
 .noise{position:fixed;inset:0;z-index:4;pointer-events:none;opacity:0.06;background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200'><filter id='n'><feTurbulence baseFrequency='0.9' numOctaves='3'/></filter><rect width='200' height='200' filter='url(%23n)'/></svg>");animation:noiseMove .35s steps(3) infinite;}
 @keyframes noiseMove{0%{transform:translate(0,0);}33%{transform:translate(-2%,1%);}66%{transform:translate(1%,-2%);}100%{transform:translate(0,0);}}
 
-/* TÂM ẢO */
 .virtual-cross{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:9998;pointer-events:none;display:none;width:120px;height:120px;}
 .virtual-cross.show{display:block;animation:vcIn .4s cubic-bezier(.4,1.6,.6,1);}
 @keyframes vcIn{0%{opacity:0;transform:translate(-50%,-50%) scale(.3);}100%{opacity:1;transform:translate(-50%,-50%) scale(1);}}
@@ -77,7 +76,6 @@ html,body{
 .virtual-cross .vc-tick.left{left:6px;top:50%;transform:translateY(-50%);}
 .virtual-cross .vc-tick.right{right:6px;top:50%;transform:translateY(-50%);}
 
-/* AIM NÂNG CAO */
 .aim-overlay{position:fixed;inset:0;z-index:8;pointer-events:none;display:none;}
 .aim-overlay.show{display:block;}
 .aim-overlay .aim-cross{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:44px;height:44px;}
@@ -87,44 +85,34 @@ html,body{
 @keyframes pulse{0%,100%{opacity:1;transform:translate(-50%,-50%) scale(1);}50%{opacity:.5;transform:translate(-50%,-50%) scale(.6);}}
 .aim-overlay .aim-circle{position:absolute;top:50%;left:50%;width:220px;height:220px;border-radius:50%;border:1px dashed rgba(255,0,51,0.35);transform:translate(-50%,-50%);animation:crossSpin 6s linear infinite;}
 
-/* Ghost crosshair */
-.ghost-cross{
-  position:fixed;pointer-events:none;z-index:9997;
-  width:30px;height:30px;display:none;
-  transform:translate(-50%,-50%);
-}
+.ghost-cross{position:fixed;pointer-events:none;z-index:9997;width:30px;height:30px;display:none;transform:translate(-50%,-50%);}
 .ghost-cross.show{display:block;}
 .ghost-cross .g-line-h{position:absolute;top:50%;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,#00d4ff,transparent);transform:translateY(-50%);box-shadow:0 0 8px #00d4ff;}
 .ghost-cross .g-line-v{position:absolute;left:50%;top:0;bottom:0;width:2px;background:linear-gradient(180deg,transparent,#00d4ff,transparent);transform:translateX(-50%);box-shadow:0 0 8px #00d4ff;}
 .ghost-cross .g-dot{position:absolute;top:50%;left:50%;width:4px;height:4px;border-radius:50%;background:#00d4ff;transform:translate(-50%,-50%);box-shadow:0 0 10px #00d4ff;}
 
-/* Aim trace */
 .aim-trace{position:fixed;inset:0;pointer-events:none;z-index:9996;display:none;}
 .aim-trace.show{display:block;}
 .trace-dot{position:absolute;width:8px;height:8px;border-radius:50%;background:radial-gradient(circle,#ff0033,transparent);transform:translate(-50%,-50%);animation:traceFade .8s ease-out forwards;}
 @keyframes traceFade{0%{opacity:.9;transform:translate(-50%,-50%) scale(1);}100%{opacity:0;transform:translate(-50%,-50%) scale(.3);}}
 
-/* Magnetic visual */
 .magnetic-vis{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);pointer-events:none;z-index:9995;display:none;width:300px;height:300px;}
 .magnetic-vis.show{display:block;}
 .magnetic-vis .mag-ring{position:absolute;top:50%;left:50%;width:100%;height:100%;border-radius:50%;border:2px solid rgba(0,212,255,0.3);transform:translate(-50%,-50%);animation:magPulse 2s ease-in-out infinite;}
 .magnetic-vis .mag-ring2{position:absolute;top:50%;left:50%;width:70%;height:70%;border-radius:50%;border:2px dashed rgba(255,0,51,0.4);transform:translate(-50%,-50%);animation:magPulse 2s ease-in-out infinite .5s;}
 @keyframes magPulse{0%,100%{transform:translate(-50%,-50%) scale(1);opacity:0.5;}50%{transform:translate(-50%,-50%) scale(1.15);opacity:1;}}
 
-/* Head guide */
 .head-guide{position:fixed;left:0;right:0;top:calc(50% - 100px);height:60px;pointer-events:none;z-index:9995;display:none;}
 .head-guide.show{display:block;}
 .head-guide .hg-line{position:absolute;left:0;right:0;top:50%;height:2px;background:linear-gradient(90deg,transparent,#ffcc00 20%,#ffcc00 80%,transparent);transform:translateY(-50%);box-shadow:0 0 12px #ffcc00;animation:hgPulse 1.5s ease-in-out infinite;}
 .head-guide .hg-line-bottom{position:absolute;left:0;right:0;bottom:0;height:2px;background:linear-gradient(90deg,transparent,rgba(255,204,0,0.4),transparent);}
 @keyframes hgPulse{0%,100%{opacity:0.6;}50%{opacity:1;}}
 
-/* Sens display */
 .sens-display{position:fixed;top:calc(20px + env(safe-area-inset-top));right:20px;pointer-events:none;z-index:9999;display:none;padding:8px 14px;border-radius:12px;background:rgba(6,8,13,0.85);border:1px solid rgba(0,212,255,0.5);font-family:Menlo,Consolas,monospace;font-size:12px;font-weight:900;color:#00d4ff;box-shadow:0 0 20px rgba(0,212,255,0.5);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);}
 .sens-display.show{display:block;}
 .sens-display .label{font-size:8px;letter-spacing:1.5px;color:#9ca3af;font-weight:700;}
 .sens-display .value{font-size:16px;font-weight:900;background:linear-gradient(90deg,#00d4ff,#fff);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;color:transparent;}
 
-/* WRAP */
 .wrap{position:relative;z-index:5;height:100%;display:flex;flex-direction:column;padding:calc(12px + env(safe-area-inset-top)) 12px calc(14px + env(safe-area-inset-bottom));gap:10px;}
 .menu-header{position:relative;padding:12px 14px;border-radius:18px;background:linear-gradient(135deg,rgba(0,153,255,0.18),rgba(13,17,23,0.85),rgba(255,0,51,0.12));border:1px solid var(--stroke);backdrop-filter:blur(20px) saturate(160%);-webkit-backdrop-filter:blur(20px) saturate(160%);box-shadow:0 0 20px rgba(0,153,255,0.3);overflow:hidden;flex:0 0 auto;}
 .menu-header::before{content:"";position:absolute;inset:0;border-radius:18px;padding:1px;background:linear-gradient(135deg,var(--sea1),var(--sea2),var(--white),var(--red1));background-size:400% 400%;-webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude;animation:borderRun 5s linear infinite;pointer-events:none;}
@@ -231,7 +219,6 @@ html,body{
 .modal-actions .btn{flex:1;padding:12px 0;font-size:11.5px;}
 .wm{position:fixed;bottom:calc(4px + env(safe-area-inset-bottom));left:50%;transform:translateX(-50%);font-size:8px;letter-spacing:2.5px;color:rgba(255,255,255,0.22);z-index:6;pointer-events:none;font-weight:800;}
 .wm span{background:linear-gradient(90deg,var(--sea1),var(--white),var(--red1));-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;color:transparent;animation:rainbow 3s linear infinite;}
-
 body.filter-sea{filter:hue-rotate(180deg) saturate(1.4);}
 body.filter-red{filter:hue-rotate(-90deg) saturate(1.5);}
 body.filter-vivid{filter:saturate(1.8) contrast(1.1);}
@@ -242,8 +229,6 @@ body.filter-bright{filter:brightness(1.35) contrast(1.05);}
 body.filter-highcontrast{filter:contrast(1.6);}
 body.filter-thermal{filter:invert(1) hue-rotate(90deg) saturate(2.5) contrast(1.3);}
 body.filter-sniper{filter:contrast(1.4) brightness(1.1) saturate(1.3);}
-
-/* Inject overlay */
 .inject-overlay{position:fixed;inset:0;z-index:80;display:none;align-items:center;justify-content:center;background:rgba(6,8,13,0.94);backdrop-filter:blur(22px);-webkit-backdrop-filter:blur(22px);padding:20px;}
 .inject-overlay.show{display:flex;animation:fadeIn .3s;}
 .inject-box{width:100%;max-width:380px;padding:26px 22px;border-radius:22px;background:linear-gradient(135deg,rgba(0,153,255,0.15),rgba(13,17,23,0.9),rgba(255,0,51,0.10));border:1px solid var(--stroke);text-align:center;position:relative;overflow:hidden;box-shadow:0 0 44px rgba(0,153,255,0.5);}
@@ -258,8 +243,6 @@ body.filter-sniper{filter:contrast(1.4) brightness(1.1) saturate(1.3);}
 .inject-log .ok{color:var(--sea2);}
 .inject-log .warn{color:var(--yellow);}
 .inject-log .err{color:var(--red2);}
-
-/* Cleaner overlay */
 .cleaner-overlay{position:fixed;inset:0;z-index:85;display:none;align-items:center;justify-content:center;background:rgba(6,8,13,0.96);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);padding:20px;}
 .cleaner-overlay.show{display:flex;animation:fadeIn .3s;}
 .cleaner-box{width:100%;max-width:380px;padding:26px 22px;border-radius:22px;background:linear-gradient(135deg,rgba(0,153,255,0.15),rgba(13,17,23,0.92),rgba(255,0,51,0.10));border:1px solid var(--stroke);text-align:center;position:relative;overflow:hidden;box-shadow:0 0 44px rgba(0,153,255,0.5);}
@@ -277,8 +260,6 @@ body.filter-sniper{filter:contrast(1.4) brightness(1.1) saturate(1.3);}
 .cleaner-log .c-ok{color:var(--sea2);}
 .cleaner-log .c-warn{color:var(--yellow);}
 .cleaner-log .c-err{color:var(--red2);}
-
-/* Device detect */
 .device-panel{padding:14px;border-radius:14px;background:rgba(0,0,0,0.4);border:1px solid var(--stroke);}
 .device-row{display:flex;justify-content:space-between;padding:6px 0;font-size:11px;border-bottom:1px solid rgba(255,255,255,0.04);}
 .device-row:last-child{border:none;}
@@ -286,8 +267,6 @@ body.filter-sniper{filter:contrast(1.4) brightness(1.1) saturate(1.3);}
 .device-row .v{font-family:Menlo,Consolas,monospace;color:var(--sea2);font-weight:800;}
 .score-bar{height:8px;border-radius:4px;background:rgba(0,0,0,0.5);overflow:hidden;margin-top:6px;border:1px solid var(--stroke);}
 .score-fill{height:100%;background:linear-gradient(90deg,var(--sea1),var(--sea2),var(--green));transition:width 1s ease;border-radius:4px;box-shadow:0 0 12px rgba(0,212,255,0.6);}
-
-/* KEY GATE */
 #keyGate{position:fixed;inset:0;z-index:9999;background:#06080d;display:flex;align-items:center;justify-content:center;padding:20px;transition:opacity .35s ease;}
 #keyGate.hide{opacity:0;pointer-events:none;display:none;}
 .key-card{width:100%;max-width:400px;padding:28px 22px;border-radius:24px;background:linear-gradient(135deg,rgba(0,153,255,0.14),rgba(13,17,23,0.9),rgba(255,0,51,0.10));border:1px solid rgba(255,255,255,0.1);backdrop-filter:blur(22px) saturate(180%);-webkit-backdrop-filter:blur(22px) saturate(180%);box-shadow:0 0 34px rgba(0,153,255,0.4);position:relative;overflow:hidden;animation:keyCardIn .6s cubic-bezier(.4,1.4,.6,1);}
@@ -314,7 +293,6 @@ body.filter-sniper{filter:contrast(1.4) brightness(1.1) saturate(1.3);}
 </head>
 <body>
 
-<!-- TÂM ẢO + AIM VISUALS -->
 <div class="virtual-cross" id="virtualCross">
   <div class="vc-line-h"></div><div class="vc-line-v"></div>
   <div class="vc-ring"></div><div class="vc-circle"></div><div class="vc-dot"></div>
@@ -342,7 +320,6 @@ body.filter-sniper{filter:contrast(1.4) brightness(1.1) saturate(1.3);}
   <div class="value" id="sensValue">100</div>
 </div>
 
-<!-- KEY GATE -->
 <div id="keyGate">
   <div class="key-card">
     <div class="key-logo">ZH</div>
@@ -356,7 +333,6 @@ body.filter-sniper{filter:contrast(1.4) brightness(1.1) saturate(1.3);}
   </div>
 </div>
 
-<!-- BACKGROUND -->
 <div class="bg" id="bg"></div>
 <div class="bg-aim">
   <div class="crosshair"></div><div class="crosshair2"></div><div class="crosshair3"></div>
@@ -388,7 +364,6 @@ body.filter-sniper{filter:contrast(1.4) brightness(1.1) saturate(1.3);}
 </symbol>
 </svg>
 
-<!-- MAIN -->
 <div class="wrap" id="wrap" style="display:none;">
   <div class="menu-header">
     <div class="mh-row">
@@ -426,7 +401,6 @@ body.filter-sniper{filter:contrast(1.4) brightness(1.1) saturate(1.3);}
 
   <div class="tab-panels">
 
-    <!-- TAB 1: KÉO TÂM -->
     <div class="panel active" data-panel="aim">
       <div class="sec-title">TÂM ẢO & CROSSHAIR</div>
       <div class="card" data-key="virtualcross"><div class="info"><div class="icon">✚</div><div class="text"><h3>TÂM ẢO PRO</h3><p>Crosshair đè trên màn hình</p></div></div><div class="switch"></div></div>
@@ -457,7 +431,6 @@ body.filter-sniper{filter:contrast(1.4) brightness(1.1) saturate(1.3);}
       <div class="slider-wrap"><div class="row"><label>SENS GIẢ LẬP</label><span class="slider-value" id="sliderSensVal">100</span></div><input type="range" class="slider" id="sliderSens" min="50" max="200" step="5" value="100"></div>
     </div>
 
-    <!-- TAB 2: NÂNG CAO - CÁC CHỨC NĂNG KÉO TÂM ÂM -->
     <div class="panel" data-panel="advanced">
       <div class="sec-title">AIM ASSIST VISUAL</div>
       <div class="card" data-key="aimpulse"><div class="info"><div class="icon">💓</div><div class="text"><h3>AIM PULSE</h3><p>Tâm ảo đập theo nhịp tim</p></div></div><div class="switch"></div></div>
@@ -480,7 +453,6 @@ body.filter-sniper{filter:contrast(1.4) brightness(1.1) saturate(1.3);}
       <div class="card" data-key="modeswitch"><div class="info"><div class="icon">🔄</div><div class="text"><h3>AUTO MODE SWITCH</h3><p>Tự đổi crosshair mỗi 5s</p></div></div><div class="switch"></div></div>
     </div>
 
-    <!-- TAB 3: DỌN DẸP -->
     <div class="panel" data-panel="clean">
       <div class="sec-title">DỌN DẸP HỆ THỐNG</div>
 
@@ -526,7 +498,6 @@ body.filter-sniper{filter:contrast(1.4) brightness(1.1) saturate(1.3);}
       <div class="log-console" id="cleanLog" style="height:140px;"></div>
     </div>
 
-    <!-- TAB 4: HIỆU NĂNG -->
     <div class="panel" data-panel="perf">
       <div class="sec-title">TỐI ƯU HIỆU NĂNG</div>
       <div class="card" data-key="fps"><div class="info"><div class="icon">💥</div><div class="text"><h3>BUFF FPS</h3><p>Giảm animation nặng nền</p></div></div><div class="switch"></div></div>
@@ -549,7 +520,6 @@ body.filter-sniper{filter:contrast(1.4) brightness(1.1) saturate(1.3);}
       </div>
     </div>
 
-    <!-- TAB 5: HIỂN THỊ -->
     <div class="panel" data-panel="visual">
       <div class="sec-title">BỘ LỌC MÀU</div>
       <div class="card" data-key="filter-sea"><div class="info"><div class="icon">🌊</div><div class="text"><h3>FILTER SEA</h3><p>Xanh biển</p></div></div><div class="switch"></div></div>
@@ -573,7 +543,6 @@ body.filter-sniper{filter:contrast(1.4) brightness(1.1) saturate(1.3);}
       <div class="slider-wrap"><div class="row"><label>BÃO HOÀ</label><span class="slider-value" id="sliderSaturateVal">100%</span></div><input type="range" class="slider" id="sliderSaturate" min="0" max="200" step="5" value="100"></div>
     </div>
 
-    <!-- TAB 6: GAME -->
     <div class="panel" data-panel="game">
       <div class="sec-title">CHỌN GAME</div>
       <div class="card" data-game="ff"><div class="info"><div class="icon">🔥</div><div class="text"><h3>FREE FIRE</h3><p>com.dts.freefireth</p></div></div><div class="switch"></div></div>
@@ -593,7 +562,6 @@ body.filter-sniper{filter:contrast(1.4) brightness(1.1) saturate(1.3);}
       </div>
     </div>
 
-    <!-- TAB 7: HỆ THỐNG -->
     <div class="panel" data-panel="system">
       <div class="sec-title">TÀI KHOẢN</div>
       <div class="profile-card">
@@ -634,7 +602,6 @@ body.filter-sniper{filter:contrast(1.4) brightness(1.1) saturate(1.3);}
   </div>
 </div>
 
-<!-- DRAWER -->
 <div class="drawer-overlay" id="drawerOverlay"></div>
 <div class="drawer" id="drawer">
   <div class="drawer-header">
@@ -653,10 +620,8 @@ body.filter-sniper{filter:contrast(1.4) brightness(1.1) saturate(1.3);}
   <div class="drawer-footer">POWERED BY <span>ZWILZ HLONG</span></div>
 </div>
 
-<!-- TOAST -->
 <div class="toast" id="toast">SẴN SÀNG</div>
 
-<!-- INJECT OVERLAY -->
 <div class="inject-overlay" id="injectOverlay">
   <div class="inject-box">
     <div class="inject-icon">💉</div>
@@ -666,7 +631,6 @@ body.filter-sniper{filter:contrast(1.4) brightness(1.1) saturate(1.3);}
   </div>
 </div>
 
-<!-- CLEANER OVERLAY -->
 <div class="cleaner-overlay" id="cleanerOverlay">
   <div class="cleaner-box">
     <div class="cleaner-icon" id="cleanerIcon">🧹</div>
@@ -679,7 +643,6 @@ body.filter-sniper{filter:contrast(1.4) brightness(1.1) saturate(1.3);}
   </div>
 </div>
 
-<!-- MODAL -->
 <div class="modal-overlay" id="modalOverlay">
   <div class="modal">
     <h3 id="modalTitle">THÔNG BÁO</h3>
@@ -693,84 +656,178 @@ body.filter-sniper{filter:contrast(1.4) brightness(1.1) saturate(1.3);}
 
 <div class="wm">POWERED BY <span>ZWILZ HLONG</span></div>
 
-<!-- FIREBASE -->
-<script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { getFirestore, collection, query, where, getDocs, doc, updateDoc, increment, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+<script>
+(function(){
+  var PROJECT_ID = "hlong-key-sever";
+  var DEVICE_KEY = "dl_utral_device";
+  var AUTH_KEY = "dl_utral_auth";
 
-const firebaseConfig = {
-  apiKey: "AIzaSyBjYGU_WQQvEzwbEYeUZM-L1Q36jI6sy-k",
-  authDomain: "hlong-key-sever.firebaseapp.com",
-  projectId: "hlong-key-sever",
-  storageBucket: "hlong-key-sever.firebasestorage.app",
-  messagingSenderId: "119094540301",
-  appId: "1:119094540301:web:8fbd7fb380f998f6fe7d44"
-};
-
-let db = null;
-try{ const app = initializeApp(firebaseConfig); db = getFirestore(app); }catch(e){}
-
-async function verifyKeyWithFirestore(inputKey){
-  if(!db) return { ok:false, msg:"LỖI FIREBASE" };
-  try{
-    const upper = inputKey.trim().toUpperCase();
-    const q = query(collection(db, "keys"), where("key", "==", upper), where("active", "==", true));
-    const snapshot = await getDocs(q);
-    if(snapshot.empty) return { ok:false, msg:"KEY KHÔNG TỒN TẠI HOẶC ĐÃ BỊ KHOÁ" };
-    const keyDoc = snapshot.docs[0];
-    const keyData = keyDoc.data();
-    if(keyData.expiry){
-      let expDate = typeof keyData.expiry.toDate === "function" ? keyData.expiry.toDate() : new Date(keyData.expiry);
-      if(expDate < new Date()) return { ok:false, msg:"KEY ĐÃ HẾT HẠN" };
+  function getDeviceId(){
+    var id = localStorage.getItem(DEVICE_KEY);
+    if(!id){
+      var rand = Math.random().toString(16).slice(2,10).toUpperCase();
+      id = "DEV-" + rand + "-" + Date.now().toString(16).slice(-6);
+      localStorage.setItem(DEVICE_KEY, id);
     }
-    let deviceId = localStorage.getItem("dl_utral_device");
-    if(!deviceId){ deviceId = "DEV-" + Math.random().toString(16).slice(2,10).toUpperCase(); localStorage.setItem("dl_utral_device", deviceId); }
-    const bound = keyData.devices || [];
-    if(bound.length > 0 && !bound.includes(deviceId)) return { ok:false, msg:"KEY ĐÃ DÙNG TRÊN THIẾT BỊ KHÁC" };
-    if(bound.length === 0){ try{ await updateDoc(doc(db,"keys",keyDoc.id),{ devices:[deviceId], lastUsed:serverTimestamp(), useCount:increment(1) }); }catch(e){} }
-    return { ok:true, msg:"KÍCH HOẠT THÀNH CÔNG", tier:keyData.tier||"VIP", expiry:keyData.expiry?(keyData.expiry.toDate?keyData.expiry.toDate().toISOString():keyData.expiry):null };
-  }catch(err){ return { ok:false, msg:"LỖI KẾT NỐI: " + err.message }; }
-}
+    return id;
+  }
 
-function initKeyGate(){
-  const btn = document.getElementById("btnVerifyKey");
-  const input = document.getElementById("keyInput");
-  const status = document.getElementById("keyStatus");
-  const gate = document.getElementById("keyGate");
-  const wrap = document.getElementById("wrap");
-  async function doVerify(){
-    const val = input.value.trim();
-    if(!val){ status.textContent = "❌ VUI LÒNG NHẬP KEY!"; status.className = "key-status error"; return; }
-    status.textContent = "⏳ ĐANG KIỂM TRA..."; status.className = "key-status loading";
-    const result = await verifyKeyWithFirestore(val);
-    if(result.ok){
-      status.textContent = "✅ " + result.msg; status.className = "key-status ok";
-      if(navigator.vibrate) navigator.vibrate([15, 40, 15]);
-      localStorage.setItem("dl_utral_auth", val.toUpperCase());
-      localStorage.setItem("dl_utral_tier", result.tier || "VIP");
-      if(result.expiry) localStorage.setItem("dl_utral_expiry", result.expiry);
-      const infoKey = document.getElementById("infoKey"); if(infoKey) infoKey.textContent = val.toUpperCase();
-      const infoTier = document.getElementById("infoTier"); if(infoTier) infoTier.textContent = result.tier || "VIP";
-      const infoExpiry = document.getElementById("infoExpiry"); if(infoExpiry && result.expiry) infoExpiry.textContent = new Date(result.expiry).toLocaleDateString("vi-VN");
-      setTimeout(() => {
-        gate.classList.add("hide"); wrap.style.display = "flex";
-        if(!window.__menuBooted){ window.__menuBooted = true; if(typeof window.__bootMenu === "function") window.__bootMenu(); }
-      }, 600);
-    }else{
-      status.textContent = "❌ " + result.msg; status.className = "key-status error";
-      if(navigator.vibrate) navigator.vibrate([30, 50, 30]);
+  function verifyKeyREST(inputKey){
+    var upper = inputKey.trim().toUpperCase();
+    var device = getDeviceId();
+    var url = "https://firestore.googleapis.com/v1/projects/" + PROJECT_ID +
+              "/databases/(default)/documents:runQuery";
+
+    var body = {
+      structuredQuery: {
+        from: [{ collectionId: "keys" }],
+        where: {
+          compositeFilter: {
+            op: "AND",
+            filters: [
+              { fieldFilter: { field: { fieldPath: "key" }, op: "EQUAL",
+                value: { stringValue: upper } } },
+              { fieldFilter: { field: { fieldPath: "active" }, op: "EQUAL",
+                value: { booleanValue: true } } }
+            ]
+          }
+        },
+        limit: 1
+      }
+    };
+
+    return fetch(url, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body)
+    }).then(function(r){ return r.json(); }).then(function(rows){
+      if(!Array.isArray(rows) || rows.length === 0 || !rows[0].document){
+        return { ok: false, msg: "KEY KHÔNG TỒN TẠI HOẶC ĐÃ BỊ KHOÁ" };
+      }
+      var docData = rows[0].document;
+      var fields = docData.fields || {};
+
+      var expiryTs = fields.expiry && fields.expiry.timestampValue
+        ? Date.parse(fields.expiry.timestampValue) : null;
+      if(expiryTs && expiryTs < Date.now()){
+        return { ok: false, msg: "KEY ĐÃ HẾT HẠN" };
+      }
+
+      var devices = [];
+      if(fields.devices && fields.devices.arrayValue && fields.devices.arrayValue.values){
+        devices = fields.devices.arrayValue.values.map(function(v){ return v.stringValue; });
+      }
+      if(devices.length > 0 && devices.indexOf(device) === -1){
+        return { ok: false, msg: "KEY ĐÃ DÙNG TRÊN THIẾT BỊ KHÁC" };
+      }
+
+      if(devices.length === 0){
+        var patchUrl = "https://firestore.googleapis.com/v1/" + docData.name +
+                       "?updateMask.fieldPaths=devices&updateMask.fieldPaths=lastUsed&updateMask.fieldPaths=useCount";
+        var patchBody = {
+          fields: {
+            devices: { arrayValue: { values: [{ stringValue: device }] } },
+            lastUsed: { timestampValue: new Date().toISOString() },
+            useCount: { integerValue: String(
+              (fields.useCount && fields.useCount.integerValue
+                ? parseInt(fields.useCount.integerValue, 10) : 0) + 1
+            ) }
+          }
+        };
+        fetch(patchUrl, {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(patchBody)
+        }).catch(function(){});
+      }
+
+      return {
+        ok: true,
+        msg: "KÍCH HOẠT THÀNH CÔNG",
+        tier: (fields.tier && fields.tier.stringValue) || "VIP",
+        expiry: fields.expiry && fields.expiry.timestampValue
+          ? fields.expiry.timestampValue : null
+      };
+    }).catch(function(err){
+      return { ok: false, msg: "LỖI KẾT NỐI: " + err.message };
+    });
+  }
+
+  function initKeyGate(){
+    var btn = document.getElementById("btnVerifyKey");
+    var input = document.getElementById("keyInput");
+    var status = document.getElementById("keyStatus");
+    var gate = document.getElementById("keyGate");
+    var wrap = document.getElementById("wrap");
+    if(!btn || !input || !status || !gate || !wrap) return;
+
+    function doVerify(){
+      var val = (input.value || "").trim();
+      if(!val){
+        status.textContent = "❌ VUI LÒNG NHẬP KEY!";
+        status.className = "key-status error";
+        return;
+      }
+      status.textContent = "⏳ ĐANG KIỂM TRA...";
+      status.className = "key-status loading";
+
+      verifyKeyREST(val).then(function(result){
+        if(result.ok){
+          status.textContent = "✅ " + result.msg;
+          status.className = "key-status ok";
+          try{ if(navigator.vibrate) navigator.vibrate([15,40,15]); }catch(e){}
+
+          try{
+            localStorage.setItem(AUTH_KEY, val.toUpperCase());
+            localStorage.setItem("dl_utral_tier", result.tier || "VIP");
+            if(result.expiry) localStorage.setItem("dl_utral_expiry", result.expiry);
+          }catch(e){}
+
+          var infoKey = document.getElementById("infoKey");
+          if(infoKey) infoKey.textContent = val.toUpperCase();
+          var infoTier = document.getElementById("infoTier");
+          if(infoTier) infoTier.textContent = result.tier || "VIP";
+          var infoExpiry = document.getElementById("infoExpiry");
+          if(infoExpiry && result.expiry){
+            infoExpiry.textContent = new Date(result.expiry).toLocaleDateString("vi-VN");
+          }
+
+          setTimeout(function(){
+            gate.classList.add("hide");
+            wrap.style.display = "flex";
+            if(!window.__menuBooted){
+              window.__menuBooted = true;
+              if(typeof window.__bootMenu === "function") window.__bootMenu();
+            }
+          }, 600);
+        } else {
+          status.textContent = "❌ " + result.msg;
+          status.className = "key-status error";
+          try{ if(navigator.vibrate) navigator.vibrate([30,50,30]); }catch(e){}
+        }
+      });
+    }
+
+    btn.addEventListener("click", doVerify);
+    input.addEventListener("keydown", function(e){
+      if(e.key === "Enter") doVerify();
+    });
+
+    var savedKey = localStorage.getItem(AUTH_KEY);
+    if(savedKey){
+      input.value = savedKey;
+      setTimeout(doVerify, 400);
     }
   }
-  btn.addEventListener("click", doVerify);
-  input.addEventListener("keydown", e => { if(e.key === "Enter") doVerify(); });
-  const savedKey = localStorage.getItem("dl_utral_auth");
-  if(savedKey){ input.value = savedKey; setTimeout(doVerify, 400); }
-}
-if(document.readyState === "loading") document.addEventListener("DOMContentLoaded", initKeyGate);
-else initKeyGate();
+
+  if(document.readyState === "loading"){
+    document.addEventListener("DOMContentLoaded", initKeyGate);
+  } else {
+    initKeyGate();
+  }
+})();
 </script>
 
-<!-- MENU LOGIC -->
 <script>
 const CONFIG = { version: "8.0.0", admin: "Zwilz HLong" };
 const State = {
@@ -922,20 +979,15 @@ function applyFeatureEffect(key, on){
     case "aimbrackets": on ? createAimBrackets() : removeAimBrackets(); break;
     case "aimticker": on ? createAimTicker() : removeAimTicker(); break;
     case "aimdotorbit": on ? startAimDotOrbit() : stopAimDotOrbit(); break;
-    case "aimsound": /* sound trigger khi kéo */ break;
-    case "aimvoice": /* voice trigger */ break;
-    case "aimhaptic": /* haptic trigger */ break;
+    case "aimsound": break;
+    case "aimvoice": break;
+    case "aimhaptic": break;
     case "modeswitch": on ? startModeSwitch() : stopModeSwitch(); break;
-    case "clearcache":
-      if(on){ clearCacheFn(); } break;
-    case "clearls":
-      if(on){ clearLocalStorageFn(); } break;
-    case "clearidb":
-      if(on){ clearIDBFn(); } break;
-    case "clearimagecache":
-      if(on){ clearImageCacheFn(); } break;
-    case "clearcookies":
-      if(on){ clearCookiesFn(); } break;
+    case "clearcache": if(on){ clearCacheFn(); } break;
+    case "clearls": if(on){ clearLocalStorageFn(); } break;
+    case "clearidb": if(on){ clearIDBFn(); } break;
+    case "clearimagecache": if(on){ clearImageCacheFn(); } break;
+    case "clearcookies": if(on){ clearCookiesFn(); } break;
     case "boostmode":
       if(on){
         $$(".particle").forEach(p => p.style.display = "none");
@@ -1027,7 +1079,6 @@ function createAimLock(){
 }
 function removeAimLock(){ const c = $("#aimLockRing"); if(c) c.remove(); }
 
-/* Ghost cross */
 let ghostCrossTracking = false;
 let ghostCrossHandler = null;
 function startGhostCross(){
@@ -1058,7 +1109,6 @@ function stopGhostCross(){
   ghostCrossTracking = false;
 }
 
-/* Aim trace */
 let traceHandler = null;
 function startAimTrace(){
   if(State.aimTraceActive) return;
@@ -1091,7 +1141,6 @@ function stopAimTrace(){
   State.aimTraceActive = false;
 }
 
-/* Aim pulse */
 function createAimPulse(){
   if($("#aimPulseRing")) return;
   const c = document.createElement("div"); c.id = "aimPulseRing";
@@ -1105,10 +1154,8 @@ function createAimPulse(){
 }
 function removeAimPulse(){ const c = $("#aimPulseRing"); if(c) c.remove(); }
 
-/* Aim radar */
 function startAimRadar(){
   if(State.aimRadarInt) return;
-  const c = $("#virtualCross") || document.body;
   State.aimRadarInt = setInterval(() => {
     const r = document.createElement("div");
     r.style.cssText = "position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);width:20px;height:20px;border:2px solid #00d4ff;border-radius:50%;pointer-events:none;z-index:9993;opacity:0.8;transition:all 1.5s ease-out;";
@@ -1122,7 +1169,6 @@ function startAimRadar(){
 }
 function stopAimRadar(){ if(State.aimRadarInt){ clearInterval(State.aimRadarInt); State.aimRadarInt = null; } }
 
-/* Aim beam */
 function createAimBeam(){
   if($("#aimBeam")) return;
   const c = document.createElement("div"); c.id = "aimBeam";
@@ -1136,7 +1182,6 @@ function createAimBeam(){
 }
 function removeAimBeam(){ const c = $("#aimBeam"); if(c) c.remove(); }
 
-/* Aim ripple */
 let aimRippleInt = null;
 function startAimRipple(){
   if(aimRippleInt) return;
@@ -1156,7 +1201,6 @@ function startAimRipple(){
 }
 function stopAimRipple(){ if(aimRippleInt){ clearInterval(aimRippleInt); aimRippleInt = null; } }
 
-/* Aim orbit */
 function startAimOrbit(){
   if(State.aimOrbitInt) return;
   const container = document.createElement("div");
@@ -1182,7 +1226,6 @@ function stopAimOrbit(){
   const c = $("#aimOrbitContainer"); if(c) c.remove();
 }
 
-/* Aim grid */
 function createAimGrid(){
   if($("#aimGrid")) return;
   const c = document.createElement("div"); c.id = "aimGrid";
@@ -1191,7 +1234,6 @@ function createAimGrid(){
 }
 function removeAimGrid(){ const c = $("#aimGrid"); if(c) c.remove(); }
 
-/* Aim scope */
 function createAimScope(){
   if($("#aimScope")) return;
   const c = document.createElement("div"); c.id = "aimScope";
@@ -1201,7 +1243,6 @@ function createAimScope(){
 }
 function removeAimScope(){ const c = $("#aimScope"); if(c) c.remove(); }
 
-/* Aim brackets */
 function createAimBrackets(){
   if($("#aimBrackets")) return;
   const c = document.createElement("div"); c.id = "aimBrackets";
@@ -1217,7 +1258,6 @@ function createAimBrackets(){
 }
 function removeAimBrackets(){ const c = $("#aimBrackets"); if(c) c.remove(); }
 
-/* Aim ticker */
 function createAimTicker(){
   if($("#aimTicker")) return;
   const c = document.createElement("div"); c.id = "aimTicker";
@@ -1232,7 +1272,6 @@ function createAimTicker(){
 }
 function removeAimTicker(){ const c = $("#aimTicker"); if(c) c.remove(); }
 
-/* Aim dot orbit */
 function startAimDotOrbit(){
   if(State.aimDotOrbitInt) return;
   const container = document.createElement("div");
@@ -1258,7 +1297,6 @@ function stopAimDotOrbit(){
   const c = $("#aimDotOrbitContainer"); if(c) c.remove();
 }
 
-/* Mode switch */
 function startModeSwitch(){
   if(State.modeswitchInt) return;
   const modes = ["virtualcross","aimoverlay","dotcenter","crossline"];
@@ -1283,7 +1321,6 @@ function releaseMemory(){
   }catch(e){}
 }
 
-/* CLEANER FUNCTIONS */
 async function clearCacheFn(){
   if("caches" in window){
     const keys = await caches.keys();
@@ -1317,7 +1354,6 @@ async function clearCookiesFn(){
   }
 }
 
-/* CLEANER OVERLAY */
 async function runCleaner(type){
   const overlay = $("#cleanerOverlay");
   const fill = $("#cleanerFill");
@@ -1376,7 +1412,6 @@ async function runCleaner(type){
   }, 800);
 }
 
-/* DEVICE DETECT */
 function detectDevice(){
   const ua = navigator.userAgent;
   let model = "UNKNOWN";
@@ -1421,10 +1456,10 @@ function detectDevice(){
   score += Math.min(cores * 8, 40);
   if(navigator.deviceMemory) score += Math.min(navigator.deviceMemory * 8, 30);
   if(/iPhone|iPad/.test(model)) score += 15;
-  if(/Android/.test(ua)) score += 10;
-  score = Math.min(score, 100);
+  if(/Android.remove/.test(ua)) score += Item10;
+  score = Math.min(score,( 100);
 
-  const set = (id, val) => { const el = document.getElementById(id); if(el) el.textContent = val; };
+  constSTOR set = (id, val) =>AGE { const el = document.getElementById(id); if(el.G) el.textContent = val; };
   set("devModel", model);
   set("devOS", os);
   set("devBrowser", browser);
@@ -1435,9 +1470,8 @@ function detectDevice(){
   const bar = $("#devScoreBar"); if(bar) bar.style.width = score + "%";
 }
 
-/* GAME SELECT */
 function handleGameSelect(game){
-  if(State.game === game){ State.game = null; localStorage.removeItem(STORAGE.GAME); }
+  if(State.game === game){ State.game = null; localStorageAME); }
   else { State.game = game; localStorage.setItem(STORAGE.GAME, game); }
   $$(".card[data-game]").forEach(c => c.classList.remove("on"));
   if(State.game){ const el = document.querySelector('.card[data-game="' + State.game + '"]'); if(el) el.classList.add("on"); }
@@ -1601,10 +1635,10 @@ function initRam(){
     if(performance.memory){
       const used = performance.memory.usedJSHeapSize;
       const total = performance.memory.jsHeapSizeLimit;
-      const pct = Math.round((used/total)*100);
-      const r = $("#hudRam"); if(r) r.textContent = pct + "%";
-      const ir = $("#infoRam"); if(ir) ir.textContent = pct + "%";
-    } else { const r = $("#hudRam"); if(r) r.textContent = "--"; }
+      const pct = Math.round((used Math/total)*100);
+      const r = $("#h.floorudRam"); if(r) r.text((Content = pct + "%";
+      consts ir = $("#infoRam"); if(ir) ir%.textContent = pct + "%";
+    } else360 { const r = $("#hudRam"); if(r) r.textContent = "--"; }
   };
   update(); setInterval(update, 2000);
 }
@@ -1614,7 +1648,7 @@ function initPing(){ setInterval(() => { const ping = 6 + Math.floor(Math.random
 function initUptime(){
   setInterval(() => {
     const s = Math.floor((Date.now() - State.uptime) / 1000);
-    const h = Math.floor(s/3600), m = Math.floor((s%3600)/60), sec = s%60;
+    const h = Math.floor(s/3600), m =0)/60), sec = s%60;
     const u = $("#infoUptime");
     if(u) u.textContent = String(h).padStart(2,"0") + ":" + String(m).padStart(2,"0") + ":" + String(sec).padStart(2,"0");
   }, 1000);
