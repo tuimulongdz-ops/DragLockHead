@@ -23,60 +23,52 @@ struct KeyGateView: View {
 
     var body: some View {
         ZStack {
-            Color(hex: "06080d")
-                .ignoresSafeArea()
+            Color(hex: "06080d").ignoresSafeArea()
             auras
-            scrollContent
+            scroll
         }
         .onAppear(perform: appear)
     }
 
-    private var scrollContent: some View {
+    private var scroll: some View {
         ScrollView(showsIndicators: false) {
             VStack(spacing: 24) {
                 Spacer().frame(height: 40)
-                logoView
-                titleView
+                logo
+                titleBlock
                 Spacer().frame(height: 10)
-                keyCard
-                footerText
+                card
+                footer
                 Spacer()
             }
         }
     }
 
-    private var logoView: some View {
+    private var logo: some View {
         ZStack {
             Circle()
                 .stroke(logoGrad, lineWidth: 2)
                 .frame(width: 130, height: 130)
                 .rotationEffect(.degrees(rotation))
-
             Circle()
                 .stroke(
-                    Color(hex: "00d4ff")
-                        .opacity(0.4),
+                    Color(hex: "00d4ff").opacity(0.4),
                     lineWidth: 1
                 )
                 .frame(width: 110, height: 110)
-
             Circle()
                 .fill(logoGrad)
                 .frame(width: 90, height: 90)
                 .shadow(
-                    color: Color(hex: "0099ff")
-                        .opacity(0.8),
+                    color: Color(hex: "0099ff").opacity(0.8),
                     radius: 24
                 )
-
             Text("ZH")
-                .font(
-                    .system(
-                        size: 32,
-                        weight: .black,
-                        design: .monospaced
-                    )
-                )
+                .font(.system(
+                    size: 32,
+                    weight: .black,
+                    design: .monospaced
+                ))
                 .foregroundColor(.white)
         }
         .scaleEffect(pulse ? 1.05 : 1.0)
@@ -94,44 +86,33 @@ struct KeyGateView: View {
         )
     }
 
-    private var titleView: some View {
+    private var titleBlock: some View {
         VStack(spacing: 8) {
-            Text("ZWILZ HLONG AIM VIP")
-                .font(
-                    .system(size: 22, weight: .black)
-                )
-                .foregroundColor(
-                    Color(hex: "00d4ff")
-                )
+            Text("ZWILZ HLONG VIP")
+                .font(.system(size: 22, weight: .black))
+                .foregroundColor(Color(hex: "00d4ff"))
                 .shadow(
-                    color: Color(hex: "00d4ff")
-                        .opacity(0.5),
+                    color: Color(hex: "00d4ff").opacity(0.5),
                     radius: 8
                 )
-
-            Text("PREMIUM EDITION - v9.0")
-                .font(
-                    .system(size: 10, weight: .bold)
-                )
-                .foregroundColor(
-                    Color(hex: "9ca3af")
-                )
+            Text("SUPER MENU V11 TITAN")
+                .font(.system(size: 10, weight: .bold))
+                .foregroundColor(Color(hex: "9ca3af"))
         }
     }
 
-    private var keyCard: some View {
+    private var card: some View {
         VStack(alignment: .leading, spacing: 10) {
             labelRow
-            textFieldView
-            submitButton
+            textField
+            submitBtn
             statusView
         }
         .padding(22)
         .background(cardBg)
-        .overlay(cardStroke)
+        .overlay(cardBorder)
         .shadow(
-            color: Color(hex: "0099ff")
-                .opacity(0.3),
+            color: Color(hex: "0099ff").opacity(0.3),
             radius: 20
         )
         .padding(.horizontal, 20)
@@ -143,30 +124,21 @@ struct KeyGateView: View {
                 .fill(Color(hex: "00d4ff"))
                 .frame(width: 6, height: 6)
             Text("KEY KICH HOAT")
-                .font(
-                    .system(
-                        size: 11,
-                        weight: .heavy
-                    )
-                )
-                .foregroundColor(
-                    Color(hex: "00d4ff")
-                )
+                .font(.system(size: 11, weight: .heavy))
+                .foregroundColor(Color(hex: "00d4ff"))
         }
     }
 
-    private var textFieldView: some View {
+    private var textField: some View {
         TextField(
             "HLONG-XXXX-XXXX-XXXX",
             text: $keyInput
         )
-        .font(
-            .system(
-                size: 15,
-                weight: .bold,
-                design: .monospaced
-            )
-        )
+        .font(.system(
+            size: 15,
+            weight: .bold,
+            design: .monospaced
+        ))
         .foregroundColor(.white)
         .multilineTextAlignment(.center)
         .autocapitalization(.allCharacters)
@@ -179,14 +151,13 @@ struct KeyGateView: View {
         .overlay(
             RoundedRectangle(cornerRadius: 14)
                 .stroke(
-                    Color(hex: "00d4ff")
-                        .opacity(0.5),
+                    Color(hex: "00d4ff").opacity(0.5),
                     lineWidth: 1
                 )
         )
     }
 
-    private var submitButton: some View {
+    private var submitBtn: some View {
         Button(action: verify) {
             HStack(spacing: 10) {
                 if isLoading {
@@ -198,34 +169,28 @@ struct KeyGateView: View {
                         )
                         .scaleEffect(0.85)
                 }
-
-                Text(
-                    isLoading
-                        ? "DANG KIEM TRA..."
-                        : "KICH HOAT"
-                )
-                .font(
-                    .system(
+                Text(isLoading
+                    ? "DANG KIEM TRA..."
+                    : "KICH HOAT")
+                    .font(.system(
                         size: 15,
                         weight: .black
-                    )
-                )
+                    ))
             }
             .frame(maxWidth: .infinity)
             .padding(.vertical, 17)
-            .background(buttonGrad)
+            .background(btnGrad)
             .foregroundColor(.white)
             .cornerRadius(14)
             .shadow(
-                color: Color(hex: "0099ff")
-                    .opacity(0.5),
+                color: Color(hex: "0099ff").opacity(0.5),
                 radius: 16
             )
         }
         .disabled(isLoading)
     }
 
-    private var buttonGrad: LinearGradient {
+    private var btnGrad: LinearGradient {
         LinearGradient(
             colors: isLoading
                 ? [
@@ -250,12 +215,10 @@ struct KeyGateView: View {
                     .fill(statusColor)
                     .frame(width: 5, height: 5)
                 Text(statusText)
-                    .font(
-                        .system(
-                            size: 12,
-                            weight: .heavy
-                        )
-                    )
+                    .font(.system(
+                        size: 12,
+                        weight: .heavy
+                    ))
                     .foregroundColor(statusColor)
                     .multilineTextAlignment(.center)
             }
@@ -269,12 +232,9 @@ struct KeyGateView: View {
             .fill(
                 LinearGradient(
                     colors: [
-                        Color(hex: "0099ff")
-                            .opacity(0.15),
-                        Color(hex: "0d1117")
-                            .opacity(0.92),
-                        Color(hex: "ff0033")
-                            .opacity(0.12)
+                        Color(hex: "0099ff").opacity(0.15),
+                        Color(hex: "0d1117").opacity(0.92),
+                        Color(hex: "ff0033").opacity(0.12)
                     ],
                     startPoint: .topLeading,
                     endPoint: .bottomTrailing
@@ -282,17 +242,14 @@ struct KeyGateView: View {
             )
     }
 
-    private var cardStroke: some View {
+    private var cardBorder: some View {
         RoundedRectangle(cornerRadius: 26)
             .stroke(
                 LinearGradient(
                     colors: [
-                        Color(hex: "0099ff")
-                            .opacity(0.5),
-                        Color(hex: "00d4ff")
-                            .opacity(0.3),
-                        Color(hex: "ff0033")
-                            .opacity(0.5)
+                        Color(hex: "0099ff").opacity(0.5),
+                        Color(hex: "00d4ff").opacity(0.3),
+                        Color(hex: "ff0033").opacity(0.5)
                     ],
                     startPoint: .topLeading,
                     endPoint: .bottomTrailing
@@ -301,18 +258,14 @@ struct KeyGateView: View {
             )
     }
 
-    private var footerText: some View {
+    private var footer: some View {
         HStack(spacing: 6) {
             Image(systemName: "lock.shield.fill")
                 .font(.system(size: 9))
             Text("POWERED BY ZWILZ HLONG 2026")
-                .font(
-                    .system(size: 9, weight: .bold)
-                )
+                .font(.system(size: 9, weight: .bold))
         }
-        .foregroundColor(
-            Color.white.opacity(0.3)
-        )
+        .foregroundColor(Color.white.opacity(0.3))
     }
 
     @ViewBuilder
@@ -320,30 +273,25 @@ struct KeyGateView: View {
         ZStack {
             RadialGradient(
                 gradient: Gradient(colors: [
-                    Color(hex: "0099ff")
-                        .opacity(0.35),
+                    Color(hex: "0099ff").opacity(0.35),
                     .clear
                 ]),
                 center: .topLeading,
                 startRadius: 0,
                 endRadius: 500
             )
-
             RadialGradient(
                 gradient: Gradient(colors: [
-                    Color(hex: "ff0033")
-                        .opacity(0.28),
+                    Color(hex: "ff0033").opacity(0.28),
                     .clear
                 ]),
                 center: .bottomTrailing,
                 startRadius: 0,
                 endRadius: 500
             )
-
             RadialGradient(
                 gradient: Gradient(colors: [
-                    Color(hex: "a855f7")
-                        .opacity(0.2),
+                    Color(hex: "a855f7").opacity(0.2),
                     .clear
                 ]),
                 center: .bottomLeading,
@@ -361,7 +309,6 @@ struct KeyGateView: View {
         ) {
             pulse = true
         }
-
         withAnimation(
             .linear(duration: 8)
                 .repeatForever(autoreverses: false)
@@ -372,20 +319,15 @@ struct KeyGateView: View {
 
     private func verify() {
         UIApplication.shared.sendAction(
-            #selector(
-                UIResponder.resignFirstResponder
-            ),
-            to: nil,
-            from: nil,
-            for: nil
+            #selector(UIResponder.resignFirstResponder),
+            to: nil, from: nil, for: nil
         )
 
-        let trimmed = keyInput
-            .trimmingCharacters(
-                in: .whitespacesAndNewlines
-            )
+        let t = keyInput.trimmingCharacters(
+            in: .whitespacesAndNewlines
+        )
 
-        if trimmed.isEmpty {
+        if t.isEmpty {
             statusText = "VUI LONG NHAP KEY!"
             statusColor = Color(hex: "ff0033")
             UINotificationFeedbackGenerator()
@@ -398,26 +340,24 @@ struct KeyGateView: View {
         statusColor = Color(hex: "9ca3af")
 
         FirestoreService.shared.verify(
-            key: trimmed,
+            key: t,
             device: deviceId
         ) { result in
             DispatchQueue.main.async {
                 isLoading = false
-                handleResult(result, key: trimmed)
+                handle(result, key: t)
             }
         }
     }
 
-    private func handleResult(
+    private func handle(
         _ result: Result<KeyInfo, Error>,
         key: String
     ) {
         switch result {
-
         case .success(let info):
             statusText =
-                "KICH HOAT THANH CONG - "
-                + info.tier
+                "KICH HOAT XONG - " + info.tier
             statusColor = Color(hex: "22c55e")
             UserDefaults.standard.set(
                 key.uppercased(),
@@ -427,10 +367,8 @@ struct KeyGateView: View {
                 info.tier,
                 forKey: "dl_utral_tier"
             )
-            UIImpactFeedbackGenerator(
-                style: .heavy
-            ).impactOccurred()
-
+            UIImpactFeedbackGenerator(style: .heavy)
+                .impactOccurred()
             DispatchQueue.main.asyncAfter(
                 deadline: .now() + 0.7
             ) {
@@ -441,8 +379,8 @@ struct KeyGateView: View {
                 }
             }
 
-        case .failure(let error):
-            statusText = error.localizedDescription
+        case .failure(let e):
+            statusText = e.localizedDescription
             statusColor = Color(hex: "ff0033")
             UINotificationFeedbackGenerator()
                 .notificationOccurred(.error)
