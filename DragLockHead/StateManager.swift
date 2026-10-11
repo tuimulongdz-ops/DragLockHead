@@ -7,26 +7,21 @@ final class StateManager: ObservableObject {
     @Published var features: [String: Bool] = [:]
     @Published var selectedTab: String = "aim"
     @Published var game: String? = nil
-
     @Published var fps: Int = 0
     @Published var ping: Int = 0
     @Published var ram: Int = 0
     @Published var batteryPct: Int = 0
     @Published var charging: Bool = false
-
     @Published var deviceId: String = ""
     @Published var toast: String = ""
     @Published var showToast: Bool = false
     @Published var isInjecting: Bool = false
-
     @Published var accentHex: String = "00d4ff"
-
     @Published var cleanActive: Bool = false
     @Published var cleanProgress: Double = 0
     @Published var cleanTitle: String = "DỌN DẸP"
     @Published var cleanStatus: String = ""
     @Published var cleanLog: [String] = []
-
     @Published var ripples: [Ripple] = []
 
     private var fpsCounter: Int = 0
@@ -35,7 +30,7 @@ final class StateManager: ObservableObject {
     private var metricsTimer: Timer?
 
     var accentColor: Color {
-        Color(hex: accentHex)
+        return Color(hex: accentHex)
     }
 
     init() {
@@ -52,8 +47,8 @@ final class StateManager: ObservableObject {
     }
 
     func toggle(_ key: String) {
-        let newValue = !(features[key] ?? false)
-        features[key] = newValue
+        let v = !(features[key] ?? false)
+        features[key] = v
         UIImpactFeedbackGenerator(style: .light)
             .impactOccurred()
         saveState()
@@ -110,22 +105,22 @@ final class StateManager: ObservableObject {
         cleanTitle = type
 
         let steps: [(String, Double)] = [
-            ("Đang phân tích thiết bị", 0.10),
+            ("Phân tích thiết bị", 0.10),
             ("Dọn cache hệ thống", 0.30),
             ("Dọn storage tạm", 0.50),
-            ("Dọn cookies trình duyệt", 0.70),
+            ("Dọn cookies", 0.70),
             ("Giải phóng RAM", 0.85),
-            ("Tối ưu hóa CPU", 0.95),
+            ("Tối ưu CPU", 0.95),
             ("Hoàn tất!", 1.00)
         ]
 
-        for (i, step) in steps.enumerated() {
+        for (i, s) in steps.enumerated() {
             DispatchQueue.main.asyncAfter(
                 deadline: .now() + Double(i) * 0.5
             ) {
-                self.cleanStatus = step.0
-                self.cleanProgress = step.1
-                self.cleanLog.append(step.0)
+                self.cleanStatus = s.0
+                self.cleanProgress = s.1
+                self.cleanLog.append(s.0)
             }
         }
 
@@ -133,7 +128,7 @@ final class StateManager: ObservableObject {
             deadline: .now() + 3.8
         ) {
             self.cleanActive = false
-            self.showToastMessage("DỌN DẸP HOÀN TẤT")
+            self.showToastMessage("DỌN DẸP XONG")
         }
     }
 
@@ -172,25 +167,21 @@ final class StateManager: ObservableObject {
             !s.isEmpty {
             return s
         }
-        let rand = UUID().uuidString
-            .replacingOccurrences(
-                of: "-",
-                with: ""
-            )
-            .prefix(8)
-            .uppercased()
-        let id = "DEV-\(rand)"
+        let r = UUID().uuidString
+            .replacingOccurrences(of: "-", with: "")
+            .prefix(8).uppercased()
+        let id = "DEV-\(r)"
         UserDefaults.standard.set(id, forKey: key)
         return id
     }
 
     private func startDisplayLink() {
-        let link = CADisplayLink(
+        let l = CADisplayLink(
             target: self,
             selector: #selector(tick)
         )
-        link.add(to: .main, forMode: .common)
-        displayLink = link
+        l.add(to: .main, forMode: .common)
+        displayLink = l
     }
 
     @objc private func tick() {
@@ -209,19 +200,19 @@ final class StateManager: ObservableObject {
             withTimeInterval: 1.0,
             repeats: true
         ) { [weak self] _ in
-            guard let self = self else { return }
-            self.ping = Int.random(in: 6...18)
-            self.ram = self.getRamUsage()
+            guard let s = self else { return }
+            s.ping = Int.random(in: 6...18)
+            s.ram = s.getRamUsage()
         }
     }
 
     private func getRamUsage() -> Int {
         var info = mach_task_basic_info()
-        var count = mach_msg_type_number_t(
+        var cnt = mach_msg_type_number_t(
             MemoryLayout<mach_task_basic_info>.size
         ) / 4
 
-        let result: kern_return_t =
+        let r: kern_return_t =
             withUnsafeMutablePointer(to: &info) {
                 $0.withMemoryRebound(
                     to: integer_t.self,
@@ -229,16 +220,14 @@ final class StateManager: ObservableObject {
                 ) {
                     task_info(
                         mach_task_self_,
-                        task_flavor_t(
-                            MACH_TASK_BASIC_INFO
-                        ),
+                        task_flavor_t(MACH_TASK_BASIC_INFO),
                         $0,
-                        &count
+                        &cnt
                     )
                 }
             }
 
-        if result == KERN_SUCCESS {
+        if r == KERN_SUCCESS {
             let used = Int(info.resident_size)
                 / 1024 / 1024
             return min(100, used * 100 / 4096)
@@ -250,21 +239,17 @@ final class StateManager: ObservableObject {
         UIDevice.current
             .isBatteryMonitoringEnabled = true
         updateBattery()
-
         NotificationCenter.default.addObserver(
             forName:
-                UIDevice
-                    .batteryLevelDidChangeNotification,
+                UIDevice.batteryLevelDidChangeNotification,
             object: nil,
             queue: .main
         ) { [weak self] _ in
             self?.updateBattery()
         }
-
         NotificationCenter.default.addObserver(
             forName:
-                UIDevice
-                    .batteryStateDidChangeNotification,
+                UIDevice.batteryStateDidChangeNotification,
             object: nil,
             queue: .main
         ) { [weak self] _ in
