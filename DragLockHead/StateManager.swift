@@ -19,7 +19,7 @@ final class StateManager: ObservableObject {
     @Published var accentHex: String = "00d4ff"
     @Published var cleanActive: Bool = false
     @Published var cleanProgress: Double = 0
-    @Published var cleanTitle: String = "DON DEP"
+    @Published var cleanTitle: String = "DỌN DẸP"
     @Published var cleanStatus: String = ""
     @Published var cleanLog: [String] = []
     @Published var ripples: [Ripple] = []
@@ -48,10 +48,8 @@ final class StateManager: ObservableObject {
 
     func toggle(_ key: String) {
         let old = features[key]
-        let v: Bool
-        if old == nil {
-            v = true
-        } else {
+        var v = true
+        if old != nil {
             v = !(old!)
         }
         features[key] = v
@@ -123,13 +121,13 @@ final class StateManager: ObservableObject {
         cleanTitle = type
 
         let texts: [String] = [
-            "Phan tich thiet bi",
-            "Don cache he thong",
-            "Don storage tam",
-            "Don cookies",
-            "Giai phong RAM",
-            "Toi uu CPU",
-            "Hoan tat"
+            "Phân tích thiết bị",
+            "Dọn cache hệ thống",
+            "Dọn storage tạm",
+            "Dọn cookies",
+            "Giải phóng RAM",
+            "Tối ưu CPU",
+            "Hoàn tất"
         ]
         let values: [Double] = [
             0.10,
@@ -160,7 +158,7 @@ final class StateManager: ObservableObject {
             deadline: .now() + 3.8
         ) {
             self.cleanActive = false
-            self.showToastMessage("DON DEP XONG")
+            self.showToastMessage("DỌN DẸP XONG")
         }
     }
 
@@ -196,7 +194,7 @@ final class StateManager: ObservableObject {
         if openScheme("ff://") {
             return
         }
-        showToastMessage("CHUA CAI GAME")
+        showToastMessage("CHƯA CÀI GAME")
     }
 
     @discardableResult
@@ -232,10 +230,10 @@ final class StateManager: ObservableObject {
     func runBuffSequence() {
         isInjecting = true
         DispatchQueue.main.asyncAfter(
-            deadline: .now() + 3.0
+            deadline: .now() + 3.2
         ) {
             self.isInjecting = false
-            self.showToastMessage("INJECT THANH CONG")
+            self.showToastMessage("INJECT THÀNH CÔNG")
             DispatchQueue.main.asyncAfter(
                 deadline: .now() + 0.6
             ) {
