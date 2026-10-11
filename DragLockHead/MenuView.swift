@@ -20,7 +20,6 @@ struct MenuView: View {
         .onAppear {
             let saved = UserDefaults.standard.string(forKey: "dl_utral_auth")
             if saved != nil, !(saved?.isEmpty ?? true) {
-                // User already verified before → skip to menu directly
                 isVerified = true
             }
         }
@@ -95,16 +94,25 @@ struct AnimatedMenuBackground: View {
         ZStack {
             Theme.dark1
 
-            RadialGradient(gradient: Gradient(colors: [Theme.sea1.opacity(0.32), .clear]),
-                           center: .topLeading, startRadius: 0, endRadius: 400)
+            RadialGradient(
+                gradient: Gradient(colors: [Theme.sea1.opacity(0.32), .clear]),
+                center: .topLeading,
+                startRadius: 0,
+                endRadius: 400)
                 .offset(x: sin(phase) * 35, y: cos(phase) * 35)
 
-            RadialGradient(gradient: Gradient(colors: [Theme.red1.opacity(0.24), .clear]),
-                           center: .bottomTrailing, startRadius: 0, endRadius: 400)
+            RadialGradient(
+                gradient: Gradient(colors: [Theme.red1.opacity(0.24), .clear]),
+                center: .bottomTrailing,
+                startRadius: 0,
+                endRadius: 400)
                 .offset(x: cos(phase) * 35, y: sin(phase) * 35)
 
-            RadialGradient(gradient: Gradient(colors: [Theme.purple.opacity(0.18), .clear]),
-                           center: .bottomLeading, startRadius: 0, endRadius: 300)
+            RadialGradient(
+                gradient: Gradient(colors: [Theme.purple.opacity(0.18), .clear]),
+                center: .bottomLeading,
+                startRadius: 0,
+                endRadius: 300)
                 .offset(x: sin(phase * 0.8) * 25, y: cos(phase * 0.8) * 25)
         }
         .ignoresSafeArea()
@@ -122,8 +130,12 @@ struct HeaderBar: View {
         HStack(spacing: 10) {
             ZStack {
                 Circle()
-                    .fill(LinearGradient(colors: [Theme.sea1, Theme.sea2],
-                                         startPoint: .topLeading, endPoint: .bottomTrailing))
+                    .fill(
+                        LinearGradient(
+                            colors: [Theme.sea1, Theme.sea2],
+                            startPoint: .topLeading,
+                            endPoint: .bottomTrailing)
+                    )
                     .frame(width: 42, height: 42)
                     .shadow(color: Theme.sea1.opacity(0.6), radius: 10)
                 Text("ZH")
@@ -138,7 +150,7 @@ struct HeaderBar: View {
                     .lineLimit(1)
                 Text("DRAGLOCK UTRAL - v9.0")
                     .font(.system(size: 8, weight: .bold))
-                    .tracking(1.8)
+                    .kerning(1.8)
                     .foregroundColor(Theme.smoke2)
             }
 
@@ -149,19 +161,28 @@ struct HeaderBar: View {
         .padding(12)
         .background(
             RoundedRectangle(cornerRadius: 18)
-                .fill(LinearGradient(
-                    colors: [Theme.sea1.opacity(0.16),
-                             Theme.dark2.opacity(0.88),
-                             Theme.red1.opacity(0.12)],
-                    startPoint: .topLeading, endPoint: .bottomTrailing))
+                .fill(
+                    LinearGradient(
+                        colors: [
+                            Theme.sea1.opacity(0.16),
+                            Theme.dark2.opacity(0.88),
+                            Theme.red1.opacity(0.12)
+                        ],
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing)
+                )
         )
         .overlay(
             RoundedRectangle(cornerRadius: 18)
-                .stroke(LinearGradient(
-                    colors: [Theme.sea1.opacity(0.6),
-                             Theme.sea2.opacity(0.25),
-                             Theme.red1.opacity(0.5)],
-                    startPoint: .topLeading, endPoint: .bottomTrailing),
+                .stroke(
+                    LinearGradient(
+                        colors: [
+                            Theme.sea1.opacity(0.6),
+                            Theme.sea2.opacity(0.25),
+                            Theme.red1.opacity(0.5)
+                        ],
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing),
                     lineWidth: 1)
         )
         .shadow(color: Theme.sea1.opacity(0.25), radius: 12)
@@ -214,7 +235,7 @@ struct HudItem: View {
         VStack(spacing: 2) {
             Text(label)
                 .font(.system(size: 8, weight: .heavy))
-                .tracking(1.5)
+                .kerning(1.5)
                 .foregroundColor(Theme.smoke2)
             Text(value)
                 .font(.system(size: 12, weight: .black, design: .monospaced))
@@ -256,25 +277,23 @@ struct TabBar: View {
                         }
                         UIImpactFeedbackGenerator(style: .light).impactOccurred()
                     }) {
-                        Text(label)
-                            .font(.system(size: 10, weight: .heavy))
-                            .tracking(0.6)
-                            .foregroundColor(state.selectedTab == key ? .white : Theme.smoke2)
-                            .padding(.horizontal, 13)
-                            .padding(.vertical, 10)
-                            .background(
-                                Group {
-                                    if state.selectedTab == key {
-                                        LinearGradient(
-                                            colors: [Theme.sea1, Theme.sea2, Theme.red1],
-                                            startPoint: .leading, endPoint: .trailing)
-                                    } else {
-                                        Color.clear
-                                    }
-                                }
-                            )
-                            .cornerRadius(11)
-                            .shadow(color: state.selectedTab == key ? Theme.sea2.opacity(0.5) : .clear, radius: 8)
+                        ZStack {
+                            if state.selectedTab == key {
+                                LinearGradient(
+                                    colors: [Theme.sea1, Theme.sea2, Theme.red1],
+                                    startPoint: .leading,
+                                    endPoint: .trailing
+                                )
+                                .cornerRadius(11)
+                                .shadow(color: Theme.sea2.opacity(0.5), radius: 8)
+                            }
+                            Text(label)
+                                .font(.system(size: 10, weight: .heavy))
+                                .kerning(0.6)
+                                .foregroundColor(state.selectedTab == key ? .white : Theme.smoke2)
+                                .padding(.horizontal, 13)
+                                .padding(.vertical, 10)
+                        }
                     }
                     .buttonStyle(.plain)
                 }
@@ -294,18 +313,26 @@ struct SectionTitle: View {
     var body: some View {
         HStack(spacing: 8) {
             RoundedRectangle(cornerRadius: 2)
-                .fill(LinearGradient(colors: [Theme.sea1, Theme.sea2, Theme.red1],
-                                     startPoint: .top, endPoint: .bottom))
+                .fill(
+                    LinearGradient(
+                        colors: [Theme.sea1, Theme.sea2, Theme.red1],
+                        startPoint: .top,
+                        endPoint: .bottom)
+                )
                 .frame(width: 3, height: 14)
                 .shadow(color: Theme.sea1, radius: 4)
             Text(text)
                 .font(.system(size: 10, weight: .black))
-                .tracking(2)
+                .kerning(2)
                 .foregroundColor(Theme.sea2)
             Spacer()
             RoundedRectangle(cornerRadius: 1)
-                .fill(LinearGradient(colors: [Color.white.opacity(0.1), Color.clear],
-                                     startPoint: .leading, endPoint: .trailing))
+                .fill(
+                    LinearGradient(
+                        colors: [Color.white.opacity(0.1), Color.clear],
+                        startPoint: .leading,
+                        endPoint: .trailing)
+                )
                 .frame(height: 1)
         }
         .padding(.horizontal, 4)
@@ -325,22 +352,26 @@ struct FeatureCard: View {
         Button(action: onToggle) {
             HStack(spacing: 11) {
                 ZStack {
-                    RoundedRectangle(cornerRadius: 11)
-                        .fill(
-                            Group {
-                                if isOn {
-                                    LinearGradient(
-                                        colors: [Theme.sea1, Theme.sea2],
-                                        startPoint: .topLeading, endPoint: .bottomTrailing)
-                                } else {
-                                    LinearGradient(
-                                        colors: [Color.white.opacity(0.08), Color.white.opacity(0.03)],
-                                        startPoint: .top, endPoint: .bottom)
-                                }
-                            }
-                        )
-                        .frame(width: 40, height: 40)
-                        .shadow(color: isOn ? Theme.sea2.opacity(0.5) : .clear, radius: 8)
+                    if isOn {
+                        RoundedRectangle(cornerRadius: 11)
+                            .fill(
+                                LinearGradient(
+                                    colors: [Theme.sea1, Theme.sea2],
+                                    startPoint: .topLeading,
+                                    endPoint: .bottomTrailing)
+                            )
+                            .frame(width: 40, height: 40)
+                            .shadow(color: Theme.sea2.opacity(0.5), radius: 8)
+                    } else {
+                        RoundedRectangle(cornerRadius: 11)
+                            .fill(
+                                LinearGradient(
+                                    colors: [Color.white.opacity(0.08), Color.white.opacity(0.03)],
+                                    startPoint: .top,
+                                    endPoint: .bottom)
+                            )
+                            .frame(width: 40, height: 40)
+                    }
                     Text(icon)
                         .font(.system(size: 16, weight: .black))
                         .foregroundColor(.white)
@@ -361,20 +392,21 @@ struct FeatureCard: View {
                 Spacer()
 
                 ZStack {
-                    Capsule()
-                        .fill(
-                            Group {
-                                if isOn {
-                                    LinearGradient(
-                                        colors: [Theme.sea1, Theme.sea2],
-                                        startPoint: .leading, endPoint: .trailing)
-                                } else {
-                                    Color.white.opacity(0.1)
-                                }
-                            }
-                        )
-                        .frame(width: 48, height: 28)
-                        .shadow(color: isOn ? Theme.sea2.opacity(0.6) : .clear, radius: 8)
+                    if isOn {
+                        Capsule()
+                            .fill(
+                                LinearGradient(
+                                    colors: [Theme.sea1, Theme.sea2],
+                                    startPoint: .leading,
+                                    endPoint: .trailing)
+                            )
+                            .frame(width: 48, height: 28)
+                            .shadow(color: Theme.sea2.opacity(0.6), radius: 8)
+                    } else {
+                        Capsule()
+                            .fill(Color.white.opacity(0.1))
+                            .frame(width: 48, height: 28)
+                    }
 
                     Circle()
                         .fill(Color.white)
@@ -387,13 +419,16 @@ struct FeatureCard: View {
             .padding(.horizontal, 14)
             .padding(.vertical, 12)
             .background(
-                Group {
+                ZStack {
                     if isOn {
                         LinearGradient(
-                            colors: [Theme.sea1.opacity(0.2),
-                                     Theme.dark2.opacity(0.85),
-                                     Theme.red1.opacity(0.15)],
-                            startPoint: .topLeading, endPoint: .bottomTrailing)
+                            colors: [
+                                Theme.sea1.opacity(0.2),
+                                Theme.dark2.opacity(0.85),
+                                Theme.red1.opacity(0.15)
+                            ],
+                            startPoint: .topLeading,
+                            endPoint: .bottomTrailing)
                     } else {
                         Color.white.opacity(0.03)
                     }
@@ -402,12 +437,14 @@ struct FeatureCard: View {
             .cornerRadius(16)
             .overlay(
                 RoundedRectangle(cornerRadius: 16)
-                    .stroke(isOn
-                            ? LinearGradient(colors: [Theme.sea2.opacity(0.7), Theme.red1.opacity(0.4)],
-                                             startPoint: .topLeading, endPoint: .bottomTrailing)
-                            : LinearGradient(colors: [Color.white.opacity(0.08), Color.white.opacity(0.08)],
-                                             startPoint: .top, endPoint: .bottom),
-                            lineWidth: 1)
+                    .stroke(
+                        LinearGradient(
+                            colors: isOn
+                                ? [Theme.sea2.opacity(0.7), Theme.red1.opacity(0.4)]
+                                : [Color.white.opacity(0.08), Color.white.opacity(0.08)],
+                            startPoint: .topLeading,
+                            endPoint: .bottomTrailing),
+                        lineWidth: 1)
             )
             .shadow(color: isOn ? Theme.sea2.opacity(0.2) : .clear, radius: 10)
         }
@@ -465,19 +502,26 @@ struct InfoCard<Content: View>: View {
             .padding(14)
             .background(
                 LinearGradient(
-                    colors: [Theme.sea1.opacity(0.1),
-                             Theme.dark2.opacity(0.88),
-                             Theme.red1.opacity(0.08)],
-                    startPoint: .topLeading, endPoint: .bottomTrailing)
+                    colors: [
+                        Theme.sea1.opacity(0.1),
+                        Theme.dark2.opacity(0.88),
+                        Theme.red1.opacity(0.08)
+                    ],
+                    startPoint: .topLeading,
+                    endPoint: .bottomTrailing)
             )
             .cornerRadius(16)
             .overlay(
                 RoundedRectangle(cornerRadius: 16)
-                    .stroke(LinearGradient(
-                        colors: [Theme.sea1.opacity(0.35),
-                                 Theme.sea2.opacity(0.15),
-                                 Theme.red1.opacity(0.3)],
-                        startPoint: .topLeading, endPoint: .bottomTrailing),
+                    .stroke(
+                        LinearGradient(
+                            colors: [
+                                Theme.sea1.opacity(0.35),
+                                Theme.sea2.opacity(0.15),
+                                Theme.red1.opacity(0.3)
+                            ],
+                            startPoint: .topLeading,
+                            endPoint: .bottomTrailing),
                         lineWidth: 1)
             )
     }
@@ -491,7 +535,7 @@ struct InfoRow: View {
         HStack {
             Text(key)
                 .font(.system(size: 11, weight: .bold))
-                .tracking(0.8)
+                .kerning(0.8)
                 .foregroundColor(Theme.smoke2)
             Spacer()
             Text(value)
@@ -509,7 +553,6 @@ struct FooterBar: View {
 
     var body: some View {
         HStack(spacing: 8) {
-            // RESET button
             Button(action: {
                 state.resetAll()
                 state.showToastMessage("DA DAT LAI")
@@ -520,7 +563,7 @@ struct FooterBar: View {
                         .font(.system(size: 14, weight: .bold))
                     Text("DAT LAI")
                         .font(.system(size: 9, weight: .black))
-                        .tracking(1)
+                        .kerning(1)
                 }
                 .frame(maxWidth: .infinity)
                 .padding(.vertical, 12)
@@ -531,7 +574,6 @@ struct FooterBar: View {
             }
             .buttonStyle(GradientButtonStyle())
 
-            // ASSISTIVE TOUCH button
             Button(action: {
                 openAssistiveTouch()
                 state.showToastMessage("MO TRO NANG - CHAM")
@@ -541,7 +583,7 @@ struct FooterBar: View {
                         .font(.system(size: 14, weight: .bold))
                     Text("TAM AO")
                         .font(.system(size: 9, weight: .black))
-                        .tracking(1)
+                        .kerning(1)
                 }
                 .frame(maxWidth: .infinity)
                 .padding(.vertical, 12)
@@ -552,7 +594,6 @@ struct FooterBar: View {
             }
             .buttonStyle(GradientButtonStyle())
 
-            // INJECT button
             Button(action: handleInject) {
                 HStack(spacing: 6) {
                     if state.isInjecting {
@@ -565,7 +606,7 @@ struct FooterBar: View {
                     }
                     Text(state.isInjecting ? "DANG INJECT..." : "INJECT")
                         .font(.system(size: 12, weight: .black))
-                        .tracking(1.5)
+                        .kerning(1.5)
                 }
                 .frame(maxWidth: .infinity)
                 .padding(.vertical, 16)
@@ -574,7 +615,8 @@ struct FooterBar: View {
                         colors: state.isInjecting
                             ? [Theme.smoke, Theme.smoke2]
                             : [Theme.sea1, Theme.sea2, Theme.red1],
-                        startPoint: .leading, endPoint: .trailing)
+                        startPoint: .leading,
+                        endPoint: .trailing)
                 )
                 .foregroundColor(.white)
                 .cornerRadius(14)
@@ -683,12 +725,10 @@ struct ToastView: View {
 
     var body: some View {
         HStack(spacing: 8) {
-            Circle()
-                .fill(Theme.sea2)
-                .frame(width: 6, height: 6)
+            Circle().fill(Theme.sea2).frame(width: 6, height: 6)
             Text(text)
                 .font(.system(size: 12, weight: .heavy))
-                .tracking(1)
+                .kerning(1)
                 .foregroundColor(.white)
         }
         .padding(.horizontal, 20)
@@ -697,9 +737,11 @@ struct ToastView: View {
         .cornerRadius(14)
         .overlay(
             RoundedRectangle(cornerRadius: 14)
-                .stroke(LinearGradient(
-                    colors: [Theme.sea1, Theme.sea2, Theme.red1],
-                    startPoint: .leading, endPoint: .trailing),
+                .stroke(
+                    LinearGradient(
+                        colors: [Theme.sea1, Theme.sea2, Theme.red1],
+                        startPoint: .leading,
+                        endPoint: .trailing),
                     lineWidth: 1)
         )
         .shadow(color: Theme.sea2.opacity(0.5), radius: 14)
@@ -731,10 +773,12 @@ struct InjectOverlay: View {
                         .frame(width: 120, height: 120)
                     Circle()
                         .trim(from: 0, to: progress)
-                        .stroke(LinearGradient(
-                            colors: [Theme.sea1, Theme.sea2, Theme.red1],
-                            startPoint: .topLeading, endPoint: .bottomTrailing),
-                                style: StrokeStyle(lineWidth: 6, lineCap: .round))
+                        .stroke(
+                            LinearGradient(
+                                colors: [Theme.sea1, Theme.sea2, Theme.red1],
+                                startPoint: .topLeading,
+                                endPoint: .bottomTrailing),
+                            style: StrokeStyle(lineWidth: 6, lineCap: .round))
                         .frame(width: 120, height: 120)
                         .rotationEffect(.degrees(-90))
 
@@ -746,12 +790,12 @@ struct InjectOverlay: View {
 
                 Text(message)
                     .font(.system(size: 13, weight: .black))
-                    .tracking(2)
+                    .kerning(2)
                     .foregroundColor(.white)
 
                 Text("ZWILZ HLONG UTRAL ENGINE")
                     .font(.system(size: 9, weight: .heavy))
-                    .tracking(3)
+                    .kerning(3)
                     .foregroundColor(Theme.smoke2)
             }
         }
@@ -1081,24 +1125,31 @@ struct GameCard: View {
     var body: some View {
         Button(action: onTap) {
             HStack(spacing: 10) {
-                Text(icon)
-                    .font(.system(size: 16, weight: .black))
-                    .foregroundColor(.white)
-                    .frame(width: 40, height: 40)
-                    .background(
-                        Group {
-                            if selected {
-                                LinearGradient(colors: [Theme.sea1, Theme.sea2],
-                                               startPoint: .topLeading, endPoint: .bottomTrailing)
-                            } else {
-                                LinearGradient(colors: [Color.white.opacity(0.08),
-                                                        Color.white.opacity(0.03)],
-                                               startPoint: .top, endPoint: .bottom)
-                            }
-                        }
-                    )
-                    .cornerRadius(11)
-                    .overlay(RoundedRectangle(cornerRadius: 11).stroke(Color.white.opacity(0.1), lineWidth: 1))
+                ZStack {
+                    if selected {
+                        RoundedRectangle(cornerRadius: 11)
+                            .fill(
+                                LinearGradient(
+                                    colors: [Theme.sea1, Theme.sea2],
+                                    startPoint: .topLeading,
+                                    endPoint: .bottomTrailing)
+                            )
+                            .frame(width: 40, height: 40)
+                    } else {
+                        RoundedRectangle(cornerRadius: 11)
+                            .fill(
+                                LinearGradient(
+                                    colors: [Color.white.opacity(0.08), Color.white.opacity(0.03)],
+                                    startPoint: .top,
+                                    endPoint: .bottom)
+                            )
+                            .frame(width: 40, height: 40)
+                    }
+                    Text(icon)
+                        .font(.system(size: 16, weight: .black))
+                        .foregroundColor(.white)
+                }
+                .overlay(RoundedRectangle(cornerRadius: 11).stroke(Color.white.opacity(0.1), lineWidth: 1))
 
                 VStack(alignment: .leading, spacing: 3) {
                     Text(name)
@@ -1113,7 +1164,7 @@ struct GameCard: View {
 
                 Text(selected ? "ON" : "OFF")
                     .font(.system(size: 11, weight: .black))
-                    .tracking(1)
+                    .kerning(1)
                     .foregroundColor(selected ? Theme.sea2 : Theme.smoke2)
                     .frame(width: 42, height: 26)
                     .background(selected ? Theme.sea1.opacity(0.2) : Color.white.opacity(0.05))
@@ -1122,12 +1173,16 @@ struct GameCard: View {
             .padding(.horizontal, 14)
             .padding(.vertical, 12)
             .background(
-                Group {
+                ZStack {
                     if selected {
-                        LinearGradient(colors: [Theme.sea1.opacity(0.2),
-                                                Theme.dark2.opacity(0.85),
-                                                Theme.red1.opacity(0.15)],
-                                       startPoint: .topLeading, endPoint: .bottomTrailing)
+                        LinearGradient(
+                            colors: [
+                                Theme.sea1.opacity(0.2),
+                                Theme.dark2.opacity(0.85),
+                                Theme.red1.opacity(0.15)
+                            ],
+                            startPoint: .topLeading,
+                            endPoint: .bottomTrailing)
                     } else {
                         Color.white.opacity(0.03)
                     }
