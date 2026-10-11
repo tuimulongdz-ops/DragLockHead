@@ -61,31 +61,35 @@ struct MainMenuContent: View {
     @ObservedObject var state: StateManager
 
     var body: some View {
-        ZStack {
-            menuBg
-            VStack(spacing: 6) {
-                HeaderBar(state: state)
-                HudRow(state: state)
-                TabBar(state: state)
-                scrollArea
-                FooterBar(state: state)
-            }
-            .padding(.horizontal, 8)
-            .padding(.top, 2)
-            .padding(.bottom, 2)
-            .simultaneousGesture(
-                DragGesture(minimumDistance: 0)
-                    .onEnded { v in
-                        state.addRipple(at: v.location)
-                    }
-            )
-            TapRippleLayer(ripples: state.ripples)
-            toastLayer
-            if state.cleanActive {
-                CleanOverlay(state: state).zIndex(1000)
-            }
-            if state.isInjecting {
-                InjectOverlay(state: state).zIndex(1001)
+        GeometryReader { geo in
+            ZStack {
+                menuBg
+                VStack(spacing: 6) {
+                    HeaderBar(state: state)
+                    HudRow(state: state)
+                    TabBar(state: state)
+                    scrollArea
+                    FooterBar(state: state)
+                }
+                .frame(width: geo.size.width - 16)
+                .frame(maxHeight: .infinity)
+                .padding(.horizontal, 8)
+                .padding(.top, 2)
+                .padding(.bottom, 2)
+                .simultaneousGesture(
+                    DragGesture(minimumDistance: 0)
+                        .onEnded { v in
+                            state.addRipple(at: v.location)
+                        }
+                )
+                TapRippleLayer(ripples: state.ripples)
+                toastLayer
+                if state.cleanActive {
+                    CleanOverlay(state: state).zIndex(1000)
+                }
+                if state.isInjecting {
+                    InjectOverlay(state: state).zIndex(1001)
+                }
             }
         }
     }
@@ -96,7 +100,9 @@ struct MainMenuContent: View {
                 contentForTab
             }
             .padding(.vertical, 6)
+            .frame(maxWidth: .infinity)
         }
+        .frame(maxWidth: .infinity)
     }
 
     @ViewBuilder
@@ -169,10 +175,11 @@ struct HeaderBar: View {
         HStack(spacing: 8) {
             avatarBadge
             titleBlock
-            Spacer()
+            Spacer(minLength: 4)
             StatusDot()
         }
         .padding(8)
+        .frame(maxWidth: .infinity)
         .background(
             RoundedRectangle(cornerRadius: 14)
                 .fill(
@@ -265,10 +272,13 @@ struct HeaderBar: View {
                 .font(.system(size: 11.5, weight: .black))
                 .foregroundColor(state.accentColor)
                 .lineLimit(1)
+                .minimumScaleFactor(0.7)
             Text("SUPER MENU V15")
                 .font(.system(size: 7.5, weight: .bold))
                 .foregroundColor(Color(hex: "9ca3af"))
+                .lineLimit(1)
         }
+        .layoutPriority(1)
     }
 }
 
@@ -336,6 +346,7 @@ struct HudRow: View {
                 color: Color(hex: "a855f7")
             )
         }
+        .frame(maxWidth: .infinity)
     }
 
     private var batteryIcon: String {
@@ -368,6 +379,7 @@ struct HudItem: View {
                 Text(label)
                     .font(.system(size: 7, weight: .heavy))
                     .foregroundColor(Color(hex: "9ca3af"))
+                    .lineLimit(1)
             }
             Text(value)
                 .font(.system(
@@ -376,6 +388,8 @@ struct HudItem: View {
                     design: .monospaced
                 ))
                 .foregroundColor(color)
+                .lineLimit(1)
+                .minimumScaleFactor(0.6)
         }
         .frame(maxWidth: .infinity)
         .padding(.vertical, 5)
@@ -430,19 +444,26 @@ struct TabBar: View {
         "gearshape.fill"
     ]
 
+    private let columns: [GridItem] = [
+        GridItem(.flexible(), spacing: 4),
+        GridItem(.flexible(), spacing: 4),
+        GridItem(.flexible(), spacing: 4),
+        GridItem(.flexible(), spacing: 4),
+        GridItem(.flexible(), spacing: 4)
+    ]
+
     var body: some View {
-        ScrollView(.horizontal, showsIndicators: false) {
-            HStack(spacing: 4) {
-                ForEach(0..<keys.count, id: \.self) { i in
-                    tabBtn(
-                        key: keys[i],
-                        label: labels[i],
-                        icon: icons[i]
-                    )
-                }
+        LazyVGrid(columns: columns, spacing: 4) {
+            ForEach(0..<keys.count, id: \.self) { i in
+                tabBtn(
+                    key: keys[i],
+                    label: labels[i],
+                    icon: icons[i]
+                )
             }
-            .padding(3)
         }
+        .padding(4)
+        .frame(maxWidth: .infinity)
         .background(Color.white.opacity(0.045))
         .cornerRadius(12)
         .overlay(
@@ -481,22 +502,26 @@ struct TabBar: View {
                         startPoint: .leading,
                         endPoint: .trailing
                     )
-                    .cornerRadius(9)
+                    .cornerRadius(7)
                     .shadow(
                         color: state.accentColor.opacity(0.5),
-                        radius: 6
+                        radius: 5
                     )
                 }
-                HStack(spacing: 4) {
+                VStack(spacing: 2) {
                     Image(systemName: icon)
-                        .font(.system(size: 8, weight: .bold))
+                        .font(.system(size: 10, weight: .bold))
                     Text(label)
-                        .font(.system(size: 9, weight: .heavy))
+                        .font(.system(size: 7.5, weight: .heavy))
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.6)
                 }
                 .foregroundColor(tabColor(key))
-                .padding(.horizontal, 9)
-                .padding(.vertical, 7)
+                .padding(.vertical, 6)
+                .padding(.horizontal, 2)
+                .frame(maxWidth: .infinity)
             }
+            .frame(maxWidth: .infinity)
         }
         .buttonStyle(.plain)
     }
@@ -543,8 +568,11 @@ struct SectionTitle: View {
             Text(text)
                 .font(.system(size: 9, weight: .black))
                 .foregroundColor(Color(hex: "00d4ff"))
-            Spacer()
+                .lineLimit(1)
+                .minimumScaleFactor(0.7)
+            Spacer(minLength: 0)
         }
+        .frame(maxWidth: .infinity)
         .padding(.horizontal, 2)
         .padding(.top, 4)
     }
@@ -561,7 +589,7 @@ struct FeatureCard: View {
     @State private var showCode: Bool = false
 
     var body: some View {
-        HStack(spacing: 0) {
+        HStack(spacing: 6) {
             Button(action: onToggle) {
                 cardContent
             }
@@ -572,6 +600,7 @@ struct FeatureCard: View {
         }
         .padding(.horizontal, 10)
         .padding(.vertical, 8)
+        .frame(maxWidth: .infinity)
         .background(bgLayer)
         .cornerRadius(12)
         .overlay(strokeLayer)
@@ -598,7 +627,7 @@ struct FeatureCard: View {
         HStack(spacing: 9) {
             iconBox
             textBox
-            Spacer()
+            Spacer(minLength: 4)
             switchView
         }
     }
@@ -626,7 +655,7 @@ struct FeatureCard: View {
                     )
             )
         }
-        .padding(.leading, 4)
+        .layoutPriority(2)
     }
 
     private var iconBox: some View {
@@ -664,6 +693,7 @@ struct FeatureCard: View {
                     lineWidth: 1
                 )
         )
+        .layoutPriority(2)
     }
 
     private var iconColor: Color {
@@ -679,11 +709,14 @@ struct FeatureCard: View {
                 .font(.system(size: 11, weight: .bold))
                 .foregroundColor(.white)
                 .lineLimit(1)
+                .minimumScaleFactor(0.6)
             Text(subtitle)
                 .font(.system(size: 8.5))
                 .foregroundColor(Color(hex: "9ca3af"))
                 .lineLimit(1)
+                .minimumScaleFactor(0.6)
         }
+        .layoutPriority(1)
     }
 
     private var switchView: some View {
@@ -719,6 +752,8 @@ struct FeatureCard: View {
                 )
                 .offset(x: isOn ? 9 : -9)
         }
+        .frame(width: 40, height: 22)
+        .layoutPriority(3)
     }
 
     private var bgLayer: some View {
@@ -788,7 +823,9 @@ struct SimpleCodeView: View {
             Text(title)
                 .font(.system(size: 15, weight: .black))
                 .foregroundColor(.white)
-            Spacer()
+                .lineLimit(1)
+                .minimumScaleFactor(0.6)
+            Spacer(minLength: 4)
             Button(action: {
                 pm.wrappedValue.dismiss()
             }) {
@@ -902,6 +939,7 @@ struct AimTab: View {
                 buildCard(items[i])
             }
         }
+        .frame(maxWidth: .infinity)
     }
 
     private func buildCard(_ e: MenuEntry) -> some View {
@@ -949,6 +987,7 @@ struct AdvancedTab: View {
                 buildCard(items[i])
             }
         }
+        .frame(maxWidth: .infinity)
     }
 
     private func buildCard(_ e: MenuEntry) -> some View {
@@ -1029,6 +1068,7 @@ struct CleanTab: View {
                 cleanBtn("ALL", "bolt.fill", "DỌN TẤT CẢ")
             }
         }
+        .frame(maxWidth: .infinity)
     }
 
     private func buildCard(_ e: MenuEntry) -> some View {
@@ -1064,6 +1104,8 @@ struct CleanTab: View {
                         weight: .black
                     ))
                     .foregroundColor(.white)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.6)
             }
             .frame(maxWidth: .infinity)
             .padding(.vertical, 10)
@@ -1140,6 +1182,7 @@ struct PerfTab: View {
                 )
             }
         }
+        .frame(maxWidth: .infinity)
     }
 
     private var chargingText: String {
@@ -1225,6 +1268,7 @@ struct GameTab: View {
                 )
             }
         }
+        .frame(maxWidth: .infinity)
     }
 
     private func gameName() -> String {
@@ -1290,6 +1334,8 @@ struct GameCard: View {
                             lineWidth: 1
                         )
                 )
+                .layoutPriority(2)
+
                 VStack(
                     alignment: .leading,
                     spacing: 2
@@ -1300,13 +1346,20 @@ struct GameCard: View {
                             weight: .bold
                         ))
                         .foregroundColor(.white)
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.6)
                     Text(id)
                         .font(.system(size: 8.5))
                         .foregroundColor(
                             Color(hex: "9ca3af")
                         )
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.6)
                 }
-                Spacer()
+                .layoutPriority(1)
+
+                Spacer(minLength: 4)
+
                 Text(onOffText)
                     .font(.system(
                         size: 10,
@@ -1316,9 +1369,11 @@ struct GameCard: View {
                     .frame(width: 38, height: 22)
                     .background(onOffBg)
                     .cornerRadius(7)
+                    .layoutPriority(3)
             }
             .padding(.horizontal, 10)
             .padding(.vertical, 8)
+            .frame(maxWidth: .infinity)
             .background(bg)
             .cornerRadius(12)
             .overlay(stroke)
@@ -1423,10 +1478,10 @@ struct ThemeTab: View {
             SectionTitle(text: "MÀU CHỦ ĐỀ", icon: "paintpalette.fill")
             LazyVGrid(
                 columns: [
-                    GridItem(.flexible()),
-                    GridItem(.flexible()),
-                    GridItem(.flexible()),
-                    GridItem(.flexible())
+                    GridItem(.flexible(), spacing: 6),
+                    GridItem(.flexible(), spacing: 6),
+                    GridItem(.flexible(), spacing: 6),
+                    GridItem(.flexible(), spacing: 6)
                 ],
                 spacing: 8
             ) {
@@ -1440,6 +1495,7 @@ struct ThemeTab: View {
                     }
                 }
             }
+            .frame(maxWidth: .infinity)
 
             SectionTitle(text: "HIỆU ỨNG NỀN", icon: "wand.and.stars")
             ForEach(0..<effectKeys.count, id: \.self) { i in
@@ -1471,6 +1527,7 @@ struct ThemeTab: View {
                 )
             }
         }
+        .frame(maxWidth: .infinity)
     }
 
     private func countEffects() -> Int {
@@ -1498,25 +1555,25 @@ struct ThemeSwatch: View {
             UIImpactFeedbackGenerator(style: .medium)
                 .impactOccurred()
         }) {
-            VStack(spacing: 4) {
+            VStack(spacing: 3) {
                 ZStack {
-                    RoundedRectangle(cornerRadius: 10)
+                    RoundedRectangle(cornerRadius: 8)
                         .fill(Color(hex: hex))
-                        .frame(height: 34)
+                        .frame(height: 30)
                         .shadow(
                             color: Color(hex: hex).opacity(0.5),
-                            radius: 5
+                            radius: 4
                         )
                     if selected {
-                        RoundedRectangle(cornerRadius: 10)
+                        RoundedRectangle(cornerRadius: 8)
                             .stroke(
                                 Color.white,
                                 lineWidth: 2
                             )
-                            .frame(height: 34)
+                            .frame(height: 30)
                         Image(systemName: "checkmark")
                             .font(.system(
-                                size: 14,
+                                size: 12,
                                 weight: .black
                             ))
                             .foregroundColor(.white)
@@ -1528,10 +1585,12 @@ struct ThemeSwatch: View {
                 }
                 Text(name)
                     .font(.system(
-                        size: 7.5,
+                        size: 7,
                         weight: .heavy
                     ))
                     .foregroundColor(labelColor)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.5)
             }
         }
         .buttonStyle(.plain)
@@ -1632,6 +1691,7 @@ struct AccessTab: View {
                 InfoRow(key: "THAY THẾ", value: "TRỢ NĂNG HỆ THỐNG")
             }
         }
+        .frame(maxWidth: .infinity)
     }
 
     private func buildCard(_ e: MenuEntry) -> some View {
@@ -1665,6 +1725,8 @@ struct AccessTab: View {
                 Text(title)
                     .font(.system(size: 9, weight: .black))
                     .foregroundColor(.white)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.6)
             }
             .frame(maxWidth: .infinity)
             .padding(.vertical, 11)
@@ -1702,7 +1764,9 @@ struct AccessTab: View {
                 Text(title)
                     .font(.system(size: 10, weight: .black))
                     .foregroundColor(state.accentColor)
-                Spacer()
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.7)
+                Spacer(minLength: 0)
             }
             Text(content)
                 .font(.system(size: 9))
@@ -1789,6 +1853,8 @@ struct SystemTab: View {
                         .font(.system(size: 12, weight: .bold))
                     Text("INJECT + MỞ GAME")
                         .font(.system(size: 11.5, weight: .black))
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.7)
                 }
                 .foregroundColor(.white)
                 .frame(maxWidth: .infinity)
@@ -1836,6 +1902,7 @@ struct SystemTab: View {
                 }
             }
         }
+        .frame(maxWidth: .infinity)
     }
 
     private func tier() -> String {
@@ -1898,6 +1965,8 @@ struct SystemTab: View {
                         size: 11,
                         weight: .black
                     ))
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.7)
             }
             .foregroundColor(.white)
             .frame(maxWidth: .infinity)
@@ -1937,6 +2006,7 @@ struct InfoCard<Content: View>: View {
             content
         }
         .padding(9)
+        .frame(maxWidth: .infinity)
         .background(
             RoundedRectangle(cornerRadius: 10)
                 .fill(Color.white.opacity(0.03))
@@ -1956,11 +2026,14 @@ struct InfoRow: View {
     let value: String
 
     var body: some View {
-        HStack {
+        HStack(spacing: 4) {
             Text(key)
                 .font(.system(size: 9.5, weight: .heavy))
                 .foregroundColor(Color(hex: "9ca3af"))
-            Spacer()
+                .lineLimit(1)
+                .minimumScaleFactor(0.7)
+                .layoutPriority(1)
+            Spacer(minLength: 4)
             Text(value)
                 .font(.system(
                     size: 10,
@@ -1969,7 +2042,10 @@ struct InfoRow: View {
                 ))
                 .foregroundColor(Color(hex: "00d4ff"))
                 .lineLimit(1)
+                .minimumScaleFactor(0.6)
+                .layoutPriority(2)
         }
+        .frame(maxWidth: .infinity)
         .padding(.vertical, 4)
         .padding(.horizontal, 3)
     }
@@ -1987,6 +2063,8 @@ struct ToastView: View {
             Text(text)
                 .font(.system(size: 11, weight: .black))
                 .foregroundColor(.white)
+                .lineLimit(1)
+                .minimumScaleFactor(0.7)
         }
         .padding(.horizontal, 14)
         .padding(.vertical, 10)
@@ -2042,6 +2120,8 @@ struct InjectOverlay: View {
                         .foregroundColor(.white)
                         .multilineTextAlignment(.center)
                         .padding(.horizontal, 20)
+                        .lineLimit(2)
+                        .minimumScaleFactor(0.7)
 
                     Text("VUI LÒNG CHỜ" + dots)
                         .font(.system(
@@ -2175,6 +2255,7 @@ struct InjectOverlay: View {
             }
         }
         .padding(.horizontal, 40)
+        .frame(maxWidth: .infinity)
     }
 
     private var stepBox: some View {
@@ -2192,6 +2273,8 @@ struct InjectOverlay: View {
                     weight: .heavy
                 ))
                 .foregroundColor(Color(hex: "9ca3af"))
+                .lineLimit(1)
+                .minimumScaleFactor(0.7)
         }
         .padding(.horizontal, 12)
         .padding(.vertical, 7)
@@ -2230,6 +2313,7 @@ struct InjectOverlay: View {
             Text("KHÔNG THOÁT ỨNG DỤNG")
                 .font(.system(size: 9, weight: .heavy))
                 .foregroundColor(Color(hex: "6b7280"))
+                .lineLimit(1)
         }
     }
 
@@ -2269,21 +2353,27 @@ struct FooterBar: View {
             Text("HOẠT ĐỘNG")
                 .font(.system(size: 8.5, weight: .heavy))
                 .foregroundColor(Color(hex: "22c55e"))
+                .lineLimit(1)
             Text("|")
                 .foregroundColor(Color(hex: "6b7280"))
             Text("\(state.activeCount()) CHỨC NĂNG")
                 .font(.system(size: 8.5, weight: .heavy))
                 .foregroundColor(Color(hex: "9ca3af"))
-            Spacer()
+                .lineLimit(1)
+                .minimumScaleFactor(0.6)
+            Spacer(minLength: 4)
             Image(systemName: "shield.lefthalf.filled")
                 .font(.system(size: 7.5))
                 .foregroundColor(Color.white.opacity(0.3))
             Text("ZWILZ HLONG V15")
                 .font(.system(size: 7.5, weight: .heavy))
                 .foregroundColor(Color.white.opacity(0.3))
+                .lineLimit(1)
+                .minimumScaleFactor(0.6)
         }
         .padding(.horizontal, 10)
         .padding(.vertical, 6)
+        .frame(maxWidth: .infinity)
         .background(Color.white.opacity(0.03))
         .cornerRadius(9)
         .overlay(
