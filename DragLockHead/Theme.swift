@@ -14,7 +14,7 @@ struct Theme {
     static let purple = Color(hex: "a855f7")
     static let cyan = Color(hex: "00ffff")
 
-    static let accentOptions: [(String, String)] = [
+    static let accents: [(String, String)] = [
         ("CYBER", "00d4ff"),
         ("MATRIX", "00ff41"),
         ("BLOOD", "ff0033"),
